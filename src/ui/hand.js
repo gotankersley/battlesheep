@@ -49,8 +49,7 @@ export class Hand {
         //}
     }
 
-    draw = (e) => {
-        return;
+    draw = (e) => {   
         //TODO: collapse into number?
         
         var ctx = this.ctx;
@@ -59,6 +58,7 @@ export class Hand {
         ctx.fillRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
         
         var player = this.player;
+        return;
         var hand = this.game.board.hands[player];	
         
         var tileImages = TileSet.activeImages[player];

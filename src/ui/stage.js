@@ -2,7 +2,7 @@ import { setHex, fillHex, strokeHex, ORIENT_FLAT, ORIENT_POINTY } from '../lib/h
 import { MenuManager } from './menu.js';
 import { PLAYER1, PLAYER2 } from '../core/board.js';
 import { Game } from '../core/game.js';
-import { Mouse } from './mouse.js';
+import { Mouse, BUTTON_LEFT } from './mouse.js';
 import { Hand, HAND_SIZE_X } from './hand.js';
 
 
@@ -11,8 +11,8 @@ import { Hand, HAND_SIZE_X } from './hand.js';
 window.CANVAS_SIZE_X;
 window.CANVAS_SIZE_Y;
 
-var CANVAS_MARGIN_X = 10;
-var CANVAS_MARGIN_Y = 10;
+window.CANVAS_MARGIN_X = 10;
+window.CANVAS_MARGIN_Y = 10;
 
 const COLOR_GRID = '#e0e0e0';
 const COLOR_MOUSE = 'rgba(0, 0, 255, 0.1)';
@@ -224,8 +224,8 @@ function draw(time) { //Top-level drawing function
         ctx.fillRect(0, 0, CANVAS_SIZE_X, CANVAS_SIZE_Y);
     }
     ctx.save();
-
-    ctx.translate(-WORLD_INIT_X, -WORLD_INIT_Y); //Offset to make drawing easier
+    
+    ctx.translate(-window.WORLD_INIT_X, -window.WORLD_INIT_Y); //Offset to make drawing easier
     
     //Perimeter
     //if (menu.showDebug && menu.showDebugPerimeter) drawPerimeter();	
@@ -277,18 +277,18 @@ function draw(time) { //Top-level drawing function
 function drawGrid_F() {
     
     //Draw grid using Odd-Q offset style						
-    var hexRowsPerScreen = Math.floor(CANVAS_SIZE_Y/HEX_SIZE_Y)+3;		
-    var hexColsPerScreen = Math.floor(2*(CANVAS_SIZE_X/HEX_SIZE_X));
+    var hexRowsPerScreen = Math.floor(window.CANVAS_SIZE_Y/window.HEX_SIZE_Y)+3;		
+    var hexColsPerScreen = Math.floor(2*(window.CANVAS_SIZE_X/window.HEX_SIZE_X));
                         
     //Rows
     for (var r = 0; r < hexRowsPerScreen; r++) { //Draw hex grid with offsets
                                         
-        var y1 = (r * HEX_SIZE_Y) + (WORLD_Y % HEX_SIZE_Y);			
-        var y2 = y1 + HEX_CENTER_GAP_Y;
+        var y1 = (r * window.HEX_SIZE_Y) + (window.WORLD_Y % window.HEX_SIZE_Y);			
+        var y2 = y1 + window.HEX_CENTER_GAP_Y;
             
         //Columns - Offset column Y-position every other iteration
         for (var c = 0; c < hexColsPerScreen; c++) {									
-            var x = (c * HEX_CENTER_GAP_X ) + (WORLD_X % HEX_DOUBLE_GAP_X);				
+            var x = (c * window.HEX_CENTER_GAP_X ) + (window.WORLD_X % window.HEX_DOUBLE_GAP_X);				
             var y = (c % 2 == 0)? y = y1 : y2;	
             
             var coord;

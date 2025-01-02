@@ -20,7 +20,7 @@ export class Mouse {
 	
 	
 		this.canvasBounds = canvas.getBoundingClientRect(); 
-		this.setBounds();		
+			
 		
 		//Events
 		canvas.addEventListener('mousemove', this.onMouseMove, false );	
@@ -32,7 +32,7 @@ export class Mouse {
 		
 
 	onMouseMove = (e) => {
-		setCoords(e);
+		this.setCoords(e);
 
 		if (this.dragging) {		
 			window.WORLD_X = this.world.x-this.click.x;
