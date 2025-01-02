@@ -8,12 +8,6 @@ import { Hand, HAND_SIZE_X } from './hand.js';
 
 
 //Constants
-window.CANVAS_SIZE_X;
-window.CANVAS_SIZE_Y;
-
-window.CANVAS_MARGIN_X = 10;
-window.CANVAS_MARGIN_Y = 10;
-
 const COLOR_GRID = '#e0e0e0';
 const COLOR_MOUSE = 'rgba(0, 0, 255, 0.1)';
 
@@ -23,35 +17,44 @@ const KEY_T = 84;
 const MESSAGE_DURATION = 3000; //MS
 const MOVE_DELAY = 200;
 
+//Globals
+window.CANVAS_SIZE_X;
+window.CANVAS_SIZE_Y;
+
+window.CANVAS_MARGIN_X = 10;
+window.CANVAS_MARGIN_Y = 10;
+
+window.menu;
+window.mouse;
+window.game;
 
 
 //Properties	
-var menu;
 var canvas;
 var ctx;	
 var tileImages; 
 var hands = [];
 var paused = false;
 var $message;
-var mouse;	
-var game;
+
+
 	
 
 export function createStage(containerId) { 
     //Menu
     var menuManager = new MenuManager();
-    menu = menuManager.properties;
+    window.menu = menuManager.properties;
     setHex(menu.orientation, HEX_SIDE);
     
     //Message popup
     $message = document.getElementById('message');
     
     //Hands
-    hands[PLAYER1] = new Hand('hand1', PLAYER1, mouse, game);
-    hands[PLAYER2] = new Hand('hand2', PLAYER2, mouse, game);
-
+    hands[PLAYER1] = new Hand('hand1', PLAYER1);
+    hands[PLAYER2] = new Hand('hand2', PLAYER2);
+    
     canvas = document.getElementById(containerId);	
-    mouse = new Mouse(canvas);
+    window.mouse = new Mouse(canvas);
     onWindowResize(); //Set canvas size
     
     WORLD_X = Math.floor(CANVAS_SIZE_X/2)+HEX_SIZE_X; //Move origin to more center of the screen
@@ -72,10 +75,10 @@ export function createStage(containerId) {
             
     
     //Game events	
-    game = new Game();
-    game.addEventListener('placed', onPlaced);
-    game.addEventListener('win', onWin);
-    game.addEventListener('moved', onMoved);
+    window.game = new Game();
+    window.game.addEventListener('placed', onPlaced);
+    window.game.addEventListener('win', onWin);
+    window.game.addEventListener('moved', onMoved);
     
     //Start rendering
     //TileSet.init(function() {			
@@ -132,9 +135,9 @@ function onBlur() {
 }
 
 function onMouseDown(e) {	
-    if (e.button == BUTTON_LEFT) {	
-        var hive = game.hive;
-        var player = hive.turn;
+    if (false && e.button == BUTTON_LEFT) {	
+        var board = game.board;
+        var player = board.turn;
         if (game.players[player] != PLAYER_HUMAN) {
             Stage.showMessage('Waiting for other player to play...');
             return;
@@ -142,7 +145,7 @@ function onMouseDown(e) {
         
         //See if a (new) tile has been selected
         var pos = mouse.axial;
-        var tile = hive.getByPos(mouse.axial);
+        var tile = board.getByPos(mouse.axial);
         var sel = mouse.selected;			
         if (tile) { //Pos is not empty				
             if (mouse.ctrlOn) mouse.selected = {q:pos.q, r:pos.r};
@@ -309,23 +312,23 @@ function drawGrid_F() {
 function drawGrid_P() {
     
     //Draw grid using Odd-R offset style						
-    var hexRowsPerScreen = Math.floor(2*(CANVAS_SIZE_Y/HEX_SIZE_Y));
-    var hexColsPerScreen = Math.floor(CANVAS_SIZE_X/HEX_SIZE_X)+3;		
+    var hexRowsPerScreen = Math.floor(2*(window.CANVAS_SIZE_Y/window.HEX_SIZE_Y));
+    var hexColsPerScreen = Math.floor(window.CANVAS_SIZE_X/window.HEX_SIZE_X)+3;		
                         
     //Rows
     for (var r = 0; r < hexRowsPerScreen; r++) { //Draw hex grid with offsets
                                         
-        var y = (r * HEX_CENTER_GAP_Y) + (WORLD_Y % HEX_DOUBLE_GAP_Y);
-        var xOffset = (r % 2 == 0)? 0 : HEX_UNIT_X;
-        xOffset += (WORLD_X % HEX_SIZE_X);	//Scrolling
+        var y = (r * window.HEX_CENTER_GAP_Y) + (window.WORLD_Y % window.HEX_DOUBLE_GAP_Y);
+        var xOffset = (r % 2 == 0)? 0 : window.HEX_UNIT_X;
+        xOffset += (window.WORLD_X % window.HEX_SIZE_X);	//Scrolling
             
         //Columns - Offset column X-position every other iteration
         for (var c = 0; c < hexColsPerScreen; c++) {									
-            var x = xOffset + (c * HEX_SIZE_X);
+            var x = xOffset + (c * window.HEX_SIZE_X);
             
             var coord;
             if (menu.showCoordinates) {
-                var axial = pixToHex(x, y);		
+                var axial = window.pixToHex(x, y);		
                 coord = axial.q + ',' + axial.r;
             }
             else coord = '';				

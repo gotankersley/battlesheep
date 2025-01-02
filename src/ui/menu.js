@@ -1,4 +1,4 @@
-import { ORIENT_FLAT, ORIENT_POINTY } from '../lib/hex-lib.js';
+import { setHex, ORIENT_FLAT, ORIENT_POINTY } from '../lib/hex-lib.js';
 import { PLAYER1, PLAYER2 } from '../core/board.js';
 import { PLAYER_HUMAN } from '../players/players.js';
 

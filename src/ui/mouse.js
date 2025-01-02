@@ -1,3 +1,5 @@
+import { setHex } from '../lib/hex-lib.js';
+
 export const BUTTON_LEFT = 0;
 export const BUTTON_MIDDLE = 1;
 
@@ -72,7 +74,7 @@ export class Mouse {
 	onMouseWheel = (e) => {
 		var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
 			
-		this.setHex(menu.orientation, HEX_SIDE + delta);
+		setHex(menu.orientation, HEX_SIDE + delta);
 		this.setBounds();
 		this.setCoords(e);
 		e.preventDefault(); //Keep screen from scrolling

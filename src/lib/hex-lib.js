@@ -82,8 +82,8 @@ function setOrient_P() {
 	window.WORLD_INIT_Y = window.HEX_SIZE_Y + window.HEX_CENTER_GAP_Y;
 	
 	//Function aliases
-	winidow.pixToHex = pixToHex_P; 
-	winidow.hexToPix = hexToPix_P;
+	window.pixToHex = pixToHex_P; 
+	window.hexToPix = hexToPix_P;
 }
 
 function setVerts() {

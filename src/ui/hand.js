@@ -14,11 +14,10 @@ var HAND_HOVER_SIZE = 10;
 //Class Hand
 export class Hand {
     
-    constructor(container, player, mouse, game) {
+    constructor(container, player) {
         this.canvas = document.getElementById(container);		
         this.ctx = this.canvas.getContext('2d');  					
-        this.player = player;
-        this.game = game;
+        this.player = player;        
         this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this), false );	
         this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this), false );	
         var self = this;
@@ -28,24 +27,23 @@ export class Hand {
             e.preventDefault();
         };
         this.hover = null;
-        this.selected = null;
-        this.mouse = mouse;
+        this.selected = null;        
     }
 
     onMouseMove = (e) => {
         if (e.button == BUTTON_LEFT) { 
-            var x = e.clientX - this.mouse.canvasBounds.left; 
-            var y = e.clientY - this.mouse.canvasBounds.top;
+            var x = e.clientX - window.mouse.canvasBounds.left; 
+            var y = e.clientY - window.mouse.canvasBounds.top;
             //if (this.player == game.hive.turn || Mouse.ctrlOn) this.hover = Math.floor((y-HAND_MARGIN_Y)/HAND_TILE_Y);
         }
     }
 
     onMouseDown = (e) => {
-        var x = e.clientX - this.mouse.canvasBounds.left; 
-        var y = e.clientY - this.mouse.canvasBounds.top;
+        var x = e.clientX - window.mouse.canvasBounds.left; 
+        var y = e.clientY - window.mouse.canvasBounds.top;
         //if (this.player == game.hive.turn || Mouse.ctrlOn) {
         //    this.selected = Math.floor((y-HAND_MARGIN_Y)/HAND_TILE_Y);
-        //    this.mouse.selected = null;
+        //    window.mouse.selected = null;
         //}
     }
 
@@ -59,7 +57,7 @@ export class Hand {
         
         var player = this.player;
         return;
-        var hand = this.game.board.hands[player];	
+        var hand = window.game.board.hands[player];	
         
         var tileImages = TileSet.activeImages[player];
 
