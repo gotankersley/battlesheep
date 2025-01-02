@@ -1,0 +1,50 @@
+html, body { /* Remove default padding around page */
+	margin: 0;
+	padding: 0
+}
+/* GRID
+#grid {
+	z-index: 1; 
+	position: absolute; 
+	left:0px; 
+	top:0px;
+}  */
+
+/* MESSAGE */
+#message {	
+    background: rgb(232,232,255); /* Old browsers */
+    /*
+	background: rgb(242,245,246); 
+	background: -moz-linear-gradient(top,  rgba(242,245,246,1) 0%, rgba(227,234,237,1) 37%, rgba(200,215,220,1) 100%);
+	background: -webkit-linear-gradient(top,  rgba(242,245,246,1) 0%,rgba(227,234,237,1) 37%,rgba(200,215,220,1) 100%);
+	background: linear-gradient(to bottom,  rgba(242,245,246,1) 0%,rgba(227,234,237,1) 37%,rgba(200,215,220,1) 100%); 
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2f5f6', endColorstr='#c8d7dc',GradientType=0 );
+	*/
+	display: none;
+	color: white;
+	text-shadow: 3px 0px 2px rgba(150, 150, 150, 0.5);
+	font-size: 20px;
+	font-family: arial;			
+	
+	position: absolute;	
+	padding: 10px;			
+	margin: 0;	
+	top: 0;
+	min-width: 200px;
+}
+		
+/* HAND */	
+.hand {
+	position:absolute;
+	top: 0;
+}
+
+/* GRAPH */
+#graph {
+    width: 600px;
+    height: 400px;
+    border: 1px solid lightgray;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
