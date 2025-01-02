@@ -16,21 +16,11 @@ function MenuProperties() {
 	this.player2 = PLAYER_HUMAN;
 
     //Debug
-    this.showDebug = false; 
-    this.showDebugTable = false; //Clears console
-    this.showDebugAnt = true;
-    this.showDebugBeetle = true;
-    this.showDebugHopper = true;
-    this.showDebugQueen = true;
-    this.showDebugSpider = true;
-    this.showDebugCoords = false;
-    this.showDebugPerimeter = true;
-    this.showDebugPlaces = true;
-    this.showDebugFrozen = true;
+    this.showMoves = false; 
     
     //Graph
-    this.showGraph = true;
-    this.showPerimeter = false;    
+    //this.showGraph = true;
+    //this.showPerimeter = false;    
     
     //Deprecated
     this.save = function() { game.save(); }
@@ -57,25 +47,14 @@ export function MenuManager() {
 	//optionsMenu.add(this.properties, 'tileSet2', tileSetNames).onChange(this.onChangeTileSet.bind(this, PLAYER2));
 	
 	//Debug
-	var debugMenu = this.rootMenu.addFolder('Debug');				
-    debugMenu.add(this.properties, 'showDebug');
-    debugMenu.add(this.properties, 'showDebugAnt');
-    debugMenu.add(this.properties, 'showDebugBeetle');
-    debugMenu.add(this.properties, 'showDebugHopper');
-    debugMenu.add(this.properties, 'showDebugQueen');
-    debugMenu.add(this.properties, 'showDebugSpider');
-    debugMenu.add(this.properties, 'showDebugCoords');
-    debugMenu.add(this.properties, 'showDebugFrozen');
-    debugMenu.add(this.properties, 'showDebugPerimeter');
-    debugMenu.add(this.properties, 'showDebugPlaces');
-    debugMenu.add(this.properties, 'showDebugTable');
-	//debugMenu.add(this.properties, 'showMoves');
+	var debugMenu = this.rootMenu.addFolder('Debug');				    
+	debugMenu.add(this.properties, 'showMoves');
           
     
     //Graph
-	var graphMenu = this.rootMenu.addFolder('Graph');			
-	graphMenu.add(this.properties, 'showGraph').onChange(this.onToggleGraph.bind(this));	
-	graphMenu.add(this.properties, 'showPerimeter');	    
+	//var graphMenu = this.rootMenu.addFolder('Graph');			
+	//graphMenu.add(this.properties, 'showGraph').onChange(this.onToggleGraph.bind(this));	
+	//graphMenu.add(this.properties, 'showPerimeter');	    
     
     //Deprecated
     //debugMenu.add(this.properties, 'save');
