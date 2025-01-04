@@ -1,5 +1,6 @@
 import { setHex, fillHex, strokeHex, ORIENT_FLAT, ORIENT_POINTY } from '../lib/hex-lib.js';
 import { MenuManager } from './menu.js';
+import { TileSet } from './tile-set.js';
 import { PLAYER1, PLAYER2 } from '../core/board.js';
 import { Game } from '../core/game.js';
 import { Mouse, BUTTON_LEFT } from './mouse.js';
@@ -27,12 +28,13 @@ window.CANVAS_MARGIN_Y = 10;
 window.menu;
 window.mouse;
 window.game;
+window.tileSet;
 
 
 //Properties	
 var canvas;
 var ctx;	
-var tileImages; 
+//var tileImages; 
 var hands = [];
 var paused = false;
 var $message;
@@ -81,9 +83,9 @@ export function createStage(containerId) {
     window.game.addEventListener('moved', onMoved);
     
     //Start rendering
-    //TileSet.init(function() {			
+    window.tileSet = new TileSet(function() {    
         draw();
-    //}); 
+    }); 
 }
 
 function showMessage(text) {
@@ -245,7 +247,7 @@ function draw(time) { //Top-level drawing function
                 
     //Tiles
     //if (mouse.selected) drawTileHighlight();
-    //drawTiles();				
+    drawTiles();				
     
     //PlacePoints
     //if (menu.showDebug && menu.showDebugPlaces) drawPlacePoints();
@@ -369,7 +371,11 @@ function drawTileHighlight() {
 }
 	
 function drawTiles() {
+    var px = hexToPix({q:0, r:0});
+    tileSet.draw(ctx, px.x, px.y, 4, PLAYER1);
     
+    var px1 = hexToPix({q:1, r:1});
+    tileSet.draw(ctx, px1.x, px1.y, 5, PLAYER2);
     /*
     var posKeys = Object.keys(game.board.grid);		
     

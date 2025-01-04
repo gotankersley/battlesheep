@@ -1,4 +1,5 @@
 import { setHex, ORIENT_FLAT, ORIENT_POINTY } from '../lib/hex-lib.js';
+import { getTileSetNames } from './tile-set.js';
 import { PLAYER1, PLAYER2 } from '../core/board.js';
 import { PLAYER_HUMAN } from '../players/players.js';
 
@@ -42,9 +43,9 @@ export function MenuManager() {
 	optionsMenu.add(this.properties, 'midnight');	
 	optionsMenu.add(this.properties, 'orientation', {flat:ORIENT_FLAT, pointy:ORIENT_POINTY}).onChange(this.onChangeOrientation);
 		
-	//var tileSetNames = TileSet.getNames();
-	//optionsMenu.add(this.properties, 'tileSet1', tileSetNames).onChange(this.onChangeTileSet.bind(this, PLAYER1));
-	//optionsMenu.add(this.properties, 'tileSet2', tileSetNames).onChange(this.onChangeTileSet.bind(this, PLAYER2));
+	var tileSetNames = getTileSetNames();
+	optionsMenu.add(this.properties, 'tileSet1', tileSetNames).onChange(this.onChangeTileSet.bind(this, PLAYER1));
+	optionsMenu.add(this.properties, 'tileSet2', tileSetNames).onChange(this.onChangeTileSet.bind(this, PLAYER2));
 	
 	//Debug
 	var debugMenu = this.rootMenu.addFolder('Debug');				    
@@ -70,7 +71,7 @@ export function MenuManager() {
 
 //Events
 MenuManager.prototype.onChangeTileSet = function(player, val) {	
-	TileSet.setActive(parseInt(player), parseInt(val));	
+	tileSet.setActive(parseInt(player), parseInt(val));	
 }
 
 MenuManager.prototype.onChangePlayer = function(player, val) {		
@@ -82,8 +83,8 @@ MenuManager.prototype.onChangeOrientation = function(val) {
 	setHex(menu.orientation, window.HEX_SIDE);
 }
 
-MenuManager.prototype.onToggleGraph = function(val) {	
-    var graph = document.getElementById('graph');
-    if (val) graph.style.display = 'block';
-    else graph.style.display = 'none';
-}
+//MenuManager.prototype.onToggleGraph = function(val) {	
+//    var graph = document.getElementById('graph');
+//    if (val) graph.style.display = 'block';
+//    else graph.style.display = 'none';
+//}
