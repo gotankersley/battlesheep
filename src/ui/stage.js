@@ -10,6 +10,7 @@ import { Hand, HAND_SIZE_X } from './hand.js';
 
 //Constants
 const COLOR_GRID = '#e0e0e0';
+const COLOR_BLACK = '#000';
 const COLOR_MOUSE = 'rgba(0, 0, 255, 0.1)';
 
 const KEY_DELETE = 46;
@@ -62,7 +63,8 @@ export function createStage(containerId) {
     WORLD_X = Math.floor(CANVAS_SIZE_X/2)+HEX_SIZE_X; //Move origin to more center of the screen
     WORLD_Y = Math.floor(CANVAS_SIZE_Y/2)+HEX_SIZE_Y;
     
-    ctx = canvas.getContext('2d');  				
+    ctx = canvas.getContext('2d');  
+    ctx.fillStyle = COLOR_BLACK;
     
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
@@ -371,21 +373,17 @@ function drawTileHighlight() {
 }
 	
 function drawTiles() {
-    var px = hexToPix({q:0, r:0});
-    tileSet.draw(ctx, px.x, px.y, 4, PLAYER1);
-    
-    var px1 = hexToPix({q:1, r:1});
-    tileSet.draw(ctx, px1.x, px1.y, 5, PLAYER2);
-    /*
+
     var posKeys = Object.keys(game.board.grid);		
     
     for (var t = 0; t < posKeys.length; t++) {
         var posKey = posKeys[t];
         var tile = game.board.grid[posKey];
         var px = hexToPix(tile.pos);
-        var tx = px.x;
-        var ty = px.y;
-        if (mouse.onScreen(tx, ty)) {
+        
+        tileSet.draw(ctx, px.x, px.y, 5, tile.player, false, tile.count);
+		
+        /*if (mouse.onScreen(tx, ty)) {
             //Check for tiles on top (stacks) - bottom to top
             if (tile.type == STACK) {
                 for (var s = 0; s < tile.stack.length; s++) {
@@ -397,9 +395,10 @@ function drawTiles() {
             else TileSet.draw(ctx, tx, ty, tile.type, tile.player);
             
         }
+        */
 
     }		
-    */
+    
 }
 	
 function drawPerimeter() {

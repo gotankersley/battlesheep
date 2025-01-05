@@ -56,31 +56,31 @@ export class Hand {
         ctx.fillRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
         
         var player = this.player;
-        return;
-        var hand = window.game.board.hands[player];	
         
-        var tileImages = TileSet.activeImages[player];
+        //var hand = window.game.board.hands[player];	
+        
+        var tileImages = tileSet.activeImages[player];
 
         //Highlight selected - draw layer below 
-        for (var h = 0; h < hand.length; h++) {
-            var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
-                    
-            if (this.selected == h) {
-                ctx.fillStyle = COLOR_TILE_HIGHLIGHT;
-                ctx.beginPath();
-                ctx.arc(HAND_HALF_TILE_X + 3, y + HAND_HALF_TILE_Y + 3, HAND_HALF_TILE_X + 6, HAND_HALF_TILE_Y + 6, 0, 2*Math.PI);
-                ctx.fill();			
-            }
-        }
+        //for (var h = 0; h < hand.length; h++) {
+        //    var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
+        //            
+        //    if (this.selected == h) {
+        //        ctx.fillStyle = COLOR_TILE_HIGHLIGHT;
+        //        ctx.beginPath();
+        //        ctx.arc(HAND_HALF_TILE_X + 3, y + HAND_HALF_TILE_Y + 3, HAND_HALF_TILE_X + 6, HAND_HALF_TILE_Y + 6, 0, 2*Math.PI);
+        //        ctx.fill();			
+        //    }
+        //}
         
-        for (var h = 0; h < hand.length; h++) {
+        for (var h = 0; h < 4; h++) {
             var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
             //Bounding box target
             //ctx.strokeStyle = '#000';
             //ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y);
                     
-            var tile = hand[h];
-            var tileImage = tileImages[tile.type];
+            //var tile = hand[h];
+            var tileImage = tileImages[h];//tile.type];
             if (this.hover == h || this.selected == h) ctx.drawImage(tileImage, 0, y , HAND_TILE_X + HAND_HOVER_SIZE, HAND_TILE_Y + HAND_HOVER_SIZE);				
             else ctx.drawImage(tileImage, 0, y, HAND_TILE_X, HAND_TILE_Y);			
         }

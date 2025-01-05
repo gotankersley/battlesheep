@@ -1,3 +1,5 @@
+import { INVALID } from '../lib/hex-lib.js';
+
 //Constants
 export const PLAYER1 = 0;
 export const PLAYER2 = 1;
@@ -11,36 +13,45 @@ export const PIN_EMPTY = 0;
 export const PIN_PLAYER1 = 1;
 export const PIN_PLAYER2 = 2;
 
-export const DIR_N = 0;
-export const DIR_NE = 1;
-export const DIR_SE = 2;
-export const DIR_S = 3;
-export const DIR_SW = 4;
-export const DIR_NW = 5;
+/* Neighboring sides
+   _0_
+5 /   \1
+4 \___/2
+    3
+ */
+export const DIR_N = 1;
+export const DIR_NE = 2;
+export const DIR_SE = 4;
+export const DIR_S = 8;
+export const DIR_SW = 16;
+export const DIR_NW = 32;
 
 export const TURN1 = 0;
 export const TURN2 = 1;
 
+export const STARTING_STACK = 16;
+
+export function Tile(tileType, player) { //Node class
+	return {			
+		type : tileType,		
+		player : +(player),
+		pos : {q:INVALID, r:INVALID},		
+        count : INVALID,
+	};
+}
 
 export class Board {
 	constructor() {
-		this.grid = {};
+		this.grid = {}; //Hash of 'board' - allows for irregular shapes	
 		this.pinCounts = [STARTING_PIN_COUNT, STARTING_PIN_COUNT];		
 		this.turn = TURN1;
-	}
-	
-	init() {
+
 		//Player
-		var i = 0; 
-		for (var r = 0; r < COUNT_ROW; r++) {
-			for (var c = 0; c < COUNT_ROW; c++) {				
-				if (r < 2) this.grid[i] = PIN_PLAYER1; //First 2
-				else if (r >= COUNT_ROW-2)  this.grid[i] = PIN_PLAYER2;
-				else this.grid[i] = PIN_EMPTY;
-				
-				i++;
-			}
-		}		
+        var tile = new Tile(0, PLAYER1);
+        tile.pos.q = 0;
+        tile.pos.r = 0;
+        this.grid['0,0'] = tile;
+		
 	}
 	
 	clone() {
@@ -54,9 +65,9 @@ export class Board {
 		newBoard.turn = this.turn;
 	}
 
-	isGameOver() { 
-		if (this.pinCounts[TURN1] <= 0 || this.pinCounts[TURN2] <= 0) return true;
-		else return false;
+	isGameOver() {
+        //See if moves available
+		return false;
 	}
 	
     makeMove(srcPos, destPos) {
@@ -64,12 +75,6 @@ export class Board {
 		this.grid[srcPos] = PIN_EMPTY;
 	} 
 		
-	makeCapture(srcPos, destPos) {
-		var oppTurn = +(!this.turn);
-		this.pinCounts[oppTurn]--;
-		this.grid[destPos] = this.grid[srcPos];
-		this.grid[srcPos] = PIN_EMPTY;
-	}
 	
 	changeTurn() {
 		this.turn = +(!this.turn);
@@ -109,28 +114,7 @@ export class Board {
 		else return {status:true, msg:''};
 	}
 
-	isValidCapture(src, dest, dir) {		
-		if (this.grid[dest]-1 == this.turn) return false; //Dest not opponent pin
-		
-		//Loop to make sure path to dest is not obstructed
-		var loop = LOOPS_BY_DIR_POS[dir][src];
-		var loopStart = LOOP_START_BY_DIR_POS[dir][src];
-		var reachedDest = false;		
-		var onLoop = false;
-		for (var i = 0; i < loop.length; i++) {
-			var p = loop[i];
-			if (p == loopStart) onLoop = true;
-			if (p == dest) {
-				reachedDest = true;
-				break;
-			}
-			else if (this.grid[p] != PIN_EMPTY) break;
-		}
-		
-		if (!reachedDest) return false; //Loop path obstructed
-		else if (!onLoop) return false; //Must travel on loop for capture
-		else return true; //Success
-	}
+	
 	
 	toString() {
 		var boardStr = '';

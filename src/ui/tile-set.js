@@ -3,6 +3,7 @@ import { PLAYER1, PLAYER2 } from '../core/board.js';
 
 //Constants
 const DRAW_BOUNDING_BOX = false;	
+const COLOR_COUNT = '#000';
     
 const TYPES = [
     {name:'sheep1', scale: 30}, 
@@ -67,7 +68,7 @@ export class TileSet {
 		});
 	}
 	
-	draw = (ctx, x, y, tileType, player, alpha) => {
+	draw = (ctx, x, y, tileType, player, alpha, count) => {
         
 		var set = this.cur[player];
 		var meta = METADATA[set];
@@ -92,11 +93,12 @@ export class TileSet {
 		if (meta.scale) {			
 			var scale = TYPES[tileType].scale;			
 			var halfScale = scale/2;
-			ctx.drawImage(this.images[set][tileType], -HEX_TILE_CENTER_X + halfScale, -HEX_TILE_CENTER_Y + halfScale, HEX_TILE_X - scale, HEX_TILE_Y - scale);
+			ctx.drawImage(this.images[set][tileType], -HEX_TILE_CENTER_X + halfScale, -HEX_TILE_CENTER_Y + halfScale, HEX_TILE_X - scale, HEX_TILE_Y - scale);        
 		}
 		else ctx.drawImage(this.images[set][tileType], -HEX_TILE_CENTER_X, -HEX_TILE_CENTER_Y, HEX_TILE_X, HEX_TILE_Y);		
-					
 		ctx.restore();
+        ctx.fillStyle = COLOR_COUNT;
+		ctx.fillText('' + count, x-scale+10, y-scale);			
 	}
 	
 	
