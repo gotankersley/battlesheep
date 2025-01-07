@@ -4,14 +4,7 @@ import { INVALID } from '../lib/hex-lib.js';
 export const PLAYER1 = 0;
 export const PLAYER2 = 1;
 
-export const BOARD_NUM = 36;
-export const COUNT_ROW = 6;
-const STARTING_PIN_COUNT = 16;
 
-//Enums
-export const PIN_EMPTY = 0;
-export const PIN_PLAYER1 = 1;
-export const PIN_PLAYER2 = 2;
 
 /* Neighboring sides
    _0_
@@ -31,26 +24,37 @@ export const TURN2 = 1;
 
 export const STARTING_STACK = 16;
 
-export function Tile(tileType, player) { //Node class
-	return {			
-		type : tileType,		
-		player : +(player),
-		pos : {q:INVALID, r:INVALID},		
-        count : INVALID,
+export function Tile(q, r) { 
+	return {						
+		stack : null,
+		pos : {q:q, r:r},        
 	};
+}
+
+export function Stack( player) {
+    return {
+        tokens : [0],
+        player : +(player),        
+    };
 }
 
 export class Board {
 	constructor() {
-		this.grid = {}; //Hash of 'board' - allows for irregular shapes	
-		this.pinCounts = [STARTING_PIN_COUNT, STARTING_PIN_COUNT];		
+		this.grid = {}; //Hash of 'board' - allows for irregular shapes			
 		this.turn = TURN1;
 
 		//Player
-        var tile = new Tile(0, PLAYER1);
-        tile.pos.q = 0;
-        tile.pos.r = 0;
-        this.grid['0,0'] = tile;
+        var tile1 = new Tile(0, 0); 
+        tile1.stack = new Stack(PLAYER2);
+        this.grid['0,0'] = tile1;
+
+        var tile2 = new Tile(1, 1); 
+        tile2.stack = new Stack(PLAYER1);
+        this.grid['1,1'] = tile2;
+        
+        
+        this.grid['0,1'] = new Tile(0,1);
+        this.grid['1,0'] = new Tile(1,0);
 		
 	}
 	
@@ -118,9 +122,9 @@ export class Board {
 	
 	toString() {
 		var boardStr = '';
-		for (var pid = 0; pid < BOARD_NUM; pid++) {
-			boardStr += this.grid[pid];
-		}
+		//for (var pid = 0; pid < BOARD_NUM; pid++) {
+		//	boardStr += this.grid[pid];
+		//}
 		boardStr += this.turn;
 		return boardStr;
 	}

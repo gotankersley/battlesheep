@@ -227,7 +227,7 @@ function draw(time) { //Top-level drawing function
     //Clear the canvas
     ctx.clearRect(0, 0, CANVAS_SIZE_X, CANVAS_SIZE_Y);
     if (menu.midnight) { //Draw dark
-        ctx.fillStyle = '#000';
+        ctx.fillStyle = COLOR_BLACK;
         ctx.fillRect(0, 0, CANVAS_SIZE_X, CANVAS_SIZE_Y);
     }
     ctx.save();
@@ -381,7 +381,14 @@ function drawTiles() {
         var tile = game.board.grid[posKey];
         var px = hexToPix(tile.pos);
         
-        tileSet.draw(ctx, px.x, px.y, 5, tile.player, false, tile.count);
+        if (tile.stack) {
+            var stack = tile.stack;
+            tileSet.draw(ctx, px.x, px.y, 5, stack.player, false, stack.tokens.length);
+        }
+        else {
+            fillHex(ctx, px.x, px.y, 'lightgreen');
+			strokeHex(ctx, px.x, px.y, 'green', 5);	
+        }
 		
         /*if (mouse.onScreen(tx, ty)) {
             //Check for tiles on top (stacks) - bottom to top

@@ -78,7 +78,8 @@ export class TileSet {
 		
 		//Outline
 		if (meta.outline) {			
-			fillHex(ctx, x, y, 'rgba(255, 255, 255, 0.5');
+			//fillHex(ctx, x, y, 'rgba(255, 255, 255, 0.5');
+			fillHex(ctx, x, y, 'lightgreen');
 			strokeHex(ctx, x, y, meta.outline, 3);	
 		}
 						
