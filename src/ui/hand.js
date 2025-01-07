@@ -48,8 +48,7 @@ export class Hand {
     }
 
     draw = (e) => {   
-        //TODO: collapse into number?
-        
+         
         var ctx = this.ctx;
         ctx.clearRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
         ctx.fillStyle = COLOR_HAND_BACKGROUND;

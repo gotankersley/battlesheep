@@ -50,6 +50,14 @@ export class Game {
 		this.gameEvents[EVENT_GAME_OVER](+(!loser), loser);
 			
 	}
+    
+    makeMove = (src, dst, moveCount, override) => {	
+        if (override || true) {//|| this.hive.canMove(src, dst)) {
+            this.board.makeMove(src, dst, moveCount);
+            //this.save();		
+            //this.onMoved(src, dst);
+        }	
+    }
 
 	undoMove () {
 		

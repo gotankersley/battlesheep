@@ -22,7 +22,7 @@ export const DIR_NW = 32;
 export const TURN1 = 0;
 export const TURN2 = 1;
 
-export const STARTING_STACK = 16;
+export const STARTING_COUNT = 5;
 
 export function Tile(q, r) { 
 	return {						
@@ -31,10 +31,10 @@ export function Tile(q, r) {
 	};
 }
 
-export function Stack( player) {
+export function Stack( player, count) {
     return {
-        tokens : [0],
         player : +(player),        
+        count : count,
     };
 }
 
@@ -45,11 +45,11 @@ export class Board {
 
 		//Player
         var tile1 = new Tile(0, 0); 
-        tile1.stack = new Stack(PLAYER2);
+        tile1.stack = new Stack(PLAYER2, STARTING_COUNT);
         this.grid['0,0'] = tile1;
 
         var tile2 = new Tile(1, 1); 
-        tile2.stack = new Stack(PLAYER1);
+        tile2.stack = new Stack(PLAYER1, STARTING_COUNT);
         this.grid['1,1'] = tile2;
         
         
@@ -74,9 +74,16 @@ export class Board {
 		return false;
 	}
 	
-    makeMove(srcPos, destPos) {
-		this.grid[destPos] = this.grid[srcPos];
-		this.grid[srcPos] = PIN_EMPTY;
+    makeMove(srcPos, destPos, moveCount) { //Split stack
+        var srcKey = srcPos.q + ',' + srcPos.r;
+        var destKey = destPos.q + ',' + destPos.r;
+        
+        //Verify sanity check
+		var srcStack = this.grid[srcKey].stack;
+        srcStack.count -= moveCount;
+        var destTile = new Tile(destPos.q, destPos.r);
+        destTile.stack = new Stack(srcStack.player, moveCount)
+		this.grid[destKey] = destTile;
 	} 
 		
 	

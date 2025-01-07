@@ -139,39 +139,31 @@ function onBlur() {
 }
 
 function onMouseDown(e) {	
-    if (false && e.button == BUTTON_LEFT) {	
+    if (e.button == BUTTON_LEFT) {	
         var board = game.board;
         var player = board.turn;
-        if (game.players[player] != PLAYER_HUMAN) {
-            Stage.showMessage('Waiting for other player to play...');
-            return;
-        }
+        //if (game.players[player] != PLAYER_HUMAN) {
+        //    Stage.showMessage('Waiting for other player to play...');
+        //    return;
+        //}
         
         //See if a (new) tile has been selected
-        var pos = mouse.axial;
-        var tile = board.getByPos(mouse.axial);
-        var sel = mouse.selected;			
-        if (tile) { //Pos is not empty				
-            if (mouse.ctrlOn) mouse.selected = {q:pos.q, r:pos.r};
-            else if (sel && (hive.grid[sel.q + ',' + sel.r].type == BEETLE || hive.grid[sel.q + ',' + sel.r].stack.length)) {  						
-                game.makeMove(sel, pos, mouse.ctrlOn);	//Stack of tiles
+        var pos = mouse.axial;   
+        var posKey = pos.q + ',' + pos.r;
+        if (board.grid[posKey]) { //Valid pasture tile
+            var tile = board.grid[posKey];            
+            if (tile.stack) { //Is tile occupied?
+                var stack = tile.stack;
+                if (mouse.ctrlOn) mouse.selected = {q:pos.q, r:pos.r}; //Navigation
+                else if (stack.player != player) return; //Can't select player's opposite tile                
+                else mouse.selected = {q:pos.q, r:pos.r}; //Make this tile the new selection                
+                
+                
             }
-            else if (tile.player != player) return; //Can't select player's opposite tile
-            else mouse.selected = {q:pos.q, r:pos.r}; //Make this tile the new selection
-            
-        }
-        else { //Pos is empty
-            //Moving a tile
-            if (sel) game.makeMove(sel, pos, mouse.ctrlOn);
-            
-            //Placing a tile (from hand)
-            else {
-                var selected = hands[player].selected;
-                if (selected !== null) {
-                    var tile = hive.hands[player][selected];			
-                    game.place(tile.type, pos, mouse.ctrlOn);
-                }
-                else Stage.showMessage('Player ' + (player+1) + ' - select a tile to play...');
+            else { //Tile is not occupied
+                //Moving a tile
+                var moveCount = 2;
+                if (mouse.selected) game.makeMove(mouse.selected, pos, moveCount, mouse.ctrlOn);  
             }
         }
     }
@@ -194,8 +186,8 @@ function onKeyDown(e) {
         }
     }
     else if (e.keyCode == KEY_T) {
-        game.hive.turn = +(!game.hive.turn);
-        game.hive.getMoves();
+        game.board.changeTurn();
+        //game.hive.getMoves();
     }
     else if (e.ctrlKey && e.key == 'z') {
         game.onMoveUndo();
@@ -383,7 +375,8 @@ function drawTiles() {
         
         if (tile.stack) {
             var stack = tile.stack;
-            tileSet.draw(ctx, px.x, px.y, 5, stack.player, false, stack.tokens.length);
+            var tileType = stack.count % 6;
+            tileSet.draw(ctx, px.x, px.y, tileType, stack.player, false, stack.count);
         }
         else {
             fillHex(ctx, px.x, px.y, 'lightgreen');
