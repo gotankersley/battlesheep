@@ -141,7 +141,7 @@ function onBlur() {
 function onMouseDown(e) {	
     if (e.button == BUTTON_LEFT) {	
         var board = game.board;
-        var player = board.turn;
+        var player = board.turn;        
         //if (game.players[player] != PLAYER_HUMAN) {
         //    Stage.showMessage('Waiting for other player to play...');
         //    return;
@@ -240,8 +240,15 @@ function draw(time) { //Top-level drawing function
     drawMouse(); //Draw active hex at cursor location 								
                 
     //Tiles
-    //if (mouse.selected) drawTileHighlight();
     drawTiles();				
+    if (mouse.selected) {
+        drawTileHighlight();
+        //Hands
+        //hands[PLAYER1].draw();
+        var posKey = mouse.selected.q + ',' + mouse.selected.r;
+        var stack = game.board.grid[posKey].stack;
+        hands[PLAYER2].draw(stack);
+    }
     
     //PlacePoints
     //if (menu.showDebug && menu.showDebugPlaces) drawPlacePoints();
@@ -263,9 +270,7 @@ function draw(time) { //Top-level drawing function
     //Turn
     drawTurn();
     
-    //Hands
-    hands[PLAYER1].draw();
-    hands[PLAYER2].draw();
+    
     
     
     
@@ -361,7 +366,7 @@ function drawTurn() {
         
 function drawTileHighlight() {
     var px = hexToPix(mouse.selected);		
-    if (mouse.onScreen(px.x, px.y)) strokeHex(ctx, px.x, px.y, '#f00', 10); 
+    if (mouse.onScreen(px.x, px.y)) strokeHex(ctx, px.x, px.y, '#f00', 5); 
 }
 	
 function drawTiles() {

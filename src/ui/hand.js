@@ -47,14 +47,14 @@ export class Hand {
         //}
     }
 
-    draw = (e) => {   
+    draw = (stack) => {   
          
         var ctx = this.ctx;
         ctx.clearRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
         ctx.fillStyle = COLOR_HAND_BACKGROUND;
         ctx.fillRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
         
-        var player = this.player;
+        var player = stack.player;
         
         //var hand = window.game.board.hands[player];	
         
@@ -72,7 +72,7 @@ export class Hand {
         //    }
         //}
         
-        for (var h = 0; h < 4; h++) {
+        for (var h = 0; h < stack.count; h++) {
             var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
             //Bounding box target
             //ctx.strokeStyle = '#000';

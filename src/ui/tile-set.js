@@ -69,7 +69,7 @@ export class TileSet {
 	}
 	
 	draw = (ctx, x, y, tileType, player, alpha, count) => {
-        
+        tileType = 5;
 		var set = this.cur[player];
 		var meta = METADATA[set];
 		

@@ -55,6 +55,11 @@ export class Board {
         
         this.grid['0,1'] = new Tile(0,1);
         this.grid['1,0'] = new Tile(1,0);
+        this.grid['0,-1'] = new Tile(0,-1);
+        this.grid['1,-1'] = new Tile(1,-1);
+        this.grid['2,-1'] = new Tile(2,-1);
+        this.grid['2,0'] = new Tile(2,0);
+        this.grid['2,1'] = new Tile(2,1);
 		
 	}
 	
@@ -84,6 +89,7 @@ export class Board {
         var destTile = new Tile(destPos.q, destPos.r);
         destTile.stack = new Stack(srcStack.player, moveCount)
 		this.grid[destKey] = destTile;
+        this.changeTurn();
 	} 
 		
 	
