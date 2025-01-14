@@ -34,7 +34,7 @@ export class Hand {
         if (e.button == BUTTON_LEFT) { 
             var x = e.clientX - window.mouse.canvasBounds.left; 
             var y = e.clientY - window.mouse.canvasBounds.top;
-            //if (this.player == game.hive.turn || Mouse.ctrlOn) this.hover = Math.floor((y-HAND_MARGIN_Y)/HAND_TILE_Y);
+            this.hover = Math.floor((y-HAND_MARGIN_Y)/HAND_TILE_Y);
         }
     }
 
@@ -61,16 +61,16 @@ export class Hand {
         var tileImages = tileSet.activeImages[player];
 
         //Highlight selected - draw layer below 
-        //for (var h = 0; h < hand.length; h++) {
-        //    var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
-        //            
-        //    if (this.selected == h) {
-        //        ctx.fillStyle = COLOR_TILE_HIGHLIGHT;
-        //        ctx.beginPath();
-        //        ctx.arc(HAND_HALF_TILE_X + 3, y + HAND_HALF_TILE_Y + 3, HAND_HALF_TILE_X + 6, HAND_HALF_TILE_Y + 6, 0, 2*Math.PI);
-        //        ctx.fill();			
-        //    }
-        //}
+        for (var h = 0; h < stack.count; h++) {
+            var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
+                    
+            if (this.selected == h) {
+                ctx.fillStyle = COLOR_TILE_HIGHLIGHT;
+                ctx.beginPath();
+                ctx.arc(HAND_HALF_TILE_X + 3, y + HAND_HALF_TILE_Y + 3, HAND_HALF_TILE_X + 6, HAND_HALF_TILE_Y + 6, 0, 2*Math.PI);
+                ctx.fill();			
+            }
+        }
         
         for (var h = 0; h < stack.count; h++) {
             var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
@@ -79,7 +79,7 @@ export class Hand {
             //ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y);
                     
             //var tile = hand[h];
-            var tileImage = tileImages[h];//tile.type];
+            var tileImage = tileImages[h%6];//tile.type];
             if (this.hover == h || this.selected == h) ctx.drawImage(tileImage, 0, y , HAND_TILE_X + HAND_HOVER_SIZE, HAND_TILE_Y + HAND_HOVER_SIZE);				
             else ctx.drawImage(tileImage, 0, y, HAND_TILE_X, HAND_TILE_Y);			
         }

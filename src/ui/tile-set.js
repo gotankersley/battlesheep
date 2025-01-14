@@ -99,7 +99,8 @@ export class TileSet {
 		else ctx.drawImage(this.images[set][tileType], -HEX_TILE_CENTER_X, -HEX_TILE_CENTER_Y, HEX_TILE_X, HEX_TILE_Y);		
 		ctx.restore();
         ctx.fillStyle = COLOR_COUNT;
-		ctx.fillText('' + count, x-scale+10, y-scale);			
+		ctx.fillText('' + count, x-scale+10, y-scale);
+			
 	}
 	
 	

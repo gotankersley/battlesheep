@@ -22,7 +22,12 @@ export const DIR_NW = 32;
 export const TURN1 = 0;
 export const TURN2 = 1;
 
-export const STARTING_COUNT = 5;
+export const STARTING_COUNT = 16;
+export const MODE_TILE = 0;
+export const MODE_PLACE = 1;
+export const MODE_MOVE = 2;
+export const MODE_GAME_OVER = 3;
+
 
 export function Tile(q, r) { 
 	return {						
@@ -42,25 +47,53 @@ export class Board {
 	constructor() {
 		this.grid = {}; //Hash of 'board' - allows for irregular shapes			
 		this.turn = TURN1;
-
-		//Player
-        var tile1 = new Tile(0, 0); 
-        tile1.stack = new Stack(PLAYER2, STARTING_COUNT);
-        this.grid['0,0'] = tile1;
-
-        var tile2 = new Tile(1, 1); 
-        tile2.stack = new Stack(PLAYER1, STARTING_COUNT);
-        this.grid['1,1'] = tile2;
-        
-        
-        this.grid['0,1'] = new Tile(0,1);
-        this.grid['1,0'] = new Tile(1,0);
-        this.grid['0,-1'] = new Tile(0,-1);
-        this.grid['1,-1'] = new Tile(1,-1);
-        this.grid['2,-1'] = new Tile(2,-1);
-        this.grid['2,0'] = new Tile(2,0);
+        this.mode = MODE_MOVE;
+  
+        //Default tile shape
+        this.grid['0,2'] = new Tile(0,2);
+        this.grid['1,1'] = new Tile(1,1);
         this.grid['2,1'] = new Tile(2,1);
-		
+        this.grid['1,2'] = new Tile(1,2);
+        
+        this.grid['3,1'] = new Tile(3,1);
+        this.grid['4,0'] = new Tile(4,0);
+        this.grid['5,0'] = new Tile(5,0);
+        this.grid['4,1'] = new Tile(4,1);
+        
+        this.grid['0,4'] = new Tile(0,4);
+        this.grid['1,3'] = new Tile(1,3);
+        this.grid['2,3'] = new Tile(2,3);
+        this.grid['1,4'] = new Tile(1,4);
+        
+        this.grid['4,2'] = new Tile(4,2);
+        this.grid['5,1'] = new Tile(5,1);
+        this.grid['6,1'] = new Tile(6,1);
+        this.grid['5,2'] = new Tile(5,2);
+        
+        this.grid['2,4'] = new Tile(2,4);
+        this.grid['3,3'] = new Tile(3,3);
+        this.grid['4,3'] = new Tile(4,3);
+        this.grid['3,4'] = new Tile(3,4);
+        
+        this.grid['4,4'] = new Tile(4,4);
+        this.grid['5,3'] = new Tile(5,3);
+        this.grid['6,3'] = new Tile(6,3);
+        this.grid['5,4'] = new Tile(5,4);
+        
+        this.grid['0,6'] = new Tile(0,6);
+        this.grid['1,5'] = new Tile(1,5);
+        this.grid['2,5'] = new Tile(2,5);
+        this.grid['1,6'] = new Tile(1,6);
+        
+        this.grid['2,6'] = new Tile(2,6);
+        this.grid['3,5'] = new Tile(3,5);
+        this.grid['4,5'] = new Tile(4,5);
+        this.grid['3,6'] = new Tile(3,6);
+        
+        //Players        
+        this.grid['0,2'].stack = new Stack(PLAYER1, STARTING_COUNT);
+        this.grid['5,0'].stack = new Stack(PLAYER2, STARTING_COUNT);
+
 	}
 	
 	clone() {

@@ -388,6 +388,10 @@ function drawTiles() {
 			strokeHex(ctx, px.x, px.y, 'green', 5);	
         }
 		
+        if (menu.showCoordinates) {
+            ctx.fillStyle = COLOR_BLACK;
+            ctx.fillText(posKey, px.x, px.y); 
+        }
         /*if (mouse.onScreen(tx, ty)) {
             //Check for tiles on top (stacks) - bottom to top
             if (tile.type == STACK) {
