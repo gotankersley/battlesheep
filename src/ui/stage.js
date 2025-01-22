@@ -12,12 +12,16 @@ import { Hand, HAND_SIZE_X } from './hand.js';
 const COLOR_GRID = '#e0e0e0';
 const COLOR_BLACK = '#000';
 const COLOR_MOUSE = 'rgba(0, 0, 255, 0.1)';
+const COLOR_TILE = 'lightgreen';
+const COLOR_TILE_BORDER = 'green';
 
 const KEY_DELETE = 46;
 const KEY_T = 84;
 
 const MESSAGE_DURATION = 3000; //MS
 const MOVE_DELAY = 200;
+
+const TAU = 2*Math.PI;
 
 //Globals
 window.CANVAS_SIZE_X;
@@ -179,15 +183,14 @@ function onKeyDown(e) {
         var sel = mouse.selected;
         var hive = game.hive;
         var posStr = sel.q + ',' + sel.r;
-        if (hive.grid[posStr]) {
-            //TODO: return to hand?
-            delete hive.grid[posStr]; 
-            mouse.selected = null;
-        }
+        //if (hive.grid[posStr]) {
+        //    //TODO: return to hand?
+        //    delete hive.grid[posStr]; 
+        //    mouse.selected = null;
+        //}
     }
     else if (e.keyCode == KEY_T) {
-        game.board.changeTurn();
-        //game.hive.getMoves();
+        game.board.changeTurn();        
     }
     else if (e.ctrlKey && e.key == 'z') {
         game.onMoveUndo();
@@ -240,15 +243,19 @@ function draw(time) { //Top-level drawing function
     drawMouse(); //Draw active hex at cursor location 								
                 
     //Tiles
-    drawTiles();				
-    if (mouse.selected) {
+    drawTiles();
+
+    //Stacks
+    drawStacks();
+    
+    /*if (mouse.selected) {
         drawTileHighlight();
         //Hands
         //hands[PLAYER1].draw();
         var posKey = mouse.selected.q + ',' + mouse.selected.r;
         var stack = game.board.grid[posKey].stack;
         hands[PLAYER2].draw(stack);
-    }
+    }*/
     
     //PlacePoints
     //if (menu.showDebug && menu.showDebugPlaces) drawPlacePoints();
@@ -269,9 +276,6 @@ function draw(time) { //Top-level drawing function
     
     //Turn
     drawTurn();
-    
-    
-    
     
     
     //Repaint
@@ -378,20 +382,36 @@ function drawTiles() {
         var tile = game.board.grid[posKey];
         var px = hexToPix(tile.pos);
         
-        if (tile.stack) {
-            var stack = tile.stack;
-            var tileType = stack.count % 6;
-            tileSet.draw(ctx, px.x, px.y, tileType, stack.player, false, stack.count);
-        }
-        else {
-            fillHex(ctx, px.x, px.y, 'lightgreen');
-			strokeHex(ctx, px.x, px.y, 'green', 5);	
+        if (!tile.stack) {         
+            fillHex(ctx, px.x, px.y, COLOR_TILE);
+			strokeHex(ctx, px.x, px.y, COLOR_TILE_BORDER, 5);	
         }
 		
         if (menu.showCoordinates) {
             ctx.fillStyle = COLOR_BLACK;
             ctx.fillText(posKey, px.x, px.y); 
         }
+    }
+}
+
+function drawStacks() {
+    var posKeys = Object.keys(game.board.grid);		
+    
+    for (var t = 0; t < posKeys.length; t++) {
+        var posKey = posKeys[t];
+        var tile = game.board.grid[posKey];
+        var px = hexToPix(tile.pos);
+        
+        if (tile.stack) {
+            var stack = tile.stack;
+            var tileType = stack.count % 6;
+            tileSet.draw(ctx, px.x, px.y, tileType, stack.player, false, stack.count);
+            //ctx.fillStyle = 'red';                       
+            //drawCircle(px.x+100, px.y+100, 40);            
+            
+        }
+    }
+}
         /*if (mouse.onScreen(tx, ty)) {
             //Check for tiles on top (stacks) - bottom to top
             if (tile.type == STACK) {
@@ -404,11 +424,11 @@ function drawTiles() {
             else TileSet.draw(ctx, tx, ty, tile.type, tile.player);
             
         }
-        */
+        
 
     }		
     
-}
+}*/
 	
 function drawPerimeter() {
     var posKeys = Object.keys(game.board.perimeter);		
@@ -522,6 +542,9 @@ function drawMoves() {
 }
 		
 
-
-
-
+function drawCircle(x, y, r) {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, TAU, false);
+    ctx.fill();
+    //ctx.stroke();
+}

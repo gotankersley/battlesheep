@@ -2,10 +2,11 @@ import { BUTTON_LEFT } from './mouse.js';
 
 var COLOR_HAND_BACKGROUND = 'rgba(100, 100, 100, 0.3)';
 var COLOR_TILE_HIGHLIGHT = '#ffffe0';
+var COLOR_TEXT = '#000';
 export const HAND_SIZE_X = 70;
 
-var HAND_TILE_X = 60;
-var HAND_TILE_Y = 60;
+var HAND_TILE_X = 50;
+var HAND_TILE_Y = 50;
 var HAND_MARGIN_Y = 5;
 var HAND_HALF_TILE_X = HAND_TILE_X/2;
 var HAND_HALF_TILE_Y = HAND_TILE_Y/2;
@@ -72,6 +73,7 @@ export class Hand {
             }
         }
         
+        ctx.fillStyle = COLOR_TEXT;
         for (var h = 0; h < stack.count; h++) {
             var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
             //Bounding box target
@@ -82,6 +84,7 @@ export class Hand {
             var tileImage = tileImages[h%6];//tile.type];
             if (this.hover == h || this.selected == h) ctx.drawImage(tileImage, 0, y , HAND_TILE_X + HAND_HOVER_SIZE, HAND_TILE_Y + HAND_HOVER_SIZE);				
             else ctx.drawImage(tileImage, 0, y, HAND_TILE_X, HAND_TILE_Y);			
+            ctx.fillText(stack.count-h, HAND_HALF_TILE_X, y+HAND_HALF_TILE_Y);
         }
             
         
