@@ -122,12 +122,30 @@ export class Board {
 	
 	clone() {
 		var newBoard = new Board();
-		for (var i = 0; i < BOARD_NUM; i++) {
-			newBoard.grid[i] = this.tiles[i];			
+        
+        //Tiles
+        newBoard.tiles = {};
+        var tileKeys = Object.keys(this.tiles);
+        for (var t = 0; t < tileKeys.length; t++) {
+            var tileKey = tileKeys[t];
+            var tile = this.tiles[tileKey];		
+            var newTile = new Tile(tile.pos.q, tile.pos.r);
+            newTile.tokenId = tile.tokenId;
+			newBoard.tiles[tileKey] = newTile;
 		}
-		newBoard.pinCounts[TURN1] = this.pinCounts[TURN1];
-		newBoard.pinCounts[TURN2] = this.pinCounts[TURN2];
-		
+        
+        //Tokens
+        newBoard.tokens = [];
+        newBoard.playerTokens = [];
+        for (var tokenId = 0; tokenId < this.tokens.length; tokenId++) {
+            var token = this.tokens[tokenId];
+            var newToken = new Token( token.id, token.player, token.count, new Pos(token.pos.q, token.pos.r));
+            newBoard.tokens.push(newToken);    
+            newBoard.playerTokens[token.player] = token.id;
+            
+        }
+        
+        //Turn				
 		newBoard.turn = this.turn;
 	}
 
