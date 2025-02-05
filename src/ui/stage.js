@@ -1,7 +1,7 @@
 import { setHex, fillHex, strokeHex, ORIENT_FLAT, ORIENT_POINTY } from '../lib/hex-lib.js';
 import { MenuManager } from './menu.js';
 import { TileSet } from './tile-set.js';
-import { PLAYER1, PLAYER2 } from '../core/board.js';
+import { PLAYER1, PLAYER2, EMPTY } from '../core/board.js';
 import { Game } from '../core/game.js';
 import { Mouse, BUTTON_LEFT } from './mouse.js';
 import { Hand, HAND_SIZE_X } from './hand.js';
@@ -154,12 +154,12 @@ function onMouseDown(e) {
         //See if a (new) tile has been selected
         var pos = mouse.axial;   
         var posKey = pos.q + ',' + pos.r;
-        if (board.grid[posKey]) { //Valid pasture tile
-            var tile = board.grid[posKey];            
-            if (tile.stack) { //Is tile occupied?
-                var stack = tile.stack;
+        if (board.tiles[posKey]) { //Valid pasture tile
+            var tile = board.tiles[posKey];            
+            if (tile.tokenId != EMPTY) { //Is tile occupied?
+                var token = board.tokens[tile.tokenId];
                 if (mouse.ctrlOn) mouse.selected = {q:pos.q, r:pos.r}; //Navigation
-                else if (stack.player != player) return; //Can't select player's opposite tile                
+                else if (token.player != player) return; //Can't select player's opposite tile                
                 else mouse.selected = {q:pos.q, r:pos.r}; //Make this tile the new selection                
                 
                 
@@ -245,15 +245,15 @@ function draw(time) { //Top-level drawing function
     //Tiles
     drawTiles();
 
-    //Stacks
-    drawStacks();
+    //Tokens
+    drawTokens();
     
     /*if (mouse.selected) {
         drawTileHighlight();
         //Hands
         //hands[PLAYER1].draw();
         var posKey = mouse.selected.q + ',' + mouse.selected.r;
-        var stack = game.board.grid[posKey].stack;
+        var tokenId = game.board.tiles[posKey].tokenId;
         hands[PLAYER2].draw(stack);
     }*/
     
@@ -375,14 +375,13 @@ function drawTileHighlight() {
 	
 function drawTiles() {
 
-    var posKeys = Object.keys(game.board.grid);		
-    
+    var posKeys = Object.keys(game.board.tiles);		    
     for (var t = 0; t < posKeys.length; t++) {
         var posKey = posKeys[t];
-        var tile = game.board.grid[posKey];
+        var tile = game.board.tiles[posKey];
         var px = hexToPix(tile.pos);
         
-        if (!tile.stack) {         
+        if (tile.tokenId == EMPTY) {         
             fillHex(ctx, px.x, px.y, COLOR_TILE);
 			strokeHex(ctx, px.x, px.y, COLOR_TILE_BORDER, 5);	
         }
@@ -394,22 +393,19 @@ function drawTiles() {
     }
 }
 
-function drawStacks() {
-    var posKeys = Object.keys(game.board.grid);		
-    
-    for (var t = 0; t < posKeys.length; t++) {
-        var posKey = posKeys[t];
-        var tile = game.board.grid[posKey];
-        var px = hexToPix(tile.pos);
-        
-        if (tile.stack) {
-            var stack = tile.stack;
-            var tileType = stack.count % 6;
-            tileSet.draw(ctx, px.x, px.y, tileType, stack.player, false, stack.count);
-            //ctx.fillStyle = 'red';                       
-            //drawCircle(px.x+100, px.y+100, 40);            
-            
-        }
+function drawTokens() {
+    var board = game.board;
+    var tokens = board.tokens;    
+    for (var tokenId = 0; tokenId < tokens.length; tokenId++) {
+        var token = tokens[tokenId];
+        //var posKey = token.pos.q + ',' + token.pos.r;
+        //var tile = board.tiles[posKey];
+        var px = hexToPix(token.pos);                       
+        var tileType = token.count % 6;
+        tileSet.draw(ctx, px.x, px.y, tileType, token.player, false, token.count);
+        //ctx.fillStyle = 'red';                       
+        //drawCircle(px.x+100, px.y+100, 40);            
+                    
     }
 }
         /*if (mouse.onScreen(tx, ty)) {
