@@ -15,10 +15,10 @@ var HAND_HOVER_SIZE = 10;
 //Class Hand
 export class Hand {
     
-    constructor(container, player) {
+    constructor(container) {
         this.canvas = document.getElementById(container);		
         this.ctx = this.canvas.getContext('2d');  					
-        this.player = player;        
+        
         this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this), false );	
         this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this), false );	
         var self = this;
@@ -42,27 +42,21 @@ export class Hand {
     onMouseDown = (e) => {
         var x = e.clientX - window.mouse.canvasBounds.left; 
         var y = e.clientY - window.mouse.canvasBounds.top;
-        //if (this.player == game.hive.turn || Mouse.ctrlOn) {
-        //    this.selected = Math.floor((y-HAND_MARGIN_Y)/HAND_TILE_Y);
-        //    window.mouse.selected = null;
-        //}
     }
 
-    draw = (stack) => {   
+    draw = (count) => {   
          
         var ctx = this.ctx;
         ctx.clearRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
         ctx.fillStyle = COLOR_HAND_BACKGROUND;
         ctx.fillRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
+                
         
-        var player = stack.player;
-        
-        //var hand = window.game.board.hands[player];	
-        
-        var tileImages = tileSet.activeImages[player];
+        //var hand = window.game.board.hands[player];	        
+        //var tileImages = tileSet.activeImages[0];
 
         //Highlight selected - draw layer below 
-        for (var h = 0; h < stack.count; h++) {
+        for (var h = 0; h < count; h++) {
             var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
                     
             if (this.selected == h) {
@@ -74,17 +68,17 @@ export class Hand {
         }
         
         ctx.fillStyle = COLOR_TEXT;
-        for (var h = 0; h < stack.count; h++) {
+        for (var h = 0; h < count; h++) {
             var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
             //Bounding box target
             //ctx.strokeStyle = '#000';
             //ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y);
                     
             //var tile = hand[h];
-            var tileImage = tileImages[h%6];//tile.type];
-            if (this.hover == h || this.selected == h) ctx.drawImage(tileImage, 0, y , HAND_TILE_X + HAND_HOVER_SIZE, HAND_TILE_Y + HAND_HOVER_SIZE);				
-            else ctx.drawImage(tileImage, 0, y, HAND_TILE_X, HAND_TILE_Y);			
-            ctx.fillText(stack.count-h, HAND_HALF_TILE_X, y+HAND_HALF_TILE_Y);
+            //var tileImage = tileImages[h%6];//tile.type];
+            //if (this.hover == h || this.selected == h) ctx.drawImage(tileImage, 0, y , HAND_TILE_X + HAND_HOVER_SIZE, HAND_TILE_Y + HAND_HOVER_SIZE);				
+            //else ctx.drawImage(tileImage, 0, y, HAND_TILE_X, HAND_TILE_Y);			
+            ctx.fillText(count-h, HAND_HALF_TILE_X, y+HAND_HALF_TILE_Y);
         }
             
         

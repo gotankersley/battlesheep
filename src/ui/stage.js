@@ -14,6 +14,7 @@ const COLOR_BLACK = '#000';
 const COLOR_MOUSE = 'rgba(0, 0, 255, 0.1)';
 const COLOR_TILE = 'lightgreen';
 const COLOR_TILE_BORDER = 'green';
+const COLOR_TOKEN_SELECTED = 'red';
 
 const KEY_DELETE = 46;
 const KEY_T = 84;
@@ -40,7 +41,7 @@ window.tileSet;
 var canvas;
 var ctx;	
 //var tileImages; 
-var hands = [];
+var hand;
 var paused = false;
 var $message;
 
@@ -56,9 +57,9 @@ export function createStage(containerId) {
     //Message popup
     $message = document.getElementById('message');
     
-    //Hands
-    hands[PLAYER1] = new Hand('hand1', PLAYER1);
-    hands[PLAYER2] = new Hand('hand2', PLAYER2);
+    //Hand
+    hand = new Hand('hand');
+    
     
     canvas = document.getElementById(containerId);	
     window.mouse = new Mouse(canvas);
@@ -112,18 +113,11 @@ function onWindowResize() {
     canvas.width = window.CANVAS_SIZE_X;
     canvas.height = window.CANVAS_SIZE_Y;
     
-    //Hands
-    var handCanvas1 = hands[PLAYER1].canvas;
-    var handCanvas2 = hands[PLAYER2].canvas;
-                    
-    handCanvas1.style.left = 0;
-    handCanvas2.style.left = (window.CANVAS_SIZE_X - HAND_SIZE_X) + 'px';
-    
-    handCanvas1.width = HAND_SIZE_X;
-    handCanvas2.width = HAND_SIZE_X;
-                            
-    handCanvas1.height = CANVAS_SIZE_Y;
-    handCanvas2.height = CANVAS_SIZE_Y;
+    //Hand
+    var handCanvas = hand.canvas;                           
+    handCanvas.style.left = (CANVAS_SIZE_X - HAND_SIZE_X) + 'px';		
+    handCanvas.width = HAND_SIZE_X;								
+    handCanvas.height = CANVAS_SIZE_Y;    
         
     //Boundary (for culling)
     mouse.setBounds();
@@ -199,8 +193,8 @@ function onKeyDown(e) {
 	
 //Game Events
 function onPlaced(player, tileType, pos) {        
-    hands[player].selected = null;
-    hands[player].hover = null;
+    hand.selected = null;
+    hand.hover = null;
     setTimeout(game.play, MOVE_DELAY);		
 }
 
@@ -245,16 +239,7 @@ function draw(time) { //Top-level drawing function
 
     //Tokens
     drawTokens();
-    
-    /*if (mouse.selected) {
-        drawTileHighlight();
-        //Hands
-        //hands[PLAYER1].draw();
-        var posKey = mouse.selected.q + ',' + mouse.selected.r;
-        var tokenId = game.board.tiles[posKey].tokenId;
-        hands[PLAYER2].draw(stack);
-    }*/
-        
+           
             
     ctx.restore();
     
@@ -264,6 +249,8 @@ function draw(time) { //Top-level drawing function
     //Turn
     drawTurn();
     
+    //Hand
+    hand.draw(6);
     
     //Repaint
     if (!paused) requestAnimationFrame(draw); 
@@ -355,10 +342,10 @@ function drawTurn() {
     
 }
         
-function drawTileHighlight() {
-    var px = hexToPix(mouse.selected);		
-    if (mouse.onScreen(px.x, px.y)) strokeHex(ctx, px.x, px.y, '#f00', 5); 
-}
+//function drawTileHighlight() {
+    //var px = hexToPix(mouse.selected);		
+    //if (mouse.onScreen(px.x, px.y)) strokeHex(ctx, px.x, px.y, '#f00', 5); 
+//}
 	
 function drawTiles() {
 
@@ -378,38 +365,27 @@ function drawTiles() {
     }
 }
 
+
 function drawTokens() {
     var board = game.board;
-    var tokens = board.tokens;    
+    var tokens = board.tokens;      
     for (var tokenId = 0; tokenId < tokens.length; tokenId++) {
-        var token = tokens[tokenId];
-        //var posKey = token.pos.q + ',' + token.pos.r;
-        //var tile = board.tiles[posKey];
+        var token = tokens[tokenId];        
         var px = hexToPix(token.pos);                       
         var tileType = token.count % 6;
+        
         tileSet.draw(ctx, px.x, px.y, tileType, token.player, false, token.count);
-        //ctx.fillStyle = 'red';                       
-        //drawCircle(px.x+100, px.y+100, 40);            
+        
+        //Highlight Selected
+        if (mouse.selected && mouse.selected.q == token.pos.q && mouse.selected.r == token.pos.r) {
+            strokeHex(ctx, px.x, px.y, COLOR_TOKEN_SELECTED, 5);    
+        }
                     
     }
+   
 }
-        /*if (mouse.onScreen(tx, ty)) {
-            //Check for tiles on top (stacks) - bottom to top
-            if (tile.type == STACK) {
-                for (var s = 0; s < tile.stack.length; s++) {
-                    var stackedTile = tile.stack[s];
-                    var offset = (5 * s);
-                    TileSet.draw(ctx, tx + offset, ty + offset, stackedTile.type, stackedTile.player, 0.5);
-                }
-            }
-            else TileSet.draw(ctx, tx, ty, tile.type, tile.player);
-            
-        }
-        
-
-    }		
+	
     
-}*/
 	
 
 	
