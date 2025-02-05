@@ -1,7 +1,9 @@
 import { BUTTON_LEFT } from './mouse.js';
 
 var COLOR_HAND_BACKGROUND = 'rgba(100, 100, 100, 0.3)';
-var COLOR_TILE_HIGHLIGHT = '#ffffe0';
+//var COLOR_TILE_HIGHLIGHT = '#ffffe0';
+var COLOR_TILE_HIGHLIGHT = '#f00';
+var COLOR_TILE_SELECTED = 'pink';
 var COLOR_TEXT = '#000';
 export const HAND_SIZE_X = 70;
 
@@ -32,19 +34,22 @@ export class Hand {
     }
 
     onMouseMove = (e) => {
-        if (e.button == BUTTON_LEFT) { 
-            var x = e.clientX - window.mouse.canvasBounds.left; 
-            var y = e.clientY - window.mouse.canvasBounds.top;
-            this.hover = Math.floor((y-HAND_MARGIN_Y)/HAND_TILE_Y);
-        }
+
+        var x = e.clientX - window.mouse.canvasBounds.left; 
+        var y = e.clientY - window.mouse.canvasBounds.top;        
+        this.hover = Math.floor((y-HAND_MARGIN_Y)/HAND_TILE_Y);
+        
     }
 
     onMouseDown = (e) => {
-        var x = e.clientX - window.mouse.canvasBounds.left; 
-        var y = e.clientY - window.mouse.canvasBounds.top;
+        if (e.button == BUTTON_LEFT) { 
+            var x = e.clientX - window.mouse.canvasBounds.left; 
+            var y = e.clientY - window.mouse.canvasBounds.top;
+            this.selected = Math.floor((y-HAND_MARGIN_Y)/HAND_TILE_Y);            
+        }
     }
 
-    draw = (count) => {   
+    draw = (selectedToken) => {   
          
         var ctx = this.ctx;
         ctx.clearRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
@@ -52,35 +57,34 @@ export class Hand {
         ctx.fillRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
                 
         
-        //var hand = window.game.board.hands[player];	        
-        //var tileImages = tileSet.activeImages[0];
-
-        //Highlight selected - draw layer below 
-        for (var h = 0; h < count; h++) {
-            var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
-                    
-            if (this.selected == h) {
-                ctx.fillStyle = COLOR_TILE_HIGHLIGHT;
-                ctx.beginPath();
-                ctx.arc(HAND_HALF_TILE_X + 3, y + HAND_HALF_TILE_Y + 3, HAND_HALF_TILE_X + 6, HAND_HALF_TILE_Y + 6, 0, 2*Math.PI);
-                ctx.fill();			
-            }
-        }
-        
-        ctx.fillStyle = COLOR_TEXT;
-        for (var h = 0; h < count; h++) {
-            var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
-            //Bounding box target
-            //ctx.strokeStyle = '#000';
-            //ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y);
-                    
-            //var tile = hand[h];
-            //var tileImage = tileImages[h%6];//tile.type];
-            //if (this.hover == h || this.selected == h) ctx.drawImage(tileImage, 0, y , HAND_TILE_X + HAND_HOVER_SIZE, HAND_TILE_Y + HAND_HOVER_SIZE);				
-            //else ctx.drawImage(tileImage, 0, y, HAND_TILE_X, HAND_TILE_Y);			
-            ctx.fillText(count-h, HAND_HALF_TILE_X, y+HAND_HALF_TILE_Y);
-        }
+        if (selectedToken >= 0) { 
+            var token = game.board.tokens[selectedToken];
+            var count = token.count;
             
+            
+            ctx.fillStyle = COLOR_TEXT;
+            for (var h = 0; h < count; h++) {
+                var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
+                
+                //Bounding box target
+                ctx.strokeStyle = '#000';
+                ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y);                                       
+                ctx.fillText(count-h, HAND_HALF_TILE_X, y+HAND_HALF_TILE_Y);
+                
+                //Selected
+                if (this.selected == h) {
+                    ctx.strokeStyle = COLOR_TILE_SELECTED;                    
+                    ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y);  	
+                }
+                
+                //Highlight selected
+                else if (this.hover == h) {
+                    ctx.strokeStyle = COLOR_TILE_HIGHLIGHT;                    
+                    ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y);  		
+                }
+                
+            }
+        }           
         
     }
 }

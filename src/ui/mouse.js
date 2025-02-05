@@ -16,6 +16,7 @@ export class Mouse {
         this.click = {x: 0, y: 0}; //Mouse down - screen coords	
         this.dragging = false;
         this.selected = null;
+        this.selectedToken = -1;
         this.ctrlOn = false;
         this.boundsX;
         this.boundsY;

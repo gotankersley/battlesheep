@@ -1,7 +1,7 @@
 import { setHex, fillHex, strokeHex, ORIENT_FLAT, ORIENT_POINTY } from '../lib/hex-lib.js';
 import { MenuManager } from './menu.js';
 import { TileSet } from './tile-set.js';
-import { PLAYER1, PLAYER2, EMPTY } from '../core/board.js';
+import { PLAYER1, PLAYER2, EMPTY, MODE_MOVE } from '../core/board.js';
 import { Game } from '../core/game.js';
 import { Mouse, BUTTON_LEFT } from './mouse.js';
 import { Hand, HAND_SIZE_X } from './hand.js';
@@ -79,6 +79,7 @@ export function createStage(containerId) {
     canvas.addEventListener('mousedown', onMouseDown, false );	
     canvas.oncontextmenu = function (e) { //Disable right clicking
         mouse.selected = null;
+        mouse.selectedToken = INVALID;
         e.preventDefault();
     };
             
@@ -148,20 +149,28 @@ function onMouseDown(e) {
         //See if a (new) tile has been selected
         var pos = mouse.axial;   
         var posKey = pos.q + ',' + pos.r;
-        if (board.tiles[posKey]) { //Valid pasture tile
+        if (board.tiles[posKey]) { //Valid tile
             var tile = board.tiles[posKey];            
             if (tile.tokenId != EMPTY) { //Is tile occupied?
                 var token = board.tokens[tile.tokenId];
-                if (mouse.ctrlOn) mouse.selected = {q:pos.q, r:pos.r}; //Navigation
+                if (mouse.ctrlOn) { //Navigation
+                    mouse.selected = {q:pos.q, r:pos.r}; 
+                    mouse.selectedToken = tile.tokenId;
+                }
                 else if (token.player != player) return; //Can't select player's opposite tile                
-                else mouse.selected = {q:pos.q, r:pos.r}; //Make this tile the new selection                
-                
-                
+                else {
+                    mouse.selected = {q:pos.q, r:pos.r}; //Make this tile the new selection                                                
+                    mouse.selectedToken = tile.tokenId;
+                }
             }
             else { //Tile is not occupied
                 //Moving a tile
-                var moveCount = 2;
-                if (mouse.selected) game.makeMove(mouse.selected, pos, moveCount, mouse.ctrlOn);  
+                if (mouse.selected) {
+                    if (hand.selected >= 0) {
+                        var token = board.tokens[mouse.selectedToken];
+                        game.makeMove(mouse.selected, pos, token.count-hand.selected, mouse.ctrlOn);  
+                    }
+                }
             }
         }
     }
@@ -173,17 +182,7 @@ function onMouseDown(e) {
 //}
 //
 function onKeyDown(e) {			
-    if (e.keyCode == KEY_DELETE) {
-        //var sel = mouse.selected;
-        //var board = game.board;
-        //var posKey = sel.q + ',' + sel.r;
-        //if (board.tiles[posKey]) {
-        //    //TODO: return to hand?
-        //    delete board.tiles[posKey]; 
-        //    mouse.selected = null;
-        //}
-    }
-    else if (e.keyCode == KEY_T) {
+    if (e.keyCode == KEY_T) {
         game.board.changeTurn();        
     }
     else if (e.ctrlKey && e.key == 'z') {
@@ -239,8 +238,7 @@ function draw(time) { //Top-level drawing function
 
     //Tokens
     drawTokens();
-           
-            
+                       
     ctx.restore();
     
     //Mouse coord		
@@ -249,8 +247,11 @@ function draw(time) { //Top-level drawing function
     //Turn
     drawTurn();
     
+    //Mode
+    drawMode();
+    
     //Hand
-    hand.draw(6);
+    hand.draw(mouse.selectedToken);
     
     //Repaint
     if (!paused) requestAnimationFrame(draw); 
@@ -341,11 +342,16 @@ function drawTurn() {
     }
     
 }
-        
-//function drawTileHighlight() {
-    //var px = hexToPix(mouse.selected);		
-    //if (mouse.onScreen(px.x, px.y)) strokeHex(ctx, px.x, px.y, '#f00', 5); 
-//}
+    
+function drawMode() {		
+    if (game.board.mode == MODE_MOVE) {
+        ctx.fillStyle = '#a0a0a0';
+        ctx.fillText('Mode: Move', CANVAS_SIZE_X / 2, 30);
+    }
+    
+    
+}    
+
 	
 function drawTiles() {
 
@@ -377,15 +383,13 @@ function drawTokens() {
         tileSet.draw(ctx, px.x, px.y, tileType, token.player, false, token.count);
         
         //Highlight Selected
-        if (mouse.selected && mouse.selected.q == token.pos.q && mouse.selected.r == token.pos.r) {
+        if (mouse.selectedToken == tokenId) {
             strokeHex(ctx, px.x, px.y, COLOR_TOKEN_SELECTED, 5);    
         }
                     
     }
    
 }
-	
-    
 	
 
 	

@@ -66,6 +66,7 @@ export class Board {
         this.turn = INVALID; 
         this.tokens = []; //All tokens
         this.playerTokens = [[], []]; //Tokens by player                
+        this.mode = MODE_MOVE;   
 	}
 	
     defaultBoard() {
