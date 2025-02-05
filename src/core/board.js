@@ -65,9 +65,7 @@ export class Board {
 		this.tiles = {}; //Hash of 'board' - allows for irregular shapes			
         this.turn = INVALID; 
         this.tokens = []; //All tokens
-        this.playerTokens = [[], []]; //Tokens by player        
-        //console.log(this.toString());
-        console.log(this.tiles);
+        this.playerTokens = [[], []]; //Tokens by player                
 	}
 	
     defaultBoard() {
@@ -168,17 +166,18 @@ export class Board {
         
         //Validate move
         //throw('Invalid board str: ' + boardStr);
-		var srcToken = this.tiles[srcKey].tokenId;
+		var srcTokenId = this.tiles[srcKey].tokenId;
         if (srcToken == EMPTY) return false; //No token at source
-        var destTile = this.tiles[destPos]; 
+        var srcToken = this.tokens[srcTokenId];
+        var destTile = this.tiles[destKey]; 
         if (destTile.tokenId != EMPTY) return false; //Dest not empty
                    
         //Make the move
         srcToken.count -= moveCount; //Decrement existing
-        var newToken = new Token(this.tokens.length, srcToken.player, srcToken.count, new Pos(srcToken.pos.q, srcToken.pos.r));
+        var newToken = new Token(this.tokens.length, srcToken.player, moveCount, new Pos(destPos.q, destPos.r));
         this.tokens.push(newToken);
         this.playerTokens[srcToken.player].push(newToken.id);
-        destTile.tokenId = newToken.id;
+        destTile.tokenId = newToken.id;        
                 		
         this.changeTurn();
         return true;

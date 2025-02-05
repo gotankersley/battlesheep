@@ -367,11 +367,9 @@ function drawTiles() {
         var posKey = posKeys[t];
         var tile = game.board.tiles[posKey];
         var px = hexToPix(tile.pos);
-        
-        if (tile.tokenId == EMPTY) {         
-            fillHex(ctx, px.x, px.y, COLOR_TILE);
-			strokeHex(ctx, px.x, px.y, COLOR_TILE_BORDER, 5);	
-        }
+                
+        fillHex(ctx, px.x, px.y, COLOR_TILE);
+        strokeHex(ctx, px.x, px.y, COLOR_TILE_BORDER, 5);	        
 		
         if (menu.showCoordinates) {
             ctx.fillStyle = COLOR_BLACK;
