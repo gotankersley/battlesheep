@@ -180,12 +180,12 @@ function onMouseDown(e) {
 //
 function onKeyDown(e) {			
     if (e.keyCode == KEY_DELETE) {
-        var sel = mouse.selected;
-        var hive = game.hive;
-        var posStr = sel.q + ',' + sel.r;
-        //if (hive.grid[posStr]) {
+        //var sel = mouse.selected;
+        //var board = game.board;
+        //var posKey = sel.q + ',' + sel.r;
+        //if (board.tiles[posKey]) {
         //    //TODO: return to hand?
-        //    delete hive.grid[posStr]; 
+        //    delete board.tiles[posKey]; 
         //    mouse.selected = null;
         //}
     }
@@ -228,9 +228,7 @@ function draw(time) { //Top-level drawing function
     ctx.save();
     
     ctx.translate(-window.WORLD_INIT_X, -window.WORLD_INIT_Y); //Offset to make drawing easier
-    
-    //Perimeter
-    //if (menu.showDebug && menu.showDebugPerimeter) drawPerimeter();	
+        
     
     //Grid		
     if (menu.showGrid) {
@@ -256,18 +254,7 @@ function draw(time) { //Top-level drawing function
         var tokenId = game.board.tiles[posKey].tokenId;
         hands[PLAYER2].draw(stack);
     }*/
-    
-    //PlacePoints
-    //if (menu.showDebug && menu.showDebugPlaces) drawPlacePoints();
-    
-    //Frozen
-    //if (menu.showDebug && menu.showDebugFrozen) drawFrozen();
-    
-    //Holes
-    //if (menu.showDebug) drawHoles();
-    
-    //Moves
-    //if (menu.showDebug) drawMoves();
+        
             
     ctx.restore();
     
@@ -426,117 +413,8 @@ function drawTokens() {
     
 }*/
 	
-function drawPerimeter() {
-    var posKeys = Object.keys(game.board.perimeter);		
-    
-    for (var t = 0; t < posKeys.length; t++) {
-        var posKey = posKeys[t];
-        var peri = game.board.perimeter[posKey];
-        var px = hexToPix({q:peri.q, r:peri.r});
-        var tx = px.x;
-        var ty = px.y;
-        if (mouse.onScreen(tx, ty)) {
-            fillHex(ctx, tx, ty, 'aqua');	   
-            if (menu.showDebugCoords) {
-                ctx.fillStyle = 'black';
-                ctx.fillText('pid:' + peri.pid, tx, ty);	              
-                ctx.fillText(' [' + posKey + '] client', tx-5, ty+10);	              
-                ctx.fillText(' [' + peri.loc +'] local', tx-5, ty+20);	              
-            }
-        }				
 
-    }		
-}
 	
-function drawPlacePoints() {
-    var posKeys = Object.keys(game.board.placePoints);				
-    
-    for (var t = 0; t < posKeys.length; t++) {
-        var posKey = posKeys[t];
-        var point = game.board.placePoints[posKey];
-        
-        if (point === game.board.turn) {			
-            
-            var posArr = posKey.split(',');
-            var q = parseInt(posArr[0]);
-            var r = parseInt(posArr[1]);
-            
-            var px = hexToPix({q:q, r:r});
-            var tx = px.x;
-            var ty = px.y;
-                
-            if (mouse.onScreen(tx, ty)) {				
-                ctx.fillStyle = 'red';
-                ctx.fillText('PLACE', tx, ty-15);							
-            }
-        }
-        
-    }		
-}
-	
-function drawFrozen() {
-    var posKeys = Object.keys(game.board.frozen);		
-    
-    for (var t = 0; t < posKeys.length; t++) {
-        var posKey = posKeys[t];			            
-        var posArr = posKey.split(',');
-        var q = parseInt(posArr[0]);
-        var r = parseInt(posArr[1]);		
-        var px = hexToPix({q:q, r:r});
-        var tx = px.x;
-        var ty = px.y;
-        if (mouse.onScreen(tx, ty)) {				
-            ctx.fillStyle = 'white';
-            ctx.fillText('FROZEN', tx, ty+15);				
-        }
-    }
-
-}
-
-function drawHoles() {
-    var posKeys = Object.keys(game.board.holes);		
-    
-    for (var t = 0; t < posKeys.length; t++) {
-        var posKey = posKeys[t];			
-        var posArr = posKey.split(',');
-        var q = parseInt(posArr[0]);
-        var r = parseInt(posArr[1]);	
-        var px = hexToPix({q:q, r:r});
-        var tx = px.x;
-        var ty = px.y;
-        if (mouse.onScreen(tx, ty)) {				
-            ctx.fillStyle = 'green';
-            ctx.fillText('HOLE', tx, ty);				
-        }
-    }
-}
-
-function drawMoves() {
-    
-    ctx.lineWidth = 1;		    
-    
-    for (var m = 0; m < game.board.moves.length; m++) {
-        var move = game.hive.moves[m];		
-        var tile = game.hive.grid[move.sq + ',' + move.sr];   
-        
-        switch (tile.type) {
-            case TYPE_ANT: if (menu.showDebugAnt) break; else continue;
-            case TYPE_BEETLE: if (menu.showDebugBeetle) break; else continue;
-            case TYPE_HOPPER: if (menu.showDebugHopper) break; else continue;
-            case TYPE_QUEEN: if (menu.showDebugQueen) break; else continue;
-            case TYPE_SPIDER: if (menu.showDebugSpider) break; else continue;
-            default: continue;
-        }
-        ctx.strokeStyle = TILE_COLORS[tile.type];            
-        var srcPx = hexToPix({q:move.sq, r:move.sr});
-        var dstPx = hexToPix({q:move.dq, r:move.dr});
-        ctx.beginPath();
-        ctx.moveTo(srcPx.x, srcPx.y);			
-        ctx.lineTo(dstPx.x, dstPx.y);
-        ctx.stroke();
-    }
-}
-		
 
 function drawCircle(x, y, r) {
     ctx.beginPath();

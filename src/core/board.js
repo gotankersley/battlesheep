@@ -63,10 +63,18 @@ export function Token( id, player, count, pos) {
 export class Board {
 	constructor() {
 		this.tiles = {}; //Hash of 'board' - allows for irregular shapes			
-		this.turn = TURN1;
-        this.mode = MODE_MOVE;        
-  
-        //Default tiles
+        this.turn = INVALID; 
+        this.tokens = []; //All tokens
+        this.playerTokens = [[], []]; //Tokens by player        
+        //console.log(this.toString());
+        console.log(this.tiles);
+	}
+	
+    defaultBoard() {
+        this.turn = TURN1;
+        this.mode = MODE_MOVE;     
+        
+         //Default tiles
         this.tiles['0,2'] = new Tile(0,2);
         this.tiles['1,1'] = new Tile(1,1);
         this.tiles['2,1'] = new Tile(2,1);
@@ -118,10 +126,8 @@ export class Board {
         
         this.tiles['0,2'].tokenId = 0;
         this.tiles['5,0'].tokenId = 1;
-        
-        console.log(this.toString());
-	}
-	
+    }
+    
 	clone() {
 		var newBoard = new Board();
         
@@ -222,7 +228,7 @@ export class Board {
 	
 	
 	toString() { //Spec: https://docs.google.com/document/d/11V8NxOIwUgfSfK_NEgoLcNuuDWOa7xfyxKEMnZwvppk/edit?tab=t.0
-        //Example: 0,2|1,1|2,1|1,2|3,1|4,0|5,0|4,1|0,4|1,3|2,3|1,4|4,2|5,1|6,1|5,2|2,4|3,3|4,3|3,4|4,4|5,3|6,3|5,4|0,6|1,5|2,5|1,6|2,6|3,5|4,5|3,6|0,2h16|5,2h16|h        
+        //Example: 0,2|1,1|2,1|1,2|3,1|4,0|5,0|4,1|0,4|1,3|2,3|1,4|4,2|5,1|6,1|5,2|2,4|3,3|4,3|3,4|4,4|5,3|6,3|5,4|0,6|1,5|2,5|1,6|2,6|3,5|4,5|3,6|0,2h16|5,2t16|h        
 		var boardStr = '';
         
         //Tiles
@@ -268,15 +274,15 @@ export class Board {
             if (!pair || pair == '') throw('Invalid board coordinate: ' + pair);
             var posArr = pair.split(PROTOCOL_DELIM1);
             var posKey = posArr[0] + ',' + posArr[1];
-            var tile = new Tile(posArr[0], posArr[1]);
+            var tile = new Tile(Number.parseInt(posArr[0]), Number.parseInt(posArr[1]));
             board.tiles[posKey] = tile;
-            //Add token id after parsed in next step
+            //NOTE: token id added after it's parsed in next step
         }
         
         //Tokens - Expect minimum of 2
         //Example: 0,2h
         if ((pairs.length - t) <= 2) throw('Invalid board tokens: ' + boardStr);
-        for (var p = t; p < pairs.length-2; p++) { //Pairs length minus 2 to account for turn at the end
+        for (var p = t; p < pairs.length-1; p++) { //Pairs length minus 1 to account for turn at the end
             var pair = pairs[p];
             if (!pair || pair == '') throw('Invalid board token: ' + pair);            
             
@@ -294,7 +300,7 @@ export class Board {
             var posArr = posStr.split(PROTOCOL_DELIM1);
             var posKey = posArr[0] + ',' + posArr[1];            
             var count = Number.parseInt(pair.substr(turnIndex+1));
-            var pos = new Pos(posArr[0], posArr[1])
+            var pos = new Pos(Number.parseInt(posArr[0]), Number.parseInt(posArr[1]))
             
             var token = new Token(board.tokens.length, player, count, pos);
             board.tokens.push(token);

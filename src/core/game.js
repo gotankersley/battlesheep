@@ -14,7 +14,9 @@ var INVALID = -1;
 
 export class Game {
 	constructor(boardStr) {
-		this.board = new Board(boardStr); //The main (current) board instance		
+		//this.board = new Board(boardStr); //The main (current) board instance		
+        //this.board = Board.fromString(boardStr);
+        this.board = Board.fromString('0,2|1,1|2,1|1,2|3,1|4,0|5,0|4,1|0,4|1,3|2,3|1,4|4,2|5,1|6,1|5,2|2,4|3,3|4,3|3,4|4,4|5,3|6,3|5,4|0,6|1,5|2,5|1,6|2,6|3,5|4,5|3,6|0,2h16|5,2t16|h');
 		boardStr = this.board.toString(); //Update
 		
 		//Add initial state
