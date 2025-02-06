@@ -2,14 +2,15 @@ import { BUTTON_LEFT } from './mouse.js';
 
 var COLOR_HAND_BACKGROUND = 'rgba(100, 100, 100, 0.3)';
 //var COLOR_TILE_HIGHLIGHT = '#ffffe0';
-var COLOR_TILE_HIGHLIGHT = '#f00';
-var COLOR_TILE_SELECTED = 'pink';
-var COLOR_TEXT = '#000';
+var COLOR_HAND_HIGHLIGHT = 'lightgreen';
+var COLOR_HAND_HIGHLIGHT2 = 'green';
+var COLOR_HAND_SELECTED = 'red';
+var COLOR_HAND_TEXT = '#000';
 export const HAND_SIZE_X = 70;
 
-var HAND_TILE_X = 50;
+var HAND_TILE_X = 70;
 var HAND_TILE_Y = 50;
-var HAND_MARGIN_Y = 5;
+var HAND_MARGIN_Y = 10;
 var HAND_HALF_TILE_X = HAND_TILE_X/2;
 var HAND_HALF_TILE_Y = HAND_TILE_Y/2;
 var HAND_HOVER_SIZE = 10;
@@ -55,32 +56,38 @@ export class Hand {
         ctx.clearRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
         ctx.fillStyle = COLOR_HAND_BACKGROUND;
         ctx.fillRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
-                
+        ctx.font = 'bold 18px arial'; 
         
         if (selectedToken >= 0) { 
             var token = game.board.tokens[selectedToken];
             var count = token.count;
             
-            
-            ctx.fillStyle = COLOR_TEXT;
+                        
             for (var h = 0; h < count; h++) {
-                var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;
-                
-                //Bounding box target
-                ctx.strokeStyle = '#000';
-                ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y);                                       
-                ctx.fillText(count-h, HAND_HALF_TILE_X, y+HAND_HALF_TILE_Y);
+                var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;                                
                 
                 //Selected
-                if (this.selected == h) {
-                    ctx.strokeStyle = COLOR_TILE_SELECTED;                    
+                if (this.selected == h) {                                   
+                    ctx.fillStyle = COLOR_HAND_SELECTED;  
+                    ctx.strokeStyle = COLOR_HAND_SELECTED;                       
                     ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y);  	
+                    ctx.fillText(count-h, HAND_HALF_TILE_X-5, y+HAND_HALF_TILE_Y+5);
                 }
                 
-                //Highlight selected
+                //Hover
                 else if (this.hover == h) {
-                    ctx.strokeStyle = COLOR_TILE_HIGHLIGHT;                    
-                    ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y);  		
+                    ctx.fillStyle = COLOR_HAND_HIGHLIGHT2;   
+                    ctx.strokeStyle = COLOR_HAND_HIGHLIGHT;                    
+                    ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y); 
+                    ctx.fillText(count-h, HAND_HALF_TILE_X-5, y+HAND_HALF_TILE_Y+5);                    
+                }
+                
+                //Regular
+                else {
+                    ctx.fillStyle = COLOR_HAND_TEXT;  
+                    ctx.strokeStyle = COLOR_HAND_TEXT;
+                    ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y);                                       
+                    ctx.fillText(count-h, HAND_HALF_TILE_X-5, y+HAND_HALF_TILE_Y+5);
                 }
                 
             }

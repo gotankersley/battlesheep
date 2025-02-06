@@ -146,7 +146,7 @@ function onMouseDown(e) {
         //    return;
         //}
         
-        //See if a (new) tile has been selected
+        //See if a (new) token has been selected
         var pos = mouse.axial;   
         var posKey = pos.q + ',' + pos.r;
         if (board.tiles[posKey]) { //Valid tile
@@ -164,9 +164,9 @@ function onMouseDown(e) {
                 }
             }
             else { //Tile is not occupied
-                //Moving a tile
+                //Moving a token
                 if (mouse.selected) {
-                    if (hand.selected >= 0) {
+                    if (hand.selected !== null) {
                         var token = board.tokens[mouse.selectedToken];
                         game.makeMove(mouse.selected, pos, token.count-hand.selected, mouse.ctrlOn);  
                     }
@@ -198,8 +198,10 @@ function onPlaced(player, tileType, pos) {
 }
 
 function onMoved(src, dst) {        
-    mouse.selected = null;		        
-    setTimeout(game.play, MOVE_DELAY);		
+    mouse.selected = null;		  
+    mouse.selectedToken = INVALID;
+    hand.selected = null;
+    //setTimeout(game.play, MOVE_DELAY);		
 }
 
 function onWin(winner, loser) {
