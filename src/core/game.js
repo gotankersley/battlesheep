@@ -5,12 +5,12 @@ import { PLAYER_HUMAN } from '../players/players.js';
 var GAME_REPEAT_WINDOW = 8; //Check for repeats this far back
 
 
-var EVENT_INVALID = 0;
-var EVENT_PLAYED = 1;
-var EVENT_GAME_OVER = 2;
+export const EVENT_INVALID = 'invalid';
+export const EVENT_MOVED = 'moved';
+export const EVENT_GAME_OVER = 'gameOver';
 
-var INFINITY = 1000000;
-var INVALID = -1;
+
+
 
 export class Game {
 	constructor(boardStr) {
@@ -57,7 +57,7 @@ export class Game {
         if (override || true) {//|| this.hive.canMove(src, dst)) {
             this.board.makeMove(src, dst, moveCount);
             //this.save();		
-            //this.onMoved(src, dst);
+            this.onMoved(src, dst);
         }	
     }
 
@@ -127,9 +127,12 @@ export class Game {
 		}		
 	}
 
-	onPlayed(move) {
-		var self = game;	
+	onMoved(move) {        
+		var self = game;
+		var board = self.board;
 		
+        var player = self.players[board.turn];        
+		/*
 		//TODO: Validate move?
 		if (!move) { //No moves available
 			alert ('No moves available - skipping player');
@@ -137,10 +140,8 @@ export class Game {
 			return self.gameEvents[EVENT_PLAYED]();
 		}
 		
-		var board = self.board;
 		var mode = board.getMode();
-		var turn = board.getTurn();
-		var player = self.players[turn];
+		
 		
 		//Update board
 		if (mode == MODE_PLACE) board.place(move.pr, move.pc);					
@@ -156,7 +157,8 @@ export class Game {
 		
 		//Check for game over
 		if (board.isGameOver()) self.onGameOver();
-		else self.gameEvents[EVENT_PLAYED](player, move);
+		else*/
+        self.gameEvents[EVENT_MOVED](player, move);
 	}
 
 }

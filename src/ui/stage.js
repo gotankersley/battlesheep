@@ -1,8 +1,8 @@
-import { setHex, fillHex, strokeHex, ORIENT_FLAT, ORIENT_POINTY } from '../lib/hex-lib.js';
+import { setHex, fillHex, strokeHex, ORIENT_FLAT, ORIENT_POINTY, INVALID } from '../lib/hex-lib.js';
 import { MenuManager } from './menu.js';
 import { TileSet } from './tile-set.js';
 import { PLAYER1, PLAYER2, EMPTY, MODE_MOVE } from '../core/board.js';
-import { Game } from '../core/game.js';
+import { Game, EVENT_MOVED } from '../core/game.js';
 import { Mouse, BUTTON_LEFT } from './mouse.js';
 import { Hand, HAND_SIZE_X } from './hand.js';
 
@@ -88,7 +88,7 @@ export function createStage(containerId) {
     window.game = new Game();
     window.game.addEventListener('placed', onPlaced);
     window.game.addEventListener('win', onWin);
-    window.game.addEventListener('moved', onMoved);
+    window.game.addEventListener(EVENT_MOVED, onMoved);
     
     //Start rendering
     window.tileSet = new TileSet(function() {    
@@ -197,7 +197,7 @@ function onPlaced(player, tileType, pos) {
     setTimeout(game.play, MOVE_DELAY);		
 }
 
-function onMoved(src, dst) {        
+function onMoved(src, dst) {         
     mouse.selected = null;		  
     mouse.selectedToken = INVALID;
     hand.selected = null;

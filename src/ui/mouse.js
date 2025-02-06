@@ -1,4 +1,4 @@
-import { setHex } from '../lib/hex-lib.js';
+import { setHex, INVALID } from '../lib/hex-lib.js';
 
 export const BUTTON_LEFT = 0;
 export const BUTTON_MIDDLE = 1;
@@ -16,7 +16,7 @@ export class Mouse {
         this.click = {x: 0, y: 0}; //Mouse down - screen coords	
         this.dragging = false;
         this.selected = null;
-        this.selectedToken = -1;
+        this.selectedToken = INVALID;
         this.ctrlOn = false;
         this.boundsX;
         this.boundsY;

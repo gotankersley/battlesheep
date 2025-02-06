@@ -8,9 +8,9 @@ var COLOR_HAND_SELECTED = 'red';
 var COLOR_HAND_TEXT = '#000';
 export const HAND_SIZE_X = 70;
 
-var HAND_TILE_X = 70;
+var HAND_TILE_X = HAND_SIZE_X;
 var HAND_TILE_Y = 50;
-var HAND_MARGIN_Y = 10;
+var HAND_MARGIN_Y = 0;
 var HAND_HALF_TILE_X = HAND_TILE_X/2;
 var HAND_HALF_TILE_Y = HAND_TILE_Y/2;
 var HAND_HOVER_SIZE = 10;
@@ -38,7 +38,7 @@ export class Hand {
 
         var x = e.clientX - window.mouse.canvasBounds.left; 
         var y = e.clientY - window.mouse.canvasBounds.top;        
-        this.hover = Math.floor((y-HAND_MARGIN_Y)/HAND_TILE_Y);
+        this.hover = Math.floor((CANVAS_SIZE_Y-(y))/HAND_TILE_Y);
         
     }
 
@@ -46,7 +46,7 @@ export class Hand {
         if (e.button == BUTTON_LEFT) { 
             var x = e.clientX - window.mouse.canvasBounds.left; 
             var y = e.clientY - window.mouse.canvasBounds.top;
-            this.selected = Math.floor((y-HAND_MARGIN_Y)/HAND_TILE_Y);            
+            this.selected = Math.floor((CANVAS_SIZE_Y-(y))/HAND_TILE_Y);            
         }
     }
 
@@ -64,7 +64,7 @@ export class Hand {
             
                         
             for (var h = 0; h < count; h++) {
-                var y = (h * HAND_TILE_Y) + HAND_MARGIN_Y;                                
+                var y = CANVAS_SIZE_Y-(((h+1) * HAND_TILE_Y) + HAND_MARGIN_Y);  
                 
                 //Selected
                 if (this.selected == h) {                                   
