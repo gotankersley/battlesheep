@@ -2,22 +2,19 @@ import { Board } from '../core/board.js';
 import { PLAYER_HUMAN } from '../players/players.js';
 
 //Constants
-var GAME_REPEAT_WINDOW = 8; //Check for repeats this far back
-
-
 export const EVENT_INVALID = 'invalid';
 export const EVENT_MOVED = 'moved';
+export const EVENT_PLACED = 'placed';
 export const EVENT_GAME_OVER = 'gameOver';
 
 
-
+const DEFAULT_BOARD_STR = '0,2|1,1|2,1|1,2|3,1|4,0|5,0|4,1|0,4|1,3|2,3|1,4|4,2|5,1|6,1|5,2|2,4|3,3|4,3|3,4|4,4|5,3|6,3|5,4|0,6|1,5|2,5|1,6|2,6|3,5|4,5|3,6|0,2h16|5,2t16|h';
 
 export class Game {
 	constructor(boardStr) {
-		//this.board = new Board(boardStr); //The main (current) board instance		
-        //this.board = Board.fromString(boardStr);
-        this.board = Board.fromString('0,2|1,1|2,1|1,2|3,1|4,0|5,0|4,1|0,4|1,3|2,3|1,4|4,2|5,1|6,1|5,2|2,4|3,3|4,3|3,4|4,4|5,3|6,3|5,4|0,6|1,5|2,5|1,6|2,6|3,5|4,5|3,6|0,2h16|5,2t16|h');
-		boardStr = this.board.toString(); //Update
+        if (boardStr != '') this.board = Board.fromString(boardStr);
+        else this.board = Board.fromString(DEFAULT_BOARD_STR);
+		boardStr = this.board.toString(); //Update / Sanity check
 		
 		//Add initial state
 		this.history = [boardStr]; //History is for game log		
@@ -44,7 +41,8 @@ export class Game {
 	onGameOver () {
 		var loser = this.board.turn; //TODO: draws?
 		
-		this.logCurrentState(this.board);
+        var boardStr = board.toString();        
+		this.history.push(boardStr);	
 		
 		//Draw the win and other hoopla...
 		this.gameEvents[EVENT_GAME_OVER](+(!loser), loser);
@@ -88,14 +86,6 @@ export class Game {
 	}
 
 
-
-	//Helper function keep track of game history
-	logCurrentState(board) {
-		var boardStr = board.toString();
-        
-		this.history.push(boardStr);		
-	}
-	
 	
 
 	//Player functions
@@ -121,7 +111,7 @@ export class Game {
 		}		
 	}
 
-	onMoved(move) {        
+	onMoved(src, dst) {        
 		
 		var board = this.board;
 		
@@ -139,12 +129,13 @@ export class Game {
 		*/
         
 		//History 
-		this.logCurrentState(board);	
+        var boardStr = board.toString();        
+		this.history.push(boardStr);	
 		
         
 		//Check for game over
 		if (board.isGameOver()) this.onGameOver();
-		else this.gameEvents[EVENT_MOVED](player, move);
+		else this.gameEvents[EVENT_MOVED](src, dst, boardStr);
 	}
 
 }

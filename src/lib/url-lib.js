@@ -7,8 +7,8 @@ export function init(onHashChanged) {
 }
 
 
-export function setHashNonVolatile(val) {
-    if (window.location.hash.replace('#') != val) {
+export function setHash(val) {
+    if (window.location.hash.replace('#') != val) {        
         nonVolatileHashChange = true;
         window.location.hash = val; //This will trigger a hash event
     }

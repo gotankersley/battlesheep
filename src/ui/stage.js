@@ -2,8 +2,8 @@ import { setHex, fillHex, strokeHex, ORIENT_FLAT, ORIENT_POINTY, INVALID } from 
 import * as Url from '../lib/url-lib.js';
 import { MenuManager } from './menu.js';
 import { TileSet } from './tile-set.js';
-import { PLAYER1, PLAYER2, EMPTY, MODE_MOVE } from '../core/board.js';
-import { Game, EVENT_MOVED, EVENT_GAME_OVER } from '../core/game.js';
+import { Board, PLAYER1, PLAYER2, EMPTY, MODE_MOVE } from '../core/board.js';
+import { Game, EVENT_MOVED, EVENT_GAME_OVER, EVENT_PLACED } from '../core/game.js';
 import { Mouse, BUTTON_LEFT } from './mouse.js';
 import { Hand, HAND_SIZE_X } from './hand.js';
 
@@ -85,24 +85,24 @@ export function createStage(containerId) {
     };
             
     //Url
-    //Url.init(function(e) {
-    //            var hash = window.location.hash.replace('#', '');	                               
-    //});
-    //
-    //        var boardStr;
-    //        if (performance.navigation.type == 0) { //First time on this page
-    //            var hash = window.location.hash.replace('#', '');
-    //            if (hash.length > 1) boardStr = hash;		
-    //            else Url.setHash(''); //Clear state
-    //        }
-    //        else Url.setHash('');  //Refresh - clear state
-    //            
-    //});    		
+    Url.init(function(e) {
+        var hash = window.location.hash.replace('#', '');	  
+        window.game.board = Board.fromString(hash);
+    });
+    
+    var boardStr = '';
+    if (performance.navigation.type == 0) { //First time on this page
+        var hash = window.location.hash.replace('#', '');
+        if (hash.length > 1) boardStr = hash;		
+        else Url.setHash(''); //Clear state
+    }
+    else Url.setHash('');  //Refresh - clear state
+                      	
 			
     
     //Game events	
-    window.game = new Game();
-    window.game.addEventListener('placed', onPlaced);
+    window.game = new Game(boardStr);
+    window.game.addEventListener(EVENT_PLACED, onPlaced);
     window.game.addEventListener(EVENT_GAME_OVER, onGameOver);
     window.game.addEventListener(EVENT_MOVED, onMoved);
     
@@ -215,11 +215,12 @@ function onPlaced(player, tileType, pos) {
     setTimeout(game.play, MOVE_DELAY);		
 }
 
-function onMoved(src, dst) {         
+function onMoved(src, dst, boardStr) {         
     mouse.selected = null;		  
     mouse.selectedToken = INVALID;
     hand.selected = null;
     hand.hover = null;    
+    Url.setHash(boardStr);
     //setTimeout(game.play, MOVE_DELAY);		
 }
 
