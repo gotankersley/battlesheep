@@ -12,7 +12,7 @@ html, body { /* Remove default padding around page */
 
 /* MESSAGE */
 #message {	
-    background: rgb(232,232,255); /* Old browsers */
+    background: lightgreen; /*rgb(232,232,255);  Old browsers */
     /*
 	background: rgb(242,245,246); 
 	background: -moz-linear-gradient(top,  rgba(242,245,246,1) 0%, rgba(227,234,237,1) 37%, rgba(200,215,220,1) 100%);

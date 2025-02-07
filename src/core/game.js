@@ -20,9 +20,7 @@ export class Game {
 		boardStr = this.board.toString(); //Update
 		
 		//Add initial state
-		this.history = [boardStr]; //History is for game log
-		this.memory = {}; //Memory is for detecting repeats
-		this.memory[boardStr] = true;
+		this.history = [boardStr]; //History is for game log		
 		this.undoHistory = [];
 		
 		this.players = [PLAYER_HUMAN, PLAYER_HUMAN];
@@ -44,9 +42,9 @@ export class Game {
 
 
 	onGameOver () {
-		var loser = this.board.getTurn(); //TODO: draws?
+		var loser = this.board.turn; //TODO: draws?
 		
-		//this.logCurrentState(boardCopy);
+		this.logCurrentState(this.board);
 		
 		//Draw the win and other hoopla...
 		this.gameEvents[EVENT_GAME_OVER](+(!loser), loser);
@@ -66,7 +64,7 @@ export class Game {
 		if (this.history.length > 1) {			
 			var oldStr = this.history.pop();
 			this.undoHistory.push(oldStr);
-			delete this.memory[oldStr];
+			
 			var boardStr = this.history[this.history.length-1];
 			
 			this.board = new Board(boardStr);
@@ -79,7 +77,7 @@ export class Game {
 		if (this.undoHistory.length > 0) {	
 			var savedStr = this.undoHistory.pop();
 			this.history.push(savedStr);
-			this.memory[savedStr] = true;
+			
 			this.board = new Board(savedStr);					
 			
 			//Check for Game over		
@@ -94,21 +92,17 @@ export class Game {
 	//Helper function keep track of game history
 	logCurrentState(board) {
 		var boardStr = board.toString();
-		this.history.push(boardStr);
-		//if (this.memory[boardStr]) {
-			//if (this.history.slice(-GAME_REPEAT_WINDOW).indexOf(boardStr) >= 0) this.gameEvents['repeat']();
-		//}
-		this.memory[boardStr] = true;
+        
+		this.history.push(boardStr);		
 	}
 	
-	load() {}
-	save() {}
+	
 
 	//Player functions
 	play () {
 		
 		var board = this.board;
-		var turn = board.getTurn();
+		var turn = board.turn;
 		var player = this.players[turn];
 		
 		if (player == PLAYER_HUMAN) return; //Ignore
@@ -128,37 +122,29 @@ export class Game {
 	}
 
 	onMoved(move) {        
-		var self = game;
-		var board = self.board;
 		
-        var player = self.players[board.turn];        
+		var board = this.board;
+		
+        var player = this.players[board.turn];        
 		/*
 		//TODO: Validate move?
 		if (!move) { //No moves available
 			alert ('No moves available - skipping player');
-			self.board.skip();
-			return self.gameEvents[EVENT_PLAYED]();
+			this.board.skip();
+			return this.gameEvents[EVENT_PLAYED]();
 		}
 		
 		var mode = board.getMode();
+
+		*/
+        
+		//History 
+		this.logCurrentState(board);	
 		
-		
-		//Update board
-		if (mode == MODE_PLACE) board.place(move.pr, move.pc);					
-		else if (mode & (MODE_MOVE | MODE_FLY)) board.move(move.sr, move.sc, move.dr, move.dc);
-			
-		//Removes, or combined moves -(e.g. place followed by remove)
-		if (move.hasOwnProperty('rr') && move.hasOwnProperty('rc')) {
-			board.remove(move.rr, move.rc);
-		}
-		
-		//History and Memory
-		self.logCurrentState(board);	
-		
+        
 		//Check for game over
-		if (board.isGameOver()) self.onGameOver();
-		else*/
-        self.gameEvents[EVENT_MOVED](player, move);
+		if (board.isGameOver()) this.onGameOver();
+		else this.gameEvents[EVENT_MOVED](player, move);
 	}
 
 }

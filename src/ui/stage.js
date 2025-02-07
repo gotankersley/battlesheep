@@ -1,8 +1,9 @@
 import { setHex, fillHex, strokeHex, ORIENT_FLAT, ORIENT_POINTY, INVALID } from '../lib/hex-lib.js';
+import * as Url from '../lib/url-lib.js';
 import { MenuManager } from './menu.js';
 import { TileSet } from './tile-set.js';
 import { PLAYER1, PLAYER2, EMPTY, MODE_MOVE } from '../core/board.js';
-import { Game, EVENT_MOVED } from '../core/game.js';
+import { Game, EVENT_MOVED, EVENT_GAME_OVER } from '../core/game.js';
 import { Mouse, BUTTON_LEFT } from './mouse.js';
 import { Hand, HAND_SIZE_X } from './hand.js';
 
@@ -83,17 +84,33 @@ export function createStage(containerId) {
         e.preventDefault();
     };
             
+    //Url
+    //Url.init(function(e) {
+    //            var hash = window.location.hash.replace('#', '');	                               
+    //});
+    //
+    //        var boardStr;
+    //        if (performance.navigation.type == 0) { //First time on this page
+    //            var hash = window.location.hash.replace('#', '');
+    //            if (hash.length > 1) boardStr = hash;		
+    //            else Url.setHash(''); //Clear state
+    //        }
+    //        else Url.setHash('');  //Refresh - clear state
+    //            
+    //});    		
+			
     
     //Game events	
     window.game = new Game();
     window.game.addEventListener('placed', onPlaced);
-    window.game.addEventListener('win', onWin);
+    window.game.addEventListener(EVENT_GAME_OVER, onGameOver);
     window.game.addEventListener(EVENT_MOVED, onMoved);
     
     //Start rendering
     window.tileSet = new TileSet(function() {    
         draw();
     }); 
+    
 }
 
 function showMessage(text) {
@@ -142,7 +159,7 @@ function onMouseDown(e) {
         var board = game.board;
         var player = board.turn;        
         //if (game.players[player] != PLAYER_HUMAN) {
-        //    Stage.showMessage('Waiting for other player to play...');
+        //    showMessage('Waiting for other player to play...');
         //    return;
         //}
         
@@ -168,7 +185,8 @@ function onMouseDown(e) {
                 if (mouse.selected) {
                     if (hand.selected !== null) {
                         var token = board.tokens[mouse.selectedToken];
-                        game.makeMove(mouse.selected, pos, token.count-hand.selected, mouse.ctrlOn);  
+                        var count = token.count-(hand.selected+1);
+                        game.makeMove(mouse.selected, pos, count, mouse.ctrlOn);  
                     }
                 }
             }
@@ -201,15 +219,18 @@ function onMoved(src, dst) {
     mouse.selected = null;		  
     mouse.selectedToken = INVALID;
     hand.selected = null;
+    hand.hover = null;    
     //setTimeout(game.play, MOVE_DELAY);		
 }
 
-function onWin(winner, loser) {
+function onGameOver(winner, loser) {
     mouse.selected = null;	
-    if (winner == PLAYER1) alert('Player1 has won');
-    else if (winner == PLAYER2) alert('Player2 has won');
-    else if (winner == WIN_DRAW) alert('Tie game');
-    else console.log('Game over?', winner, loser);
+    
+    if (winner == PLAYER1) showMessage('Player1 has won');
+    else if (winner == PLAYER2) showMessage('Player2 has won');
+    else showMessage('Game Over!');
+    //else if (winner == WIN_DRAW) showMessage('Tie game');
+    //else console.log('Game over?', winner, loser);
 }
 	
 //Drawing	

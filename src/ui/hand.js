@@ -60,7 +60,7 @@ export class Hand {
         
         if (selectedToken >= 0) { 
             var token = game.board.tokens[selectedToken];
-            var count = token.count;
+            var count = token.count-1; //Have to leave at least one
             
                         
             for (var h = 0; h < count; h++) {
