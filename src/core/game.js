@@ -1,5 +1,7 @@
 import { Board } from '../core/board.js';
-import { PLAYER_HUMAN } from '../players/players.js';
+import { PLAYER_HUMAN, PLAYER_RANDOM, PLAYER_NETWORK } from '../players/players.js';
+import * as RandomPlayer from '../players/random.js';
+import * as NetworkPlayer from '../players/network.js';
 
 //Constants
 export const EVENT_INVALID = 'invalid';
@@ -27,7 +29,7 @@ export class Game {
 
 
 
-	updateBoard (newBoard) {
+	updateBoard = (newBoard)  => {
 		this.board = newBoard;
 		this.gameEvents[EVENT_BOARD_UPDATE](newBoard);
 	}
@@ -38,7 +40,7 @@ export class Game {
 	}
 
 
-	onGameOver () {
+	onGameOver = () => {
 		var loser = this.board.turn; //TODO: draws?
 		
         var boardStr = board.toString();        
@@ -49,15 +51,12 @@ export class Game {
 			
 	}
     
-    makeMove = (src, dst, moveCount, override) => {	
-        if (override || true) {//|| this.hive.canMove(src, dst)) {
-            this.board.makeMove(src, dst, moveCount);
-            //this.save();		
-            this.onMoved(src, dst);
-        }	
+    makeMove = (src, dst, moveCount, override) => {	       
+        this.board.makeMove(src, dst, moveCount);            	
+        this.onMoved(src, dst, moveCount);        
     }
 
-	undoMove () {
+	undoMove = () => {
 		
 		if (this.history.length > 1) {			
 			var oldStr = this.history.pop();
@@ -71,7 +70,7 @@ export class Game {
 		return false;
 	}
 
-	redoMove() {
+	redoMove = () => {
 		if (this.undoHistory.length > 0) {	
 			var savedStr = this.undoHistory.pop();
 			this.history.push(savedStr);
@@ -89,7 +88,7 @@ export class Game {
 	
 
 	//Player functions
-	play () {
+	play = () => {
 		
 		var board = this.board;
 		var turn = board.turn;
@@ -98,9 +97,8 @@ export class Game {
 		if (player == PLAYER_HUMAN) return; //Ignore
 		
 		//Handle no-move, and one move
-		var plays = board.getPlays();	
-		if (plays.length == 0) return this.onPlayed();
-		else if (plays.length == 1) return this.onPlayed(plays[0]);
+		//var moves = board.getMoves();	
+		//if (moves.length == 0) return this.onPlayed();		
 		
 		
 		//All Async - expect onPlayed callback	
@@ -111,7 +109,11 @@ export class Game {
 		}		
 	}
 
-	onMoved(src, dst) {        
+    onPlayed = (move) => {
+        this.makeMove(move.src, move.dst, move.count);
+    }
+
+	onMoved = (src, dst, moveCount) => {        
 		
 		var board = this.board;
 		

@@ -4,6 +4,7 @@ import { MenuManager } from './menu.js';
 import { TileSet } from './tile-set.js';
 import { Board, PLAYER1, PLAYER2, EMPTY, MODE_MOVE } from '../core/board.js';
 import { Game, EVENT_MOVED, EVENT_GAME_OVER, EVENT_PLACED } from '../core/game.js';
+import { PLAYER_HUMAN } from '../players/players.js';
 import { Mouse, BUTTON_LEFT } from './mouse.js';
 import { Hand, HAND_SIZE_X } from './hand.js';
 
@@ -69,9 +70,7 @@ export function createStage(containerId) {
     WORLD_X = Math.floor(CANVAS_SIZE_X/3)+HEX_SIZE_X; //Move origin to more center of the screen
     WORLD_Y = 100;//Math.floor(CANVAS_SIZE_Y/2)+HEX_SIZE_Y;
     
-    ctx = canvas.getContext('2d');  
-    ctx.fillStyle = COLOR_BLACK;
-    ctx.font = 'bold 14px arial'; 
+    ctx = canvas.getContext('2d');   
     
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
@@ -124,7 +123,7 @@ function showMessage(text) {
 }
 	
 	
-function onWindowResize() {
+const onWindowResize = () => {
     window.CANVAS_SIZE_X = window.innerWidth - window.CANVAS_MARGIN_X;
     window.CANVAS_SIZE_Y = window.innerHeight - window.CANVAS_MARGIN_Y;
             
@@ -146,23 +145,23 @@ function onWindowResize() {
     $message.style.width = (CANVAS_SIZE_X - 160) + 'px';
 }
 	
-function onFocus() {
+const onFocus = () => {
     paused = false;
     requestAnimationFrame(draw); 
 }
 
-function onBlur() {
+const onBlur = () => {
     paused = true;
 }
 
-function onMouseDown(e) {	
+const onMouseDown = (e) => {	
     if (e.button == BUTTON_LEFT) {	
         var board = game.board;
         var player = board.turn;        
-        //if (game.players[player] != PLAYER_HUMAN) {
-        //    showMessage('Waiting for other player to play...');
-        //    return;
-        //}
+        if (game.players[player] != PLAYER_HUMAN) {
+            showMessage('Waiting for other player to play...');
+            return;
+        }
         
         //See if a (new) token has been selected
         var pos = mouse.axial;   
@@ -201,12 +200,12 @@ function onMouseDown(e) {
     }
 }
 	
-//function onKeyPress(e) {
+//const onKeyPress = (e) => {
 //	var key = e.which;
 //	console.log(e);
 //}
 //
-function onKeyDown(e) {			
+const onKeyDown = (e) => {			
     if (e.keyCode == KEY_T) {
         game.board.changeTurn();        
     }
@@ -216,22 +215,22 @@ function onKeyDown(e) {
 }
 	
 //Game Events
-function onPlaced(player, tileType, pos) {        
+const onPlaced = (player, tileType, pos) => {        
     hand.selected = null;
     hand.hover = null;
     setTimeout(game.play, MOVE_DELAY);		
 }
 
-function onMoved(src, dst, boardStr) {         
+const onMoved = (src, dst, boardStr) => {         
     mouse.selected = null;		  
     mouse.selectedToken = INVALID;
     hand.selected = null;
     hand.hover = null;    
     Url.setHash(boardStr);
-    //setTimeout(game.play, MOVE_DELAY);		
+    setTimeout(game.play, MOVE_DELAY);		
 }
 
-function onGameOver(winner, loser) {
+const onGameOver = (winner, loser) => {
     mouse.selected = null;	
     showMessage('Game OVER!');
     if (winner == PLAYER1) alert('Player1 has won');
@@ -290,6 +289,8 @@ function draw(time) { //Top-level drawing function
 					
 function drawGrid_F() {
     
+    ctx.font = 'bold 12px arial';
+        
     //Draw grid using Odd-Q offset style						
     var hexRowsPerScreen = Math.floor(window.CANVAS_SIZE_Y/window.HEX_SIZE_Y)+3;		
     var hexColsPerScreen = Math.floor(2*(window.CANVAS_SIZE_X/window.HEX_SIZE_X));
@@ -321,6 +322,8 @@ function drawGrid_F() {
 }	
 	
 function drawGrid_P() {
+    
+    ctx.font = 'bold 12px arial';
     
     //Draw grid using Odd-R offset style						
     var hexRowsPerScreen = Math.floor(2*(window.CANVAS_SIZE_Y/window.HEX_SIZE_Y));
@@ -404,6 +407,9 @@ function drawTiles() {
 
 
 function drawTokens() {
+    ctx.fillStyle = COLOR_BLACK;
+    ctx.font = 'bold 14px arial';
+    
     var board = game.board;
     var tokens = board.tokens;      
     for (var tokenId = 0; tokenId < tokens.length; tokenId++) {

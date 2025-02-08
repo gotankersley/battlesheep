@@ -169,11 +169,11 @@ export class Board {
     isGameOver() {
         var curPlayer = this.turn;
         var oppPlayer = +(!this.turn);
-        if (this.isGameOverForPlayer(curPlayer)) {
-            if (this.isGameOverForPlayer(oppPlayer)) return true;
-            
-        }
-        return false;
+        if (this.isGameOverForPlayer(curPlayer)) return true;
+        //    if (this.isGameOverForPlayer(oppPlayer)) return true;
+        //    
+        //}
+        //return false;
     }
     
 	isGameOverForPlayer(player) {
@@ -280,6 +280,7 @@ export class Board {
             if (tile.tokenId != EMPTY) return {status: false, msg:'Can not jump over other tokens'};
         }
         var moves = this.getMoves();
+        
 		return {status:true, msg:''};
 	}
     
@@ -303,7 +304,7 @@ export class Board {
                     var move = {
                         src:new Pos(token.pos.q, token.pos.r),
                         dst:new Pos(neighQ, neighR),
-                        count:stepCount,
+                        count:token.count-1, //The represents the max available
                     };
                     moves.push(move);
                     

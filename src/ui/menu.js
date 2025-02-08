@@ -1,13 +1,13 @@
 import { setHex, ORIENT_FLAT, ORIENT_POINTY } from '../lib/hex-lib.js';
 import { getTileSetNames } from './tile-set.js';
 import { PLAYER1, PLAYER2 } from '../core/board.js';
-import { PLAYER_HUMAN } from '../players/players.js';
+import { PLAYER_HUMAN,  PLAYER_RANDOM, PLAYER_NETWORK  } from '../players/players.js';
 
 //Struct MenuProperties
 function MenuProperties() {
 	//Options
 	this.showGrid = true;
-	this.showCoordinates = true;
+	this.showCoordinates = false;
 	this.orientation = ORIENT_FLAT;	
 	this.tileSet1 = 0;
 	this.tileSet2 = 1;		
@@ -19,9 +19,6 @@ function MenuProperties() {
     //Debug
     this.showMoves = false; 
     
-    //Graph
-    //this.showGraph = true;
-    //this.showPerimeter = false;    
     
     //Deprecated
     this.save = function() { game.save(); }
@@ -52,19 +49,10 @@ export function MenuManager() {
 	debugMenu.add(this.properties, 'showMoves');
           
     
-    //Graph
-	//var graphMenu = this.rootMenu.addFolder('Graph');			
-	//graphMenu.add(this.properties, 'showGraph').onChange(this.onToggleGraph.bind(this));	
-	//graphMenu.add(this.properties, 'showPerimeter');	    
-    
-    //Deprecated
-    //debugMenu.add(this.properties, 'save');
-	//debugMenu.add(this.properties, 'load');
-	//debugMenu.closed = false;
 	
 	
 	//Root menu			
-	var playerNames = {Human:PLAYER_HUMAN};//, Random:PLAYER_RANDOM, Heuristic:PLAYER_HEURISTIC, Zoe:PLAYER_NETWORK, Squish:PLAYER_AB, Squash:PLAYER_SQUASH};
+	var playerNames = {Human:PLAYER_HUMAN, Random:PLAYER_RANDOM, Network:PLAYER_NETWORK};
 	this.rootMenu.add(this.properties, 'player1', playerNames).onChange(this.onChangePlayer.bind(this, PLAYER1));
 	this.rootMenu.add(this.properties, 'player2', playerNames).onChange(this.onChangePlayer.bind(this, PLAYER2));
 }
@@ -82,9 +70,3 @@ MenuManager.prototype.onChangePlayer = function(player, val) {
 MenuManager.prototype.onChangeOrientation = function(val) {	
 	setHex(menu.orientation, window.HEX_SIDE);
 }
-
-//MenuManager.prototype.onToggleGraph = function(val) {	
-//    var graph = document.getElementById('graph');
-//    if (val) graph.style.display = 'block';
-//    else graph.style.display = 'none';
-//}
