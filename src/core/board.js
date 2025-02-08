@@ -189,7 +189,9 @@ export class Board {
                 var neighQ = token.pos.q + NEIGHBORS_Q[dir];
                 var neighR = token.pos.r + NEIGHBORS_R[dir];
                 var neighKey = neighQ + ',' + neighR;
-                if (this.tiles[neighKey] && this.tiles[neighKey].tokenId == EMPTY) return false;
+                if (this.tiles[neighKey] && this.tiles[neighKey].tokenId == EMPTY) {
+                    return false;
+                }
             }
             
         }
@@ -213,8 +215,7 @@ export class Board {
         this.tokens.push(newToken);
         this.playerTokens[srcToken.player].push(newToken.id);
         dstTile.tokenId = newToken.id;        
-                		
-        this.changeTurn();        
+                		              
         
 	} 
 		
@@ -315,7 +316,7 @@ export class Board {
                 }
             }
             
-        }
+        }        
         return moves;
     }
 	
@@ -406,4 +407,27 @@ export class Board {
         //TODO: Sanity check all tiles are connected
 		return board;
 	}
+    
+    static parseMove = (moveStr) => { //Example: 2,1|6|4,-1
+        var pairs = moveStr.split(PROTOCOL_DELIM2);
+        if (pairs.length != 3) throw('Invalid move str: ' + moveStr);
+        
+        //Source
+        var srcStr = pairs[0];
+        var srcArr = srcStr.split(PROTOCOL_DELIM1);
+        if (srcArr.length != 2) throw('Invalid move source coordinates: ' + moveStr);
+        var src = new Pos(Number.parseInt(srcArr[0]), Number.parseInt(srcArr[1]));
+        
+        //Count
+        var count = Number.parseInt(pairs[1]);
+        
+        
+        //Dest
+        var dstStr = pairs[0];
+        var dstArr = dstStr.split(PROTOCOL_DELIM1);
+        if (dstArr.length != 2) throw('Invalid move dest coordinates: ' + moveStr);
+        var dst = new Pos(Number.parseInt(dstArr[0]), Number.parseInt(dstArr[1])); 
+            
+        return {src:src, dst:dst, count:count};
+    }
 }

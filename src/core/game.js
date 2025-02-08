@@ -43,7 +43,7 @@ export class Game {
 	onGameOver = () => {
 		var loser = this.board.turn; //TODO: draws?
 		
-        var boardStr = board.toString();        
+        var boardStr = this.board.toString();        
 		this.history.push(boardStr);	
 		
 		//Draw the win and other hoopla...
@@ -94,6 +94,10 @@ export class Game {
 		var turn = board.turn;
 		var player = this.players[turn];
 		
+        if (board.isGameOver()){            
+            return this.onGameOver();
+        }
+        
 		if (player == PLAYER_HUMAN) return; //Ignore
 		
 		//Handle no-move, and one move
@@ -137,7 +141,10 @@ export class Game {
         
 		//Check for game over
 		if (board.isGameOver()) this.onGameOver();
-		else this.gameEvents[EVENT_MOVED](src, dst, boardStr);
+		else {
+            board.changeTurn(); 
+            this.gameEvents[EVENT_MOVED](src, dst, boardStr);            
+        }
 	}
 
 }

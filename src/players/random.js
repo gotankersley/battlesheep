@@ -5,7 +5,7 @@ export function getPlay (board, onPlayed) {
 
 	if (moves.length) {
         var randMove = moves[Math.floor(Math.random() * moves.length)];	//Random spot	
-		randMove.count = Math.floor(Math.random() * randMove.count) //Random split
+		randMove.count = Math.floor(Math.random() * randMove.count)+1 //Random split
 		
 
         onPlayed(randMove);

@@ -1,3 +1,5 @@
+import { Board } from '../core/board.js';
+
 //Network player
 var networkUrl = null;
 
@@ -16,9 +18,10 @@ export function getPlay (board, onPlayed) {
         //Optional argument to log info 
         if (data.hasOwnProperty('log')) console.log(data.log); 
         
-        //Expect a Move String - Example:  
+        //Expect a Move String - Example: 2,1|6|4,-1
         var moveStr = data.move;
-        //Parse
+        var move = Board.parseMove(moveStr);
+                
         onPlayed(move);			
     });
     
