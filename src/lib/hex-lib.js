@@ -135,7 +135,7 @@ export function strokeHex(ctx, x, y, color, width) {
 }
 
 //Hex struct
-function Hex(q, r) {
+export function Hex(q, r) {
 	var s = -q - r;
 	return {q: q, r: r, s: s};
 }

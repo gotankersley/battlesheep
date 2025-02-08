@@ -7,7 +7,7 @@ import { PLAYER_HUMAN } from '../players/players.js';
 function MenuProperties() {
 	//Options
 	this.showGrid = true;
-	this.showCoordinates = false;
+	this.showCoordinates = true;
 	this.orientation = ORIENT_FLAT;	
 	this.tileSet1 = 0;
 	this.tileSet2 = 1;		

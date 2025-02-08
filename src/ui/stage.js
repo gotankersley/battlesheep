@@ -184,9 +184,15 @@ function onMouseDown(e) {
                 //Moving a token
                 if (mouse.selected) {
                     if (hand.selected !== null) {
+                        var src = mouse.selected;
+                        var dst = pos;
                         var token = board.tokens[mouse.selectedToken];
-                        var count = token.count-(hand.selected+1);
-                        game.makeMove(mouse.selected, pos, count, mouse.ctrlOn);  
+                        var moveCount = token.count-(hand.selected+1);
+                        var validateMove = board.isValidMove(src, dst, moveCount);
+                        if (validateMove.status) {
+                            game.makeMove(src, dst, moveCount, mouse.ctrlOn);
+                        }
+                        else showMessage(validateMove.msg);
                     }
                 }
             }

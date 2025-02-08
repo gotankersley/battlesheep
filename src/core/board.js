@@ -1,4 +1,4 @@
-import { INVALID } from '../lib/hex-lib.js';
+import { INVALID, Hex } from '../lib/hex-lib.js';
 
 //Constants
 export const PLAYER1 = 0;
@@ -161,27 +161,25 @@ export class Board {
 		return false;
 	}
 	
-    makeMove(srcPos, destPos, moveCount) { //Split token
+    makeMove(srcPos, dstPos, moveCount) { 
+        //Higher-level validatation done in isValidMove function
         var srcKey = srcPos.q + ',' + srcPos.r;
-        var destKey = destPos.q + ',' + destPos.r;
-        
-        //Validate move
-        //throw('Invalid board str: ' + boardStr);
+        var dstKey = dstPos.q + ',' + dstPos.r;
+                        
 		var srcTokenId = this.tiles[srcKey].tokenId;
-        if (srcToken == EMPTY) return false; //No token at source
+        if (srcToken == EMPTY) throw('No token at source tile: ' + srcKey); 
         var srcToken = this.tokens[srcTokenId];
-        var destTile = this.tiles[destKey]; 
-        if (destTile.tokenId != EMPTY) return false; //Dest not empty
+        var dstTile = this.tiles[dstKey]; 
+        if (dstTile.tokenId != EMPTY) throw('Destination tile not empty: ' + dstKey);  
                    
         //Make the move
         srcToken.count -= moveCount; //Decrement existing
-        var newToken = new Token(this.tokens.length, srcToken.player, moveCount, new Pos(destPos.q, destPos.r));
+        var newToken = new Token(this.tokens.length, srcToken.player, moveCount, new Pos(dstPos.q, dstPos.r));
         this.tokens.push(newToken);
         this.playerTokens[srcToken.player].push(newToken.id);
-        destTile.tokenId = newToken.id;        
+        dstTile.tokenId = newToken.id;        
                 		
-        this.changeTurn();
-        return true;
+        this.changeTurn();        
         
 	} 
 		
@@ -190,39 +188,64 @@ export class Board {
 		this.turn = +(!this.turn);
 	}
 
-	inBounds(pos) {
-        if (this.tiles[pos.q + ',' + pos.r]) return true;		
+	inBounds(posKey) {
+        if (this.tiles[posKey]) return true;		
 		else return false;
 	}
 	
-    isValidMove(src, dest) {
-		
+    isValidMove(src, dst, moveCount) {
+        var srcKey = src.q + ',' + src.r;
+        var dstKey = dst.q + ',' + dst.r;        
         
-		if (!this.inBounds(src)) return {status: false, msg:'Source out of bounds'};
-		else if (!this.inBounds(dest)) return {status: false, msg:'Dest out of bounds'};
-		else if (this.tiles[src]-1 != this.turn) return {status: false, msg:'Not your pin'};
-		else if (this.tiles[dest] != PIN_EMPTY) {
-			
-			if (this.isValidCapture(src, dest, DIR_N)) { //North
-				return {status: true, msg:'', dir:DIR_N};
-			}
-			
-			else if (this.isValidCapture(src, dest, DIR_S)) { //South
-				return {status: true, msg:'', dir:DIR_S};
-			}
-			
-			else if (this.isValidCapture(src, dest, DIR_E)) { //East
-				return {status: true, msg:'', dir:DIR_E};
-			}
-			
-			else if (this.isValidCapture(src, dest, DIR_W)) { //West
-				return {status: true, msg:'', dir:DIR_W};
-			}
-						
-			else return {status: false, msg:'Invalid capture'};
-		}
-		else if (DESTS_BY_POS[src].indexOf(dest) < 0) return {status: false, msg:'Invalid move'};		
-		else return {status:true, msg:''};
+		if (!this.inBounds(srcKey)) return {status: false, msg:'Source out of bounds'};
+		if (!this.inBounds(dstKey)) return {status: false, msg:'Dest out of bounds'};
+        
+        var srcTokenId = this.tiles[srcKey].tokenId;        
+        if (srcToken == EMPTY) return {status: false, msg:'No token at source tile: ' + srcKey};
+        
+        var srcToken = this.tokens[srcTokenId];
+		if (srcToken.player != this.turn) return {status: false, msg:'Not your token'};
+        
+        var dstTile = this.tiles[dstKey];          
+        if (dstTile.tokenId != EMPTY) return {status: false, msg:'Destination tile not empty'};
+        
+        var srcCube = Hex(src.q, src.r); //Cube coordinates
+        var dstCube = Hex(dst.q, dst.r); //Cube coordinates
+        
+        var dirQ = 0;
+        var dirR = 0;
+        
+        //If any one of the cube coordinates is the same, then it has to lie on a straight line
+        if (srcCube.q == dstCube.q) {            
+            dirR = Math.sign( dstCube.r - srcCube.r);
+        }
+        else if (srcCube.r == dstCube.r) {
+            dirQ = Math.sign( dstCube.q - srcCube.q);            
+        }
+        else if (srcCube.s == dstCube.s) {
+            dirQ = Math.sign( dstCube.q - srcCube.q);
+            dirR = Math.sign( dstCube.r - srcCube.r);
+        }
+        else return {status: false, msg:'Must move in a straight line'};
+
+        //Verify no gaps or obstacles between src and dst
+        var deltaCube = {
+            q: Math.abs(srcCube.q - dstCube.q),
+            r: Math.abs(srcCube.r - dstCube.r),
+            s: Math.abs(srcCube.s - dstCube.s),
+        };
+    	var dist = (deltaCube.q + deltaCube.r + deltaCube.s)/2;
+        var pos = new Pos(src.q, src.r);
+        for (var d = 0; d < dist; d++) {
+            pos.q += dirQ;
+            pos.r += dirR;
+            var posKey = pos.q + ',' + pos.r;
+            if (!this.tiles[posKey]) return {status: false, msg:'Can not move over gaps'};
+            var tile = this.tiles[posKey];
+            if (tile.tokenId != EMPTY) return {status: false, msg:'Can not jump over other tokens'};
+        }
+
+		return {status:true, msg:''};
 	}
 
 	
