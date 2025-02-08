@@ -66,11 +66,12 @@ export function createStage(containerId) {
     window.mouse = new Mouse(canvas);
     onWindowResize(); //Set canvas size
     
-    WORLD_X = Math.floor(CANVAS_SIZE_X/2)+HEX_SIZE_X; //Move origin to more center of the screen
-    WORLD_Y = Math.floor(CANVAS_SIZE_Y/2)+HEX_SIZE_Y;
+    WORLD_X = Math.floor(CANVAS_SIZE_X/3)+HEX_SIZE_X; //Move origin to more center of the screen
+    WORLD_Y = 100;//Math.floor(CANVAS_SIZE_Y/2)+HEX_SIZE_Y;
     
     ctx = canvas.getContext('2d');  
     ctx.fillStyle = COLOR_BLACK;
+    ctx.font = 'bold 14px arial'; 
     
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
@@ -232,10 +233,10 @@ function onMoved(src, dst, boardStr) {
 
 function onGameOver(winner, loser) {
     mouse.selected = null;	
-    
-    if (winner == PLAYER1) showMessage('Player1 has won');
-    else if (winner == PLAYER2) showMessage('Player2 has won');
-    else showMessage('Game Over!');
+    showMessage('Game OVER!');
+    if (winner == PLAYER1) alert('Player1 has won');
+    else if (winner == PLAYER2) alert('Player2 has won');
+    else alert('Game Over!');
     //else if (winner == WIN_DRAW) showMessage('Tie game');
     //else console.log('Game over?', winner, loser);
 }

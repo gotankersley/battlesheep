@@ -12,12 +12,22 @@ export const PLAYER2 = 1;
 4 \___/2
     3
  */
-export const DIR_N = 1;
-export const DIR_NE = 2;
-export const DIR_SE = 4;
-export const DIR_S = 8;
-export const DIR_SW = 16;
-export const DIR_NW = 32;
+export const DIR_N = 0;
+export const DIR_NE = 1;
+export const DIR_SE = 2;
+export const DIR_S = 3;
+export const DIR_SW = 4;
+export const DIR_NW = 5;
+
+export const DIR_FLAG_N = 1;
+export const DIR_FLAG_NE = 2;
+export const DIR_FLAG_SE = 4;
+export const DIR_FLAG_S = 8;
+export const DIR_FLAG_SW = 16;
+export const DIR_FLAG_NW = 32;
+
+const NEIGHBORS_Q = [0,1,1,0,-1,-1]; //By dir
+const NEIGHBORS_R = [-1,-1,0,1,1,0];  //By dir 
 
 export const TURN1 = 0;
 export const TURN2 = 1;
@@ -38,7 +48,7 @@ const PROTOCOL_TO_TURN = [PROTOCOL_TURN1, PROTOCOL_TURN2];
 
 const PROTOCOL_DELIM1 = ',';
 const PROTOCOL_DELIM2 = '|';
-
+const MAX_TRAVERSAL = 100;
 
 export function Pos(q, r) {
     return {q:q, r:r};
@@ -156,9 +166,34 @@ export class Board {
 		newBoard.turn = this.turn;
 	}
 
-	isGameOver() {
+    isGameOver() {
+        var curPlayer = this.turn;
+        var oppPlayer = +(!this.turn);
+        if (this.isGameOverForPlayer(curPlayer)) {
+            if (this.isGameOverForPlayer(oppPlayer)) return true;
+            
+        }
+        return false;
+    }
+    
+	isGameOverForPlayer(player) {
         //See if moves available
-		return false;
+        var tokenIds = this.playerTokens[player];
+        for (var t = 0; t < tokenIds.length; t++) {
+            var tokenId = tokenIds[t];
+            var token = this.tokens[tokenId];
+            if (token.count <= 1) continue; //Token can't be split further
+            
+            //Check neighbors to verify that at least one move is available            
+            for (var dir = 0; dir < 6; dir++) {
+                var neighQ = token.pos.q + NEIGHBORS_Q[dir];
+                var neighR = token.pos.r + NEIGHBORS_R[dir];
+                var neighKey = neighQ + ',' + neighR;
+                if (this.tiles[neighKey] && this.tiles[neighKey].tokenId == EMPTY) return false;
+            }
+            
+        }
+		return true; //No moves available
 	}
 	
     makeMove(srcPos, dstPos, moveCount) { 
@@ -244,10 +279,44 @@ export class Board {
             var tile = this.tiles[posKey];
             if (tile.tokenId != EMPTY) return {status: false, msg:'Can not jump over other tokens'};
         }
-
+        var moves = this.getMoves();
 		return {status:true, msg:''};
 	}
-
+    
+    getMoves() {
+        var moves = [];
+        
+        var tokenIds = this.playerTokens[this.turn];
+        for (var t = 0; t < tokenIds.length; t++) {
+            var tokenId = tokenIds[t];
+            var token = this.tokens[tokenId];
+            if (token.count <= 1) continue; //Token can't be split further
+            
+            //Check neighbors to verify that at least one move is available            
+            for (var dir = 0; dir < 6; dir++) {
+                var neighQ = token.pos.q + NEIGHBORS_Q[dir];
+                var neighR = token.pos.r + NEIGHBORS_R[dir];
+                var neighKey = neighQ + ',' + neighR;
+                
+                var stepCount = 1;
+                while (stepCount < MAX_TRAVERSAL && this.tiles[neighKey] && this.tiles[neighKey].tokenId == EMPTY){
+                    var move = {
+                        src:new Pos(token.pos.q, token.pos.r),
+                        dst:new Pos(neighQ, neighR),
+                        count:stepCount,
+                    };
+                    moves.push(move);
+                    
+                    neighQ += NEIGHBORS_Q[dir];
+                    neighR += NEIGHBORS_R[dir];
+                    neighKey = neighQ + ',' + neighR;
+                    stepCount++;
+                }
+            }
+            
+        }
+        return moves;
+    }
 	
 	
 	toString() { //Spec: https://docs.google.com/document/d/11V8NxOIwUgfSfK_NEgoLcNuuDWOa7xfyxKEMnZwvppk/edit?tab=t.0
