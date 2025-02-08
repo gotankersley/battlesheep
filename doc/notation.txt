@@ -1,3 +1,6 @@
+** DEPRECATED**
+-> Use this instead: https://docs.google.com/document/d/11V8NxOIwUgfSfK_NEgoLcNuuDWOa7xfyxKEMnZwvppk/edit?tab=t.0#heading=h.fcfuiowger5c
+-----
 - Assuming all pastures are identified 0-31
 - Hex directions are labeled A-F, clockwise
 
