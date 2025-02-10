@@ -170,49 +170,78 @@ const onBlur = () => {
 
 const onMouseDown = (e) => {	
     if (e.button == BUTTON_LEFT) {	
-        var board = game.board;
-        var player = board.turn;        
-        if (game.players[player] != PLAYER_HUMAN) {
-            showMessage('Waiting for other player to play...');
-            return;
+        if (game.players[game.board.turn] != PLAYER_HUMAN) {
+            showMessage('Waiting for other player to play...');            
         }
-        
-        //See if a (new) token has been selected
-        var pos = mouse.axial;   
-        var posKey = pos.q + ',' + pos.r;
-        if (board.tiles[posKey]) { //Valid tile
-            var tile = board.tiles[posKey];            
-            if (tile.tokenId != EMPTY) { //Is tile occupied?
-                var token = board.tokens[tile.tokenId];
-                if (mouse.ctrlOn) { //Navigation
-                    mouse.selected = {q:pos.q, r:pos.r}; 
-                    mouse.selectedToken = tile.tokenId;
-                }
-                else if (token.player != player) return; //Can't select player's opposite tile                
-                else {
-                    mouse.selected = {q:pos.q, r:pos.r}; //Make this tile the new selection                                                
-                    mouse.selectedToken = tile.tokenId;
-                }
+        else if (game.board.mode == MODE_TILE) onTileModeClicked();
+        else if (game.board.mode == MODE_PLACE) onPlaceModeClicked();
+        else if (game.board.mode == MODE_MOVE) onMoveModeClicked();        
+    }
+}
+
+function onTileModeClicked() {
+    
+
+}
+
+function onPlaceModeClicked() {
+    var board = game.board;
+    var player = board.turn;   
+    
+    var pos = mouse.axial;   
+    var posKey = pos.q + ',' + pos.r;
+    if (board.tiles[posKey]) { //Valid tile
+        var tile = board.tiles[posKey];            
+        if (tile.tokenId == EMPTY) { //Is tile occupied?
+            //TODO: Check for perimeter
+            game.makePlace(pos, mouse.ctrlOn);
+        }
+        else showMessage('Token may not be placed on same tile as another token');
+    }
+}
+
+
+function onMoveModeClicked() {
+    var board = game.board;
+    var player = board.turn;        
+ 
+    
+    //See if a (new) token has been selected
+    var pos = mouse.axial;   
+    var posKey = pos.q + ',' + pos.r;
+    if (board.tiles[posKey]) { //Valid tile
+        var tile = board.tiles[posKey];            
+        if (tile.tokenId != EMPTY) { //Is tile occupied?
+            var token = board.tokens[tile.tokenId];
+            if (mouse.ctrlOn) { //Navigation
+                mouse.selected = {q:pos.q, r:pos.r}; 
+                mouse.selectedToken = tile.tokenId;
             }
-            else { //Tile is not occupied
-                //Moving a token
-                if (mouse.selected) {
-                    if (hand.selected !== null) {
-                        var src = mouse.selected;
-                        var dst = pos;
-                        var token = board.tokens[mouse.selectedToken];
-                        var moveCount = token.count-(hand.selected+1);
-                        var validateMove = board.isValidMove(src, dst, moveCount);
-                        if (validateMove.status) {
-                            game.makeMove(src, dst, moveCount, mouse.ctrlOn);
-                        }
-                        else showMessage(validateMove.msg);
+            else if (token.player != player) return; //Can't select opposite player's token                
+            else {
+                mouse.selected = {q:pos.q, r:pos.r}; //Make this tile the new selection                                                
+                mouse.selectedToken = tile.tokenId;
+            }
+        }
+        else { //Tile is not occupied
+            //Moving a token
+            if (mouse.selected) {
+                if (hand.selected !== null) {
+                    var src = mouse.selected;
+                    var dst = pos;
+                    var token = board.tokens[mouse.selectedToken];
+                    var moveCount = token.count-(hand.selected+1);
+                    var validateMove = board.isValidMove(src, dst, moveCount);
+                    if (validateMove.status) {
+                        game.makeMove(src, dst, moveCount, mouse.ctrlOn);
                     }
+                    else showMessage(validateMove.msg);
                 }
             }
         }
     }
 }
+
 	
 //const onKeyPress = (e) => {
 //	var key = e.which;
@@ -229,10 +258,12 @@ const onKeyDown = (e) => {
 }
 	
 //Game Events
-const onPlaced = (player, tileType, pos) => {        
+const onPlaced = (pos, boardStr) => {        
     hand.selected = null;
     hand.hover = null;
-    window.modesController.setValue(MODE_MOVE);
+    Url.setHash(boardStr);    
+    //window.modesController.setValue(MODE_MOVE);
+    
     setTimeout(game.play, MOVE_DELAY);		
 }
 
@@ -278,18 +309,34 @@ function draw(time) { //Top-level drawing function
     
     //Mouse
     drawMouse(); //Draw active hex at cursor location 								
-                
-    //Tiles
-    drawTiles();
-
-    if (mode == MODE_PLACE) {
+         
+    if (mode == MODE_TILE) {
+        //Hand
+        hand.drawTile();
+    }
+    else if (mode == MODE_PLACE) {
         
+        //Tiles
+        drawTiles();
+        
+        //Tokens
+        drawPlaceToken();
+        
+        //Hand
+        hand.drawPlace();
     }
     else if (mode == MODE_MOVE) {
+        //Tiles
+        drawTiles();
+        
         //Tokens
         drawTokens();
+        
+        //Hand
+        hand.drawMove(mouse.selectedToken);
     }
-                       
+
+              
     ctx.restore();
     
     //Mouse coord		
@@ -298,8 +345,7 @@ function draw(time) { //Top-level drawing function
     //Turn
     drawTurn();    
     
-    //Hand
-    hand.draw(mouse.selectedToken);
+    
     
     //Repaint
     if (!paused) requestAnimationFrame(draw); 
@@ -424,9 +470,8 @@ function drawTokens() {
     for (var tokenId = 0; tokenId < tokens.length; tokenId++) {
         var token = tokens[tokenId];        
         var px = hexToPix(token.pos);                       
-        var tileType = token.count % 6;
-        
-        tileSet.draw(ctx, px.x, px.y, tileType, token.player, false, token.count);
+        //var tileType = token.count % 6;        
+        tileSet.draw(ctx, px.x, px.y, token.player, token.count);
         
         //Highlight Selected
         if (mouse.selectedToken == tokenId) {
@@ -437,7 +482,22 @@ function drawTokens() {
    
 }
 	
-
+function drawPlaceToken() {
+    var board = game.board;
+    
+    //Cursor
+    tileSet.draw(ctx, mouse.snap.x, mouse.snap.y, board.turn, INVALID);
+    
+    //Existing
+    var tokens = board.tokens;      
+    for (var tokenId = 0; tokenId < tokens.length; tokenId++) {
+        var token = tokens[tokenId];        
+        var px = hexToPix(token.pos);                       
+              
+        tileSet.draw(ctx, px.x, px.y, token.player, INVALID);
+                    
+    }
+}
 	
 
 function drawCircle(x, y, r) {

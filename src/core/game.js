@@ -56,6 +56,11 @@ export class Game {
         this.board.makeMove(src, dst, moveCount);            	
         this.onMoved(src, dst, moveCount);        
     }
+    
+    makePlace = (pos, override) => {	       
+        this.board.makePlace(pos);
+        this.onPlaced(pos);
+    }
 
 	undoMove = () => {
 		
@@ -116,6 +121,16 @@ export class Game {
 
     onPlayed = (move) => {
         this.makeMove(move.src, move.dst, move.count);
+    }
+
+    onPlaced = (pos) => {
+        //History 
+        var board = this.board;
+        
+        var boardStr = board.toString();        
+		this.history.push(boardStr);
+        board.changeTurn(); 
+        this.gameEvents[EVENT_PLACED](pos, boardStr);            
     }
 
 	onMoved = (src, dst, moveCount) => {        

@@ -49,13 +49,21 @@ export class Hand {
             this.selected = Math.floor((CANVAS_SIZE_Y-(y))/HAND_TILE_Y);            
         }
     }
+    
+    drawTile = () => {
+        var ctx = this.ctx;
+        drawBackground(ctx);    
+    }
 
-    draw = (selectedToken) => {   
+    drawPlace = () => {
+        var ctx = this.ctx;
+        drawBackground(ctx);    
+    }
+    
+    drawMove = (selectedToken) => {   
          
         var ctx = this.ctx;
-        ctx.clearRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
-        ctx.fillStyle = COLOR_HAND_BACKGROUND;
-        ctx.fillRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
+        drawBackground(ctx);
         ctx.font = 'bold 18px arial'; 
         
         if (selectedToken >= 0) { 
@@ -96,3 +104,10 @@ export class Hand {
     }
 }
 //End class Hand
+
+    
+function drawBackground(ctx) {
+    ctx.clearRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
+    ctx.fillStyle = COLOR_HAND_BACKGROUND;
+    ctx.fillRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
+}

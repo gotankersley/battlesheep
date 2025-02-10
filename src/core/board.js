@@ -216,9 +216,21 @@ export class Board {
         this.tokens.push(newToken);
         this.playerTokens[srcToken.player].push(newToken.id);
         dstTile.tokenId = newToken.id;        
-                		              
-        
+                		                      
 	} 
+    
+    makePlace(pos) {
+        var tileKey = pos.q + ',' + pos.r;
+        if (!this.tiles[tileKey]) throw('Must place on tile - invalid coord: ' + tileKey);
+        var tile = this.tiles[tileKey];
+        var newToken = new Token(this.tokens.length, this.turn, STARTING_COUNT, new Pos(pos.q, pos.r));
+        this.tokens.push(newToken);
+        this.playerTokens[this.turn].push(newToken.id);
+        
+        tile.tokenId = newToken.id;
+        
+        
+    }
 		
 	
 	changeTurn() {

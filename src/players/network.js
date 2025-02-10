@@ -3,7 +3,7 @@ import { Board } from '../core/board.js';
 //Network player
 var networkUrl = null;
 
-const URL = 'http://10.30.2.115:8000/state/'; //For other domains add "Access-Control-Allow-Origin: *" to the header
+const URL = 'https://softserve.harding.edu/aivai/play-state'; //For other domains add "Access-Control-Allow-Origin: *" to the header
 export function getPlay (board, onPlayed) { 
 	
 	//var playerId = +(new Date()); //Timestamp
@@ -12,7 +12,9 @@ export function getPlay (board, onPlayed) {
     
     var boardStr = board.toString();
             
-    var url = networkUrl + boardStr + '/think';
+    //var url = networkUrl + boardStr + '/act/' +;
+    //TODO - id's
+    var url = networkUrl;
     
     ajax(url, (data, status) => {
         //Optional argument to log info 

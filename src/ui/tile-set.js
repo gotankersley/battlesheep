@@ -1,4 +1,4 @@
-import { fillHex, strokeHex } from '../lib/hex-lib.js';
+import { fillHex, strokeHex, INVALID } from '../lib/hex-lib.js';
 import { PLAYER1, PLAYER2 } from '../core/board.js';
 
 //Constants
@@ -68,8 +68,8 @@ export class TileSet {
 		});
 	}
 	
-	draw = (ctx, x, y, tileType, player, alpha, count) => {
-        tileType = 5;
+	draw = (ctx, x, y, player, count) => {
+        var tileType = 5; //TODO - use or lose        
 		var set = this.cur[player];
 		var meta = METADATA[set];
 		
@@ -77,15 +77,15 @@ export class TileSet {
 		if (DRAW_BOUNDING_BOX) ctx.strokeRect(x, y, HEX_TILE, HEX_TILE); 
 		
 		//Outline
-		if (meta.outline) {			
-			//fillHex(ctx, x, y, 'rgba(255, 255, 255, 0.5');
-			fillHex(ctx, x, y, 'lightgreen');
-			strokeHex(ctx, x, y, meta.outline, 3);	
-		}
+		//if (meta.outline) {			
+		//	//fillHex(ctx, x, y, 'rgba(255, 255, 255, 0.5');
+		//	fillHex(ctx, x, y, 'lightgreen');
+		//	strokeHex(ctx, x, y, meta.outline, 3);	
+		//}
 						
 		//Rotate tile
 		ctx.save();
-		if (alpha) ctx.globalAlpha = alpha;
+		//if (alpha) ctx.globalAlpha = alpha;
 		
 		ctx.translate(x, y);
 		if (player == PLAYER1) ctx.rotate(HEX_ANGLE*Math.PI/180);
@@ -98,8 +98,10 @@ export class TileSet {
 		}
 		else ctx.drawImage(this.images[set][tileType], -HEX_TILE_CENTER_X, -HEX_TILE_CENTER_Y, HEX_TILE_X, HEX_TILE_Y);		
 		ctx.restore();
-        ctx.fillStyle = COLOR_COUNT;
-		ctx.fillText('' + count, x-scale+10, y-scale);		
+        if (count != INVALID) {
+            ctx.fillStyle = COLOR_COUNT;
+            ctx.fillText('' + count, x-scale+10, y-scale);		
+        }
 			
 	}
 	
