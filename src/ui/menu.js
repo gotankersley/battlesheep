@@ -1,6 +1,6 @@
 import { setHex, ORIENT_FLAT, ORIENT_POINTY } from '../lib/hex-lib.js';
 import { getTileSetNames } from './tile-set.js';
-import { PLAYER1, PLAYER2 } from '../core/board.js';
+import { PLAYER1, PLAYER2, MODE_TILE, MODE_PLACE, MODE_MOVE } from '../core/board.js';
 import { PLAYER_HUMAN,  PLAYER_RANDOM, PLAYER_NETWORK  } from '../players/players.js';
 
 //Struct MenuProperties
@@ -15,6 +15,7 @@ function MenuProperties() {
 
 	this.player1 = PLAYER_HUMAN;
 	this.player2 = PLAYER_HUMAN;
+    this.mode = MODE_PLACE;
 
     //Debug
     this.showMoves = false; 
@@ -44,17 +45,15 @@ export function MenuManager() {
 	optionsMenu.add(this.properties, 'tileSet1', tileSetNames).onChange(this.onChangeTileSet.bind(this, PLAYER1));
 	optionsMenu.add(this.properties, 'tileSet2', tileSetNames).onChange(this.onChangeTileSet.bind(this, PLAYER2));
 	
-	//Debug
-	var debugMenu = this.rootMenu.addFolder('Debug');				    
-	debugMenu.add(this.properties, 'showMoves');
-          
-    
-	
 	
 	//Root menu			
-	var playerNames = {Human:PLAYER_HUMAN, Random:PLAYER_RANDOM, Network:PLAYER_NETWORK};
+    var modes = {Tile:MODE_TILE, Place:MODE_PLACE, Move:MODE_MOVE};
+	window.modesController = this.rootMenu.add(this.properties, 'mode', modes).onChange(this.onChangeMode.bind(this));
+	
+    var playerNames = {Human:PLAYER_HUMAN, Random:PLAYER_RANDOM, Network:PLAYER_NETWORK};
 	this.rootMenu.add(this.properties, 'player1', playerNames).onChange(this.onChangePlayer.bind(this, PLAYER1));
 	this.rootMenu.add(this.properties, 'player2', playerNames).onChange(this.onChangePlayer.bind(this, PLAYER2));
+    
 }
 
 //Events
@@ -65,6 +64,12 @@ MenuManager.prototype.onChangeTileSet = function(player, val) {
 MenuManager.prototype.onChangePlayer = function(player, val) {		
 	game.players[player] = parseInt(val);
 	game.play();
+}
+
+MenuManager.prototype.onChangeMode = function(val) {		
+	if (typeof(val) != 'number') {
+        game.board.mode = Number.parseInt(menu.mode);    
+    }
 }
 
 MenuManager.prototype.onChangeOrientation = function(val) {	

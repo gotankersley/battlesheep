@@ -2,7 +2,7 @@ import { setHex, fillHex, strokeHex, ORIENT_FLAT, ORIENT_POINTY, INVALID } from 
 import * as Url from '../lib/url-lib.js';
 import { MenuManager } from './menu.js';
 import { TileSet } from './tile-set.js';
-import { Board, PLAYER1, PLAYER2, EMPTY, MODE_MOVE } from '../core/board.js';
+import { Board, PLAYER1, PLAYER2, EMPTY, MODE_TILE, MODE_PLACE, MODE_MOVE } from '../core/board.js';
 import { Game, EVENT_MOVED, EVENT_GAME_OVER, EVENT_PLACED } from '../core/game.js';
 import { PLAYER_HUMAN } from '../players/players.js';
 import { Mouse, BUTTON_LEFT } from './mouse.js';
@@ -53,6 +53,7 @@ var $message;
 export function createStage(containerId) { 
     //Menu
     var menuManager = new MenuManager();
+    
     window.menu = menuManager.properties;
     setHex(menu.orientation, HEX_SIDE);
     
@@ -86,8 +87,14 @@ export function createStage(containerId) {
             
     //Url
     Url.init(function(e) {
-        var hash = window.location.hash.replace('#', '');	  
-        window.game.board = Board.fromString(hash);
+        var hash = window.location.hash.replace('#', '');
+        try {
+            window.game.board = Board.fromString(hash);            
+        }
+        catch (err) {
+            showMessage(err);
+            window.game = new Game('');
+        }
     });
     
     var boardStr = '';
@@ -101,10 +108,17 @@ export function createStage(containerId) {
 			
     
     //Game events	
-    window.game = new Game(boardStr);
+    try {
+        window.game = new Game(boardStr);
+    }
+    catch (err) {
+        showMessage(err);
+        window.game = new Game('');
+    }
     window.game.addEventListener(EVENT_PLACED, onPlaced);
     window.game.addEventListener(EVENT_GAME_OVER, onGameOver);
     window.game.addEventListener(EVENT_MOVED, onMoved);
+    window.modesController.setValue(game.board.mode);
     
     //Start rendering
     window.tileSet = new TileSet(function() {    
@@ -218,6 +232,7 @@ const onKeyDown = (e) => {
 const onPlaced = (player, tileType, pos) => {        
     hand.selected = null;
     hand.hover = null;
+    window.modesController.setValue(MODE_MOVE);
     setTimeout(game.play, MOVE_DELAY);		
 }
 
@@ -226,7 +241,8 @@ const onMoved = (src, dst, boardStr) => {
     mouse.selectedToken = INVALID;
     hand.selected = null;
     hand.hover = null;    
-    Url.setHash(boardStr);
+    Url.setHash(boardStr);    
+    
     setTimeout(game.play, MOVE_DELAY);		
 }
 
@@ -251,7 +267,7 @@ function draw(time) { //Top-level drawing function
     ctx.save();
     
     ctx.translate(-window.WORLD_INIT_X, -window.WORLD_INIT_Y); //Offset to make drawing easier
-        
+    var mode = game.board.mode;
     
     //Grid		
     if (menu.showGrid) {
@@ -266,8 +282,13 @@ function draw(time) { //Top-level drawing function
     //Tiles
     drawTiles();
 
-    //Tokens
-    drawTokens();
+    if (mode == MODE_PLACE) {
+        
+    }
+    else if (mode == MODE_MOVE) {
+        //Tokens
+        drawTokens();
+    }
                        
     ctx.restore();
     
@@ -275,10 +296,7 @@ function draw(time) { //Top-level drawing function
     drawMouseCoords();
     
     //Turn
-    drawTurn();
-    
-    //Mode
-    drawMode();
+    drawTurn();    
     
     //Hand
     hand.draw(mouse.selectedToken);
@@ -376,16 +394,7 @@ function drawTurn() {
     }
     
 }
-    
-function drawMode() {		
-    if (game.board.mode == MODE_MOVE) {
-        ctx.fillStyle = '#a0a0a0';
-        ctx.fillText('Mode: Move', CANVAS_SIZE_X / 2, 30);
-    }
-    
-    
-}    
-
+       
 	
 function drawTiles() {
 

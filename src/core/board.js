@@ -35,6 +35,7 @@ export const TURN2 = 1;
 export const EMPTY = -1;
 
 export const STARTING_COUNT = 16;
+
 export const MODE_TILE = 0;
 export const MODE_PLACE = 1;
 export const MODE_MOVE = 2;
@@ -402,6 +403,7 @@ export class Board {
             board.tiles[posKey].tokenId = token.id;
         }
 		
+        this.mode = MODE_PLACE;
         
         //TODO: Normalize
         //TODO: Sanity check all tiles are connected

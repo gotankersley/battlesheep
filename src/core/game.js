@@ -10,6 +10,7 @@ export const EVENT_PLACED = 'placed';
 export const EVENT_GAME_OVER = 'gameOver';
 
 
+
 const DEFAULT_BOARD_STR = '0,2|1,1|2,1|1,2|3,1|4,0|5,0|4,1|0,4|1,3|2,3|1,4|4,2|5,1|6,1|5,2|2,4|3,3|4,3|3,4|4,4|5,3|6,3|5,4|0,6|1,5|2,5|1,6|2,6|3,5|4,5|3,6|0,2h16|5,2t16|h';
 
 export class Game {
