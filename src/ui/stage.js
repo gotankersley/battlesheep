@@ -17,6 +17,7 @@ const COLOR_MOUSE = 'rgba(0, 0, 255, 0.1)';
 const COLOR_TILE = 'lightgreen';
 const COLOR_TILE_ACTIVE = '#32CD32';
 const COLOR_TILE_BORDER = 'green';
+const COLOR_TILE_INTERSECTS = '#8F9779';
 const COLOR_TOKEN_SELECTED = 'red';
 
 const KEY_DELETE = 46;
@@ -343,9 +344,9 @@ function draw(time) { //Top-level drawing function
     drawMouse(); //Draw active hex at cursor location 								
          
     if (mode == MODE_TILE) {
-        drawTileMode();
-        
         drawTiles();
+        
+        drawTileMode();        
         
         //Hand
         hand.drawTile();
@@ -498,15 +499,26 @@ function drawTiles() {
 
 function drawTileMode() {
     
-    var hexes = Board.splitTileQuad(mouse.axial, tileQuadRot);
-    var color = COLOR_TILE_ACTIVE;
+    var quadSplit = game.board.splitTileQuad(mouse.axial, tileQuadRot);
+    var hexes = quadSplit.hexes;
+    var initialColor;
+    var otherColor;
+    if (quadSplit.intersects) {
+        initialColor = COLOR_TILE_INTERSECTS;
+        otherColor = COLOR_TILE_INTERSECTS;
+    }
+    else {
+        initialColor = COLOR_TILE_ACTIVE;
+        otherColor = COLOR_TILE;
+    }
+    var color = initialColor;
     for (var h = 0; h < hexes.length; h++) {
         var hex = hexes[h];
         var px = hexToPix(hex);
         
         fillHex(ctx, px.x, px.y, color); 
         strokeHex(ctx, px.x, px.y, COLOR_TILE_BORDER, 5); 
-        color = COLOR_TILE;
+        color = otherColor;
     }
 }
 

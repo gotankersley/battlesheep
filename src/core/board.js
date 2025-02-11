@@ -189,7 +189,9 @@ export class Board {
     }
     
     makeTile(initialPos, tileRot) {
-        var hexes = Board.splitTileQuad(initialPos, tileRot);
+        var quadSplit = this.splitTileQuad(initialPos, tileRot);
+        if (quadSplit.intersects) throw('Tiles must not intersect existing tiles');
+        var hexes = quadSplit.hexes;
         for (var h = 0; h < hexes.length; h++) {
             var hex = hexes[h];
             var tileKey = hex.q + ',' + hex.r;
@@ -453,17 +455,20 @@ export class Board {
         return {src:src, dst:dst, count:count};
     }
     
-    static splitTileQuad(initialPos, tileRot) {
+    splitTileQuad(initialPos, tileRot) {
         var hexes = [];
         var tileQuadDirs = TILE_QUADS_BY_ROT[tileRot];
         hexes.push(new Pos(initialPos.q, initialPos.r));
+        var intersects = false;
         for (var d = 0; d < tileQuadDirs.length; d++) { //Should always only be three
             var dir = tileQuadDirs[d];
             var q = initialPos.q + NEIGHBORS_Q[dir];
             var r = initialPos.r + NEIGHBORS_R[dir];
             var pos = new Pos(q, r);
+            var posKey = q + ',' + r;
             hexes.push(pos);
+            if (this.tiles[posKey]) intersects = true;
         }
-        return hexes;
+        return {hexes: hexes, intersects: intersects};
     }
 }
