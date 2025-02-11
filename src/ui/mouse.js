@@ -14,7 +14,9 @@ export class Mouse {
         this.snap = {x:0, y:0}; //Screen coords that are snapped to the nearest hex
         this.screen = {x:0, y:0}; //Screen coords	
         this.world = {x: 0, y:0}; //World coords 
-        this.click = {x: 0, y: 0}; //Mouse down - screen coords	
+        this.click = {x: 0, y: 0}; //Mouse down - screen coords
+        this.clickPos = {q:0, r:0} //Mouse down - axial coords
+        this.clickExited = true; //Mouse still in same hex after click
         this.dragging = false;
         this.selected = null;
         this.selectedToken = INVALID;
@@ -42,20 +44,25 @@ export class Mouse {
 			window.WORLD_X = this.world.x-this.click.x;
 			window.WORLD_Y = this.world.y-this.click.y;
 		}
+        else if (!this.clickExited) {
+            if (this.clickPos.q != this.axial.q || this.clickPos.r != this.axial.r) {
+                this.clickExited = true;                
+            }
+        }
 	}
 
 	onMouseDown = (e) => {	
 		if (e.ctrlKey) this.ctrlOn = true;		
 		this.setCoords(e);		
-		//var mouseOverTile = game.hive.grid[ax.q + ',' + ax.r];
 		
-		//if (mouseOverTile) {
-		
-		//}
+        this.clickPos.q = this.axial.q;
+        this.clickPos.r = this.axial.r;
+        this.clickExited = false;
+        
 		if  (e.ctrlKey || e.button == BUTTON_MIDDLE) { //Middle click
 			
 			this.click.x = this.world.x - window.WORLD_X;
-			this.click.y = this.world.y - window.WORLD_Y;
+			this.click.y = this.world.y - window.WORLD_Y;            
 			this.dragging = true;
 		}
 
@@ -63,10 +70,9 @@ export class Mouse {
 	}
 
 	onMouseUp = (e) => {
-		this.ctrlOn = false;
-		//if (e.button == BUTTON_MIDDLE) { //Middle click
+		this.ctrlOn = false;		
 		this.dragging = false;  		
-		//}
+		
 	}
 
 	onMouseOut = (e) => {

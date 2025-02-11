@@ -471,4 +471,29 @@ export class Board {
         }
         return {hexes: hexes, intersects: intersects};
     }
+    
+    isConnected() { //Driver function
+        var tileKeys = Object.keys(this.tiles);
+        var totalTiles = tileKeys.length;
+        if (totalTiles <= 0) return true;        
+        var initialPos = tileKeys[0].pos; //Pick random to start
+        var breadcrumbs = {};
+        var initialPosKey = initialPos.q + ',' + initialPos.r;
+        breadcrumbs[initialPosKey] = true;
+        return isConnectedDFS(totalTiles, initialPos, breadcrumbs);
+        
+    }
+    
+    isConnectedDFS(total, pos, breadcrumbs) { //Recursive Depth-First-Search
+        for (var dir = 0; dir < 6; dir++) {
+            var neighQ = pos.q + NEIGHBORS_Q[dir];
+            var neighR = pos.r + NEIGHBORS_R[dir];
+            var neighKey = neighQ + ',' + neighR;
+            if (this.tiles[neighKey] && !breadcrumbs[neighKey] ) {                
+                var neighPos = new Pos(neighQ, neighR);
+                breadcrumbs[neighKey] = true;
+                isConnectedDFS(total, neighPos, breadcrumbs); //Recurse
+            }
+        }
+    }
 }

@@ -24,9 +24,10 @@ const KEY_DELETE = 46;
 const KEY_T = 84;
 const KEY_ARROW_LEFT = 37;
 const KEY_ARROW_RIGHT = 39;
+const KEY_SPACE = 32;
 
 const MESSAGE_DURATION = 3000; //MS
-const MOVE_DELAY = 200;
+const DELAY_MOVE = 200;
 
 //const TAU = 2*Math.PI;
 
@@ -196,6 +197,7 @@ function onTileModeClicked(e) {
 }
 
 function onPlaceModeClicked(e) {
+    
     if (e.button == BUTTON_LEFT) {	
         var board = game.board;
         var player = board.turn;   
@@ -276,7 +278,8 @@ const onKeyDown = (e) => {
         else if (e.keyCode == KEY_ARROW_RIGHT) {
             if (tileQuadRot > 0) tileQuadRot--;
             else tileQuadRot = TILE_ROTATIONS-1;            
-        }       
+        }    
+        else if (e.keyCode == KEY_SPACE) triggerClick();          
     }
     
 }
@@ -287,8 +290,8 @@ const onTile = (pos, tileRot, boardStr) => {
     hand.hover = null;
     Url.setHash(boardStr);    
     //window.modesController.setValue(MODE_MOVE);
-    
-    setTimeout(game.play, MOVE_DELAY);		
+        
+    setTimeout(game.play, DELAY_MOVE);		
 }
 
 const onPlaced = (pos, boardStr) => {        
@@ -297,7 +300,7 @@ const onPlaced = (pos, boardStr) => {
     Url.setHash(boardStr);    
     //window.modesController.setValue(MODE_MOVE);
     
-    setTimeout(game.play, MOVE_DELAY);		
+    setTimeout(game.play, DELAY_MOVE);		
 }
 
 const onMoved = (src, dst, boardStr) => {         
@@ -307,7 +310,7 @@ const onMoved = (src, dst, boardStr) => {
     hand.hover = null;    
     Url.setHash(boardStr);    
     
-    setTimeout(game.play, MOVE_DELAY);		
+    setTimeout(game.play, DELAY_MOVE);		
 }
 
 const onGameOver = (winner, loser) => {
@@ -503,9 +506,13 @@ function drawTileMode() {
     var hexes = quadSplit.hexes;
     var initialColor;
     var otherColor;
-    if (quadSplit.intersects) {
+    if ( !mouse.clickExited ) {
+        initialColor = COLOR_TILE_ACTIVE;
+        otherColor = COLOR_TILE;
+    }
+    else if ( quadSplit.intersects) {
         initialColor = COLOR_TILE_INTERSECTS;
-        otherColor = COLOR_TILE_INTERSECTS;
+        otherColor = COLOR_TILE_INTERSECTS;        
     }
     else {
         initialColor = COLOR_TILE_ACTIVE;
@@ -568,3 +575,13 @@ function drawPlaceToken() {
 //    ctx.fill();
 //    //ctx.stroke();
 //}
+
+function triggerClick() {    
+    var evt = new MouseEvent('mousedown', {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        button : BUTTON_LEFT
+    });
+    canvas.dispatchEvent(evt);
+}
