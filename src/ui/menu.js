@@ -18,12 +18,8 @@ function MenuProperties() {
     this.mode = MODE_PLACE;
 
     //Debug
-    this.showMoves = false; 
+    this.normalize = function() { game.board.normalize(); }; 
     
-    
-    //Deprecated
-    this.save = function() { game.save(); }
-	this.load = function() { game.load(); }
 }
 //End struct MenuProperties
 
@@ -45,6 +41,11 @@ export function MenuManager() {
 	optionsMenu.add(this.properties, 'tileSet1', tileSetNames).onChange(this.onChangeTileSet.bind(this, PLAYER1));
 	optionsMenu.add(this.properties, 'tileSet2', tileSetNames).onChange(this.onChangeTileSet.bind(this, PLAYER2));
 	
+    
+    //Debug
+	var debugMenu = this.rootMenu.addFolder('Debug');				
+    debugMenu.add(this.properties, 'normalize');
+
 	
 	//Root menu			
     var modes = {Tile:MODE_TILE, Place:MODE_PLACE, Move:MODE_MOVE};

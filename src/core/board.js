@@ -299,6 +299,48 @@ export class Board {
         return moves;
     }
 	
+    normalize() { //Make the coords all positive
+        
+        //Traverse to find the min coords
+        var minQ = Number.POSITIVE_INFINITY;
+        var minR = Number.POSITIVE_INFINITY;
+        
+        var tileKeys = Object.keys(this.tiles);
+        for (var t = 0; t < tileKeys.length; t++) {
+            var tileKey = tileKeys[t];
+            var tile = this.tiles[tileKey];
+            if (tile.pos.q < minQ) minQ = tile.pos.q;
+            if (tile.pos.r < minR) minR = tile.pos.r;		
+        }
+        minQ *= -1;
+        minR *= -1;
+        if (minQ == 0 && minR == 0) { //Already normalized
+           //this.normalizeOffset = {q:0, r:0};
+        }
+        else {	
+            //Loop again to offset
+            var newTiles = {};
+            for (var t = 0; t < tileKeys.length; t++) {
+                var tileKey = tileKeys[t];
+                var tile = this.tiles[tileKey];
+               
+                tile.pos.q += minQ;
+                tile.pos.r += minR;
+                
+                if (tile.tokenId != EMPTY) {
+                    var token = this.tokens[tile.tokenId];
+                    token.pos.q += minQ;
+                    token.pos.r += minR;
+                }
+                var newKey = tile.pos.q + ',' + tile.pos.r;
+                newTiles[newKey] = tile;
+                
+            }
+            this.tiles = newTiles;
+            
+            //this.normalizeOffset = {q:minQ, r:minR};
+        }
+    }
 	
 	toString() { //Spec: https://docs.google.com/document/d/11V8NxOIwUgfSfK_NEgoLcNuuDWOa7xfyxKEMnZwvppk/edit?tab=t.0
         //Example: 0,2|1,1|2,1|1,2|3,1|4,0|5,0|4,1|0,4|1,3|2,3|1,4|4,2|5,1|6,1|5,2|2,4|3,3|4,3|3,4|4,4|5,3|6,3|5,4|0,6|1,5|2,5|1,6|2,6|3,5|4,5|3,6|0,2h16|5,2t16|h        

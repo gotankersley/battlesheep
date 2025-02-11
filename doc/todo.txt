@@ -1,0 +1,19 @@
+TODO:
+
+Tile:
+- Draw visual occlusion
+- Check connected
+- Show tile quad count in hand
+
+Debug:
+- Normalize
+
+Place:
+- Show hand
+- Perimeter
+
+Move:
+- Alternate split style
+
+General:
+- Board str / mode

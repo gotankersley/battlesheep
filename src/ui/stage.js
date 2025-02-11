@@ -15,6 +15,7 @@ const COLOR_GRID = '#e0e0e0';
 const COLOR_BLACK = '#000';
 const COLOR_MOUSE = 'rgba(0, 0, 255, 0.1)';
 const COLOR_TILE = 'lightgreen';
+const COLOR_TILE_ACTIVE = '#32CD32';
 const COLOR_TILE_BORDER = 'green';
 const COLOR_TOKEN_SELECTED = 'red';
 
@@ -181,6 +182,8 @@ const onMouseDown = (e) => {
 }
 
 function onTileModeClicked(e) {
+    if (e.ctrlKey) return;
+    
     if (e.button == BUTTON_LEFT) {
         game.makeTile(mouse.axial, tileQuadRot);
     }
@@ -496,12 +499,14 @@ function drawTiles() {
 function drawTileMode() {
     
     var hexes = Board.splitTileQuad(mouse.axial, tileQuadRot);
+    var color = COLOR_TILE_ACTIVE;
     for (var h = 0; h < hexes.length; h++) {
         var hex = hexes[h];
         var px = hexToPix(hex);
-        var c = h == 0? COLOR_BLACK : COLOR_TILE;
-        fillHex(ctx, px.x, px.y, c); 
+        
+        fillHex(ctx, px.x, px.y, color); 
         strokeHex(ctx, px.x, px.y, COLOR_TILE_BORDER, 5); 
+        color = COLOR_TILE;
     }
 }
 
