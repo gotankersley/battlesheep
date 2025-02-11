@@ -7,6 +7,7 @@ import * as NetworkPlayer from '../players/network.js';
 export const EVENT_INVALID = 'invalid';
 export const EVENT_MOVED = 'moved';
 export const EVENT_PLACED = 'placed';
+export const EVENT_TILE = 'tile';
 export const EVENT_GAME_OVER = 'gameOver';
 
 
@@ -16,7 +17,8 @@ const DEFAULT_BOARD_STR = '0,2|1,1|2,1|1,2|3,1|4,0|5,0|4,1|0,4|1,3|2,3|1,4|4,2|5
 export class Game {
 	constructor(boardStr) {
         if (boardStr != '') this.board = Board.fromString(boardStr);
-        else this.board = Board.fromString(DEFAULT_BOARD_STR);
+        //else this.board = Board.fromString(DEFAULT_BOARD_STR);
+        else this.board = new Board();
 		boardStr = this.board.toString(); //Update / Sanity check
 		
 		//Add initial state
@@ -35,23 +37,7 @@ export class Game {
 		this.gameEvents[EVENT_BOARD_UPDATE](newBoard);
 	}
 
-	//Event methods
-	addEventListener(name, callback) {	
-		this.gameEvents[name] = callback;
-	}
-
-
-	onGameOver = () => {
-		var loser = this.board.turn; //TODO: draws?
-		
-        var boardStr = this.board.toString();        
-		this.history.push(boardStr);	
-		
-		//Draw the win and other hoopla...
-		this.gameEvents[EVENT_GAME_OVER](+(!loser), loser);
-			
-	}
-    
+    // Action methods
     makeMove = (src, dst, moveCount, override) => {	       
         this.board.makeMove(src, dst, moveCount);            	
         this.onMoved(src, dst, moveCount);        
@@ -61,7 +47,37 @@ export class Game {
         this.board.makePlace(pos);
         this.onPlaced(pos);
     }
+    
+    makeTile = (initialPos, tileRot) => {
+        this.board.makeTile(initialPos, tileRot);
+        this.onTile(initialPos, tileRot);
+    }
 
+    play = () => {
+		
+		var board = this.board;
+		var turn = board.turn;
+		var player = this.players[turn];
+		
+        if (board.isGameOver()){            
+            return this.onGameOver();
+        }
+        
+		if (player == PLAYER_HUMAN) return; //Ignore
+		
+		//Handle no-move, and one move
+		//var moves = board.getMoves();	
+		//if (moves.length == 0) return this.onPlayed();		
+		
+		
+		//All Async - expect onPlayed callback	
+		switch (player) {
+			case PLAYER_NETWORK: NetworkPlayer.getPlay(board, this.onPlayed); break;	 	//Network
+			case PLAYER_RANDOM: RandomPlayer.getPlay(board, this.onPlayed); break;			//Random			
+			default: alert('Invalid player');
+		}		
+	}
+    
 	undoMove = () => {
 		
 		if (this.history.length > 1) {			
@@ -93,40 +109,18 @@ export class Game {
 
 	
 
-	//Player functions
-	play = () => {
-		
-		var board = this.board;
-		var turn = board.turn;
-		var player = this.players[turn];
-		
-        if (board.isGameOver()){            
-            return this.onGameOver();
-        }
-        
-		if (player == PLAYER_HUMAN) return; //Ignore
-		
-		//Handle no-move, and one move
-		//var moves = board.getMoves();	
-		//if (moves.length == 0) return this.onPlayed();		
-		
-		
-		//All Async - expect onPlayed callback	
-		switch (player) {
-			case PLAYER_NETWORK: NetworkPlayer.getPlay(board, this.onPlayed); break;	 	//Network
-			case PLAYER_RANDOM: RandomPlayer.getPlay(board, this.onPlayed); break;			//Random			
-			default: alert('Invalid player');
-		}		
+	//Event methods	
+    addEventListener(name, callback) {	
+		this.gameEvents[name] = callback;
 	}
-
     onPlayed = (move) => {
         this.makeMove(move.src, move.dst, move.count);
     }
 
     onPlaced = (pos) => {
-        //History 
         var board = this.board;
         
+        //History 
         var boardStr = board.toString();        
 		this.history.push(boardStr);
         board.changeTurn(); 
@@ -163,5 +157,25 @@ export class Game {
         }
 	}
 
+    onTile = (initialPos, tileRot) => {        
+        var board = this.board;
+        
+        //History 
+        var boardStr = board.toString();        
+		this.history.push(boardStr);
+        board.changeTurn(); 
+        this.gameEvents[EVENT_TILE](initialPos, tileRot, boardStr); 
+
+    }
+    onGameOver = () => {
+		var loser = this.board.turn; //TODO: draws?
+		
+        var boardStr = this.board.toString();        
+		this.history.push(boardStr);	
+		
+		//Draw the win and other hoopla...
+		this.gameEvents[EVENT_GAME_OVER](+(!loser), loser);
+			
+	}
 }
 //end class Game

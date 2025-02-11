@@ -29,6 +29,16 @@ export const DIR_FLAG_NW = 32;
 const NEIGHBORS_Q = [0,1,1,0,-1,-1]; //By dir
 const NEIGHBORS_R = [-1,-1,0,1,1,0];  //By dir 
 
+const TILE_QUADS_BY_ROT = [ //By rotation
+    [DIR_SE, DIR_S, DIR_SW],
+    [DIR_S, DIR_SW, DIR_NW],
+    [DIR_SW, DIR_NW, DIR_N],
+    [DIR_NW, DIR_N, DIR_NE],
+    [DIR_N, DIR_NE, DIR_SE],
+    [DIR_NE, DIR_SE, DIR_S],
+];
+export const TILE_ROTATIONS = 6;
+
 export const TURN1 = 0;
 export const TURN2 = 1;
 
@@ -62,6 +72,7 @@ export function Tile(q, r) {
 	};
 }
 
+
 export function Token( id, player, count, pos) {
     return {
         id : id,
@@ -74,69 +85,13 @@ export function Token( id, player, count, pos) {
 export class Board {
 	constructor() {
 		this.tiles = {}; //Hash of 'board' - allows for irregular shapes			
-        this.turn = INVALID; 
+        this.turn = PLAYER1; 
         this.tokens = []; //All tokens
         this.playerTokens = [[], []]; //Tokens by player                
-        this.mode = MODE_MOVE;   
+        this.mode = MODE_TILE;   
 	}
 	
-    defaultBoard() {
-        this.turn = TURN1;
-        this.mode = MODE_MOVE;     
-        
-         //Default tiles
-        this.tiles['0,2'] = new Tile(0,2);
-        this.tiles['1,1'] = new Tile(1,1);
-        this.tiles['2,1'] = new Tile(2,1);
-        this.tiles['1,2'] = new Tile(1,2);
-        
-        this.tiles['3,1'] = new Tile(3,1);
-        this.tiles['4,0'] = new Tile(4,0);
-        this.tiles['5,0'] = new Tile(5,0);
-        this.tiles['4,1'] = new Tile(4,1);
-        
-        this.tiles['0,4'] = new Tile(0,4);
-        this.tiles['1,3'] = new Tile(1,3);
-        this.tiles['2,3'] = new Tile(2,3);
-        this.tiles['1,4'] = new Tile(1,4);
-        
-        this.tiles['4,2'] = new Tile(4,2);
-        this.tiles['5,1'] = new Tile(5,1);
-        this.tiles['6,1'] = new Tile(6,1);
-        this.tiles['5,2'] = new Tile(5,2);
-        
-        this.tiles['2,4'] = new Tile(2,4);
-        this.tiles['3,3'] = new Tile(3,3);
-        this.tiles['4,3'] = new Tile(4,3);
-        this.tiles['3,4'] = new Tile(3,4);
-        
-        this.tiles['4,4'] = new Tile(4,4);
-        this.tiles['5,3'] = new Tile(5,3);
-        this.tiles['6,3'] = new Tile(6,3);
-        this.tiles['5,4'] = new Tile(5,4);
-        
-        this.tiles['0,6'] = new Tile(0,6);
-        this.tiles['1,5'] = new Tile(1,5);
-        this.tiles['2,5'] = new Tile(2,5);
-        this.tiles['1,6'] = new Tile(1,6);
-        
-        this.tiles['2,6'] = new Tile(2,6);
-        this.tiles['3,5'] = new Tile(3,5);
-        this.tiles['4,5'] = new Tile(4,5);
-        this.tiles['3,6'] = new Tile(3,6);
-        
-        //Tokens        
-        var token1 = new Token(0, PLAYER1, STARTING_COUNT, new Pos(0, 2));
-        var token2 = new Token(1, PLAYER1, STARTING_COUNT, new Pos(5, 2));
-        this.tokens = [token1, token2]; //All tokens
-        this.playerTokens = [ //Tokens by player
-            [0], //Player1
-            [1], //Player2
-        ];
-        
-        this.tiles['0,2'].tokenId = 0;
-        this.tiles['5,0'].tokenId = 1;
-    }
+    
     
 	clone() {
 		var newBoard = new Board();
@@ -165,9 +120,11 @@ export class Board {
         
         //Turn				
 		newBoard.turn = this.turn;
+        newBoard.mode = this.mode;
 	}
 
     isGameOver() {
+        if (this.mode != MODE_MOVE) return false;
         var curPlayer = this.turn;
         var oppPlayer = +(!this.turn);
         if (this.isGameOverForPlayer(curPlayer)) return true;
@@ -227,8 +184,17 @@ export class Board {
         this.tokens.push(newToken);
         this.playerTokens[this.turn].push(newToken.id);
         
-        tile.tokenId = newToken.id;
+        tile.tokenId = newToken.id;        
         
+    }
+    
+    makeTile(initialPos, tileRot) {
+        var hexes = Board.splitTileQuad(initialPos, tileRot);
+        for (var h = 0; h < hexes.length; h++) {
+            var hex = hexes[h];
+            var tileKey = hex.q + ',' + hex.r;
+            this.tiles[tileKey] = new Tile(hex.q, hex.r);
+        }
         
     }
 		
@@ -443,5 +409,19 @@ export class Board {
         var dst = new Pos(Number.parseInt(dstArr[0]), Number.parseInt(dstArr[1])); 
             
         return {src:src, dst:dst, count:count};
+    }
+    
+    static splitTileQuad(initialPos, tileRot) {
+        var hexes = [];
+        var tileQuadDirs = TILE_QUADS_BY_ROT[tileRot];
+        hexes.push(new Pos(initialPos.q, initialPos.r));
+        for (var d = 0; d < tileQuadDirs.length; d++) { //Should always only be three
+            var dir = tileQuadDirs[d];
+            var q = initialPos.q + NEIGHBORS_Q[dir];
+            var r = initialPos.r + NEIGHBORS_R[dir];
+            var pos = new Pos(q, r);
+            hexes.push(pos);
+        }
+        return hexes;
     }
 }

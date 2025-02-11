@@ -2,6 +2,7 @@ import { setHex, INVALID } from '../lib/hex-lib.js';
 
 export const BUTTON_LEFT = 0;
 export const BUTTON_MIDDLE = 1;
+export const BUTTON_RIGHT = 2;
 
 	
 //Mouse class
