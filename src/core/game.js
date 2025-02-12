@@ -1,4 +1,4 @@
-import { Board, MODE_PLACE, MODE_MOVE } from '../core/board.js';
+import { Board, MODE_PLACE, MODE_MOVE, MODE_TILE } from '../core/board.js';
 import { PLAYER_HUMAN, PLAYER_RANDOM, PLAYER_NETWORK } from '../players/players.js';
 import * as RandomPlayer from '../players/random.js';
 import * as NetworkPlayer from '../players/network.js';
@@ -107,15 +107,21 @@ export class Game {
 		return false;
 	}
 
-
-	
-
 	//Event methods	
     addEventListener(name, callback) {	
 		this.gameEvents[name] = callback;
 	}
-    onPlayed = (move) => {
-        this.makeMove(move.src, move.dst, move.count);
+    onPlayed = (play) => {
+        var mode = this.board.mode;
+        if (mode == MODE_TILE) {
+            this.makeTile(play.pos, play.rot);
+        }
+        else if (mode == MODE_PLACE) {
+            this.makePlace(play.pos);
+        }
+        else if (mode == MODE_MOVE) {            
+            this.makeMove(play.src, play.dst, play.count);
+        }        
     }
 
     onPlaced = (pos) => {

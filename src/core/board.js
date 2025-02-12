@@ -53,6 +53,8 @@ export const MODE_PLACE = 1;
 export const MODE_MOVE = 2;
 export const MODE_GAME_OVER = 3;
 
+export const INITIAL_TOKENS = 2;
+
 
 const PROTOCOL_TURN1 = 'h';
 const PROTOCOL_TURN2 = 't';
@@ -186,7 +188,7 @@ export class Board {
         this.playerTokens[this.turn].push(newToken.id);
         
         tile.tokenId = newToken.id;        
-        if (this.tokens.length == 2) this.mode = MODE_MOVE;
+        if (this.tokens.length == INITIAL_TOKENS) this.mode = MODE_MOVE;
     }
     
     makeTile(initialPos, tileRot) {
@@ -275,6 +277,8 @@ export class Board {
         
         if (!perimeter[posKey]) return {status:false, msg:'Token must be placed on the perimeter'};
         
+        if (this.tokens.length >= INITIAL_TOKENS) return {status:false, msg:'Only two token may be placed initially'};
+        
     	return {status:true, msg:''};
 	}
     
@@ -334,7 +338,7 @@ export class Board {
         return false;
     }
     
-    getPerimeter() {
+    getPerimeter() { //Essentially equivalent to getPlaceMoves, but useful whenever the perimeter is needed
         //Note - This currently includes holes
         var perimeter = {};
         
@@ -354,10 +358,47 @@ export class Board {
         
         return perimeter;
     }
-    
 
-    
-    getMoves() {
+    getTileMoves() {
+        var tileKeys = Object.keys(this.tiles);
+        if (!tileKeys.length) {
+            return [{pos: new Pos(0, 0), rot:0}]; //First move
+        }
+        var tileMoves = [];
+        
+        var perimeter = this.getPerimeter();
+        var perimeterKeys = Object.keys(perimeter);
+        
+        //Look at tiles on the perimeter
+        for (var k = 0; k < perimeterKeys.length; k++) {
+            var perimeterKey = perimeterKeys[k];
+            var tile = this.tiles[perimeterKey]; 
+            
+            //Find the neighboring edge from the perimeter            
+            for (var dir = 0; dir < 6; dir++) {
+                var neighQ = tile.pos.q + NEIGHBORS_Q[dir];
+                var neighR = tile.pos.r + NEIGHBORS_R[dir];
+                var neighKey = neighQ + ',' + neighR;
+                
+                if (!this.tiles[neighKey]) {
+                    //See what tile quads might can be placed on the perimeter edge
+                    var edgePos = new Pos(neighQ, neighR);
+                    for (var r = 0; r < TILE_ROTATIONS; r++) {
+                        var quadSplit = this.splitTileQuad(edgePos, r);
+                        if (!quadSplit.intersects) {
+                            var tileMove = {pos: edgePos, rot: r};
+                            tileMoves.push (tileMove);
+                        }
+                    }
+                    
+                }
+            }
+        }
+        
+        return tileMoves;
+    }
+       
+    getMoves() { //Because getMoveMoves would be ridiculous...
         var moves = [];
         
         var tokenIds = this.playerTokens[this.turn];
@@ -497,7 +538,7 @@ export class Board {
         }
         else { //Tokens -                      
             //Example: 0,2h
-            if ((pairs.length - t) <= 2) board.mode = MODE_PLACE;                 
+            if ((pairs.length - t) <= INITIAL_TOKENS) board.mode = MODE_PLACE;                 
             else board.mode = MODE_MOVE;
             
             for (var p = t; p < pairs.length-1; p++) { //Pairs length minus 1 to account for turn at the end
