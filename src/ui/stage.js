@@ -92,13 +92,14 @@ export function createStage(containerId) {
     //Url
     Url.init(function(e) {
         var hash = window.location.hash.replace('#', '');
-        try {
-            window.game.board = Board.fromString(hash);            
-        }
-        catch (err) {
-            showMessage(err);
-            window.game = new Game('');
-        }
+        //try {
+            window.game.board = Board.fromString(hash); 
+            window.modesController.setValue(game.board.mode);            
+        //}
+        //catch (err) {
+        //    showMessage(err);
+        //    window.game = new Game('');
+        //}
     });
     
     var boardStr = '';
@@ -112,13 +113,13 @@ export function createStage(containerId) {
 			
     
     //Game events	
-    try {
+    //try {
         window.game = new Game(boardStr);
-    }
-    catch (err) {
-        showMessage(err);
-        window.game = new Game('');
-    }
+    //}
+    //catch (err) {
+    //    showMessage(err);
+    //    window.game = new Game('');
+    //}
     window.game.addEventListener(EVENT_TILED, onTiled);
     window.game.addEventListener(EVENT_PLACED, onPlaced);
     window.game.addEventListener(EVENT_MOVED, onMoved);

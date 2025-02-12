@@ -430,7 +430,7 @@ export class Board {
         boardStr = boardStr.toLowerCase();
         if (!boardStr || boardStr == '') throw('Invalid board str: ' + boardStr);
         var pairs = boardStr.split(PROTOCOL_DELIM2);
-        if (pairs.length < TILE_COUNT) throw('Invalid board str: ' + boardStr);
+        
         		
         //Turn - Should be last
         var turnStr = pairs[pairs.length-1];
@@ -439,9 +439,10 @@ export class Board {
         else throw('Invalid board turn: ' + turnStr);
         
         
-        //Tiles - Expect 32
+        //Tiles - Expect max 32
         var t;
-        for (t = 0; t < TILE_COUNT; t++) {
+        var tilePairs = Math.min(pairs.length-1, TILE_COUNT);        
+        for (t = 0; t < tilePairs; t++) {
             var pair = pairs[t];
             if (!pair || pair == '') throw('Invalid board coordinate: ' + pair);
             var posArr = pair.split(PROTOCOL_DELIM1);
@@ -451,36 +452,43 @@ export class Board {
             //NOTE: token id added after it's parsed in next step
         }
         
-        //Tokens - Expect minimum of 2
-        //Example: 0,2h
-        if ((pairs.length - t) <= 2) throw('Invalid board tokens: ' + boardStr);
-        for (var p = t; p < pairs.length-1; p++) { //Pairs length minus 1 to account for turn at the end
-            var pair = pairs[p];
-            if (!pair || pair == '') throw('Invalid board token: ' + pair);            
+        if (tilePairs < TILE_COUNT) { //Still adding tiles - no tokens yet
+            board.mode = MODE_TILE;
+        }
+        else { //Tokens -                      
+            //Example: 0,2h
+            if ((pairs.length - t) <= 2) board.mode = MODE_PLACE;                 
+            else board.mode = MODE_MOVE;
             
-            var turnIndex = pair.indexOf(PROTOCOL_TURN1);
-            var player;            
-            if (turnIndex >= 0) {  //Player 1
-                player = PLAYER1;                
+            for (var p = t; p < pairs.length-1; p++) { //Pairs length minus 1 to account for turn at the end
+                var pair = pairs[p];
+                if (!pair || pair == '') throw('Invalid board token: ' + pair);            
+                
+                var turnIndex = pair.indexOf(PROTOCOL_TURN1);
+                var player;            
+                if (turnIndex >= 0) {  //Player 1
+                    player = PLAYER1;                
+                }
+                else { //Not player 1
+                    turnIndex = pair.indexOf(PROTOCOL_TURN2);
+                    if (turnIndex < 0) throw('Invalid board token - player turn not found: ' + pair);
+                    player = PLAYER2;
+                }
+                var posStr = pair.substr(0, turnIndex);
+                var posArr = posStr.split(PROTOCOL_DELIM1);
+                var posKey = posArr[0] + ',' + posArr[1];            
+                var count = Number.parseInt(pair.substr(turnIndex+1));
+                var pos = new Pos(Number.parseInt(posArr[0]), Number.parseInt(posArr[1]))
+                
+                var token = new Token(board.tokens.length, player, count, pos);
+                board.tokens.push(token);
+                board.playerTokens[player].push(token.id);
+                board.tiles[posKey].tokenId = token.id;
             }
-            else { //Not player 1
-                turnIndex = pair.indexOf(PROTOCOL_TURN2);
-                if (turnIndex < 0) throw('Invalid board token - player turn not found: ' + pair);
-                player = PLAYER2;
-            }
-            var posStr = pair.substr(0, turnIndex);
-            var posArr = posStr.split(PROTOCOL_DELIM1);
-            var posKey = posArr[0] + ',' + posArr[1];            
-            var count = Number.parseInt(pair.substr(turnIndex+1));
-            var pos = new Pos(Number.parseInt(posArr[0]), Number.parseInt(posArr[1]))
             
-            var token = new Token(board.tokens.length, player, count, pos);
-            board.tokens.push(token);
-            board.playerTokens[player].push(token.id);
-            board.tiles[posKey].tokenId = token.id;
         }
 		
-        this.mode = MODE_PLACE;
+        
         
         //TODO: Normalize
         //TODO: Sanity check all tiles are connected
