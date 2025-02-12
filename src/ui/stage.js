@@ -20,6 +20,7 @@ const COLOR_TILE_BORDER = 'green';
 const COLOR_TILE_INTERSECTS = '#8F9779';
 const COLOR_TOKEN_SELECTED = 'red';
 const COLOR_TOKEN_SELECTED2 = '#007FFF';
+const COLOR_TOKEN_BY_PLAYER = [COLOR_TOKEN_SELECTED, COLOR_TOKEN_SELECTED2];
 
 const KEY_DELETE = 46;
 const KEY_T = 84;
@@ -240,6 +241,9 @@ function onClickedMoveMode(e) {
                     mouse.selectedToken = tile.tokenId;
                 }
                 else if (token.player != player) return; //Can't select opposite player's token                
+                else if (mouse.selectedToken == tile.tokenId) { //De-Select
+                    resetSelection();
+                }
                 else {
                     mouse.selected = {q:pos.q, r:pos.r}; //Make this tile the new selection                                                
                     mouse.selectedToken = tile.tokenId;
@@ -257,7 +261,11 @@ function onClickedMoveMode(e) {
                         //*Whew - now that we have all the input required, actually make the move
                         makeMove(src, dst, moveCount, mouse.ctrlOn);                        
                     }
-                    else if (tileDest === null) tileDest = pos; //Alternate destination select style
+                    //Alternate destination select style
+                    else if (tileDest !== null && tileDest.q == pos.q && tileDest.r == pos.r) {
+                        tileDest = null;
+                    }
+                    else tileDest = pos; 
 
                 }
             }
@@ -309,28 +317,28 @@ const onKeyDown = (e) => {
 	
 //Game Events
 const onTiled = (pos, tileRot, boardStr) => {        
-    resetSelections();
+    resetSelection();
     Url.setHash(boardStr);        
         
     setTimeout(game.play, DELAY_MOVE);		
 }
 
 const onPlaced = (pos, boardStr) => {        
-    resetSelections();
+    resetSelection();
     Url.setHash(boardStr);        
     
     setTimeout(game.play, DELAY_MOVE);		
 }
 
 const onMoved = (src, dst, boardStr) => {         
-    resetSelections();   
+    resetSelection();   
     Url.setHash(boardStr);    
     
     setTimeout(game.play, DELAY_MOVE);		
 }
 
 const onGameOver = (winner, loser) => {
-    resetSelections();	
+    resetSelection();	
     showMessage('Game OVER!');
     if (winner == PLAYER1) alert('Player1 has won');
     else if (winner == PLAYER2) alert('Player2 has won');
@@ -339,11 +347,11 @@ const onGameOver = (winner, loser) => {
 }
 
 const onModeChanged = (boardStr) => {    
-    resetSelections();
+    resetSelection();
     Url.setHash(boardStr);
 }
 
-function resetSelections() {
+function resetSelection() {
     window.modesController.setValue(game.board.mode);
     hand.selected = null;
     hand.hover = null;
@@ -515,8 +523,8 @@ function drawTurn() {
 
 function drawTileDest() {
     var px = hexToPix(tileDest);                       
-           
-    strokeHex(ctx, px.x, px.y, COLOR_TOKEN_SELECTED, 5);            
+    var color = COLOR_TOKEN_BY_PLAYER[game.board.turn];   
+    strokeHex(ctx, px.x, px.y, color, 5);            
 }
     
        
@@ -583,7 +591,8 @@ function drawTokens() {
         
         //Highlight Selected
         if (mouse.selectedToken == tokenId) {
-            strokeHex(ctx, px.x, px.y, COLOR_TOKEN_SELECTED, 5);    
+            var color = COLOR_TOKEN_BY_PLAYER[game.board.turn];   
+            strokeHex(ctx, px.x, px.y, color, 5);    
         }        
                     
     }

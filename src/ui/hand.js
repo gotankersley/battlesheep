@@ -1,19 +1,22 @@
 import { BUTTON_LEFT } from './mouse.js';
 
-var COLOR_HAND_BACKGROUND = 'rgba(100, 100, 100, 0.3)';
-//var COLOR_TILE_HIGHLIGHT = '#ffffe0';
-var COLOR_HAND_HIGHLIGHT = 'lightgreen';
-var COLOR_HAND_HIGHLIGHT2 = 'green';
-var COLOR_HAND_SELECTED = 'red';
-var COLOR_HAND_TEXT = '#000';
+const COLOR_HAND_BACKGROUND = 'rgba(100, 100, 100, 0.3)';
+
+const COLOR_HAND_HIGHLIGHT = 'lightgreen';
+const COLOR_HAND_HIGHLIGHT2 = 'green';
+const COLOR_HAND_TEXT = '#000';
+const COLOR_HAND_SELECTED = 'red';
+const COLOR_HAND_SELECTED2 = '#007FFF';
+const COLOR_HAND_BY_PLAYER = [COLOR_HAND_SELECTED, COLOR_HAND_SELECTED2];
+
 export const HAND_SIZE_X = 70;
 
-var HAND_TILE_X = HAND_SIZE_X;
-var HAND_TILE_Y = 50;
-var HAND_MARGIN_Y = 0;
-var HAND_HALF_TILE_X = HAND_TILE_X/2;
-var HAND_HALF_TILE_Y = HAND_TILE_Y/2;
-var HAND_HOVER_SIZE = 10;
+const HAND_TILE_X = HAND_SIZE_X;
+const HAND_TILE_Y = 50;
+const HAND_MARGIN_Y = 0;
+const HAND_HALF_TILE_X = HAND_TILE_X/2;
+const HAND_HALF_TILE_Y = HAND_TILE_Y/2;
+const HAND_HOVER_SIZE = 10;
 
 //Class Hand
 export class Hand {
@@ -78,9 +81,10 @@ export class Hand {
                 var y = CANVAS_SIZE_Y-(((h+1) * HAND_TILE_Y) + HAND_MARGIN_Y);  
                 
                 //Selected
-                if (this.selected == h) {                                   
-                    ctx.fillStyle = COLOR_HAND_SELECTED;  
-                    ctx.strokeStyle = COLOR_HAND_SELECTED;                       
+                if (this.selected == h) {   
+                    var color = COLOR_HAND_BY_PLAYER[token.player];
+                    ctx.fillStyle = color;  
+                    ctx.strokeStyle = color;                       
                     ctx.strokeRect( 0, y, HAND_TILE_X, HAND_TILE_Y);  	
                     ctx.fillText(count-h, HAND_HALF_TILE_X-5, y+HAND_HALF_TILE_Y+5);
                 }

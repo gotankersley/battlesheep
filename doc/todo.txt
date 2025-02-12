@@ -1,8 +1,6 @@
 TODO:
 
 Tile:
-x Draw visual occlusion
-x Check connected
 - Show tile quad count in hand
 
 
@@ -15,10 +13,10 @@ Random AI:
 - Use other modes now
 
 Game Over:
-- tally score
+- Tally score
 
-GFX:
--
+Undo/Redo
+
 
 Questions:
 - Random of rnd tile->rnd move vs all tiles and rnd
