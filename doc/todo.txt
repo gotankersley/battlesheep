@@ -4,17 +4,12 @@ Tile:
 - Show tile quad count in hand
 
 
-Place:
-- Show hand
 
-
-Random AI:
-- Use other modes now
 
 Game Over:
 - Tally score
 
-Undo/Redo
+
 
 
 Questions:

@@ -82,17 +82,17 @@ export class Game {
 	undoMove = () => {
 		
 		if (this.history.length > 1) {			
-			var oldStr = this.history.pop();
-			this.undoHistory.push(oldStr);
+			var oldStr = this.history.pop();			
 			
 			var boardStr = this.history[this.history.length-1];
 			
-			this.board = new Board(boardStr);
+			this.board = Board.fromString(boardStr);
 			return true;		
 		}
 		return false;
 	}
 
+    /*
 	redoMove = () => {
 		if (this.undoHistory.length > 0) {	
 			var savedStr = this.undoHistory.pop();
@@ -106,6 +106,7 @@ export class Game {
 		}
 		return false;
 	}
+    */
 
 	//Event methods	
     addEventListener(name, callback) {	
@@ -142,17 +143,7 @@ export class Game {
 		var board = this.board;
 		
         var player = this.players[board.turn];        
-		/*
-		//TODO: Validate move?
-		if (!move) { //No moves available
-			alert ('No moves available - skipping player');
-			this.board.skip();
-			return this.gameEvents[EVENT_PLAYED]();
-		}
-		
-		var mode = board.getMode();
 
-		*/
         
 		//History 
         var boardStr = board.toString();        

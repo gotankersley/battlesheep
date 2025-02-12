@@ -2,7 +2,7 @@ import { setHex, fillHex, strokeHex, ORIENT_FLAT, ORIENT_POINTY, INVALID } from 
 import * as Url from '../lib/url-lib.js';
 import { MenuManager } from './menu.js';
 import { TileSet } from './tile-set.js';
-import { Board, PLAYER1, PLAYER2, EMPTY, MODE_TILE, MODE_PLACE, MODE_MOVE, TILE_ROTATIONS } from '../core/board.js';
+import { Board, PLAYER1, PLAYER2, EMPTY, MODE_TILE, MODE_PLACE, MODE_MOVE, TILE_ROTATIONS, TILE_QUAD } from '../core/board.js';
 import { Game, EVENT_MOVED, EVENT_PLACED, EVENT_TILED, EVENT_GAME_OVER, EVENT_MODE_CHANGED } from '../core/game.js';
 import { PLAYER_HUMAN } from '../players/players.js';
 import { Mouse, BUTTON_LEFT, BUTTON_RIGHT } from './mouse.js';
@@ -306,7 +306,7 @@ const onKeyDown = (e) => {
         game.board.changeTurn();        
     }
     else if (e.ctrlKey && e.key == 'z') {
-        game.onMoveUndo();
+        game.undoMove();
     }
     else if (game.board.mode == MODE_TILE) {
         if (e.keyCode == KEY_ARROW_LEFT) {            
@@ -400,7 +400,9 @@ function draw(time) { //Top-level drawing function
         drawTileMode();        
         
         //Hand
-        hand.drawTile();
+        var tileKeys = Object.keys(game.board.tiles);
+        var tileQuadsRemaining = 8-(tileKeys.length/TILE_QUAD); //Should always divide evenly
+        hand.drawTile(tileQuadsRemaining);
     }
     else if (mode == MODE_PLACE) {
         
@@ -411,7 +413,7 @@ function draw(time) { //Top-level drawing function
         drawPlaceToken();
         
         //Hand
-        hand.drawPlace();
+        hand.drawPlace(game.board.playerTokens);
     }
     else if (mode == MODE_MOVE) {
         //Tiles

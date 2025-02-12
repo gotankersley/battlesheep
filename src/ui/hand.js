@@ -1,4 +1,5 @@
 import { BUTTON_LEFT } from './mouse.js';
+import { setHex, ORIENT_FLAT, fillHex, strokeHex } from '../lib/hex-lib.js';
 
 const COLOR_HAND_BACKGROUND = 'rgba(100, 100, 100, 0.3)';
 
@@ -17,6 +18,7 @@ const HAND_MARGIN_Y = 0;
 const HAND_HALF_TILE_X = HAND_TILE_X/2;
 const HAND_HALF_TILE_Y = HAND_TILE_Y/2;
 const HAND_HOVER_SIZE = 10;
+
 
 //Class Hand
 export class Hand {
@@ -56,14 +58,38 @@ export class Hand {
         }
     }
     
-    drawTile = () => {
+    drawTile = (tileQuadsRemaining) => {
         var ctx = this.ctx;
-        drawBackground(ctx);    
+        drawBackground(ctx);   
+
+        ctx.strokeStyle = '#000';
+        var savedHexSize = HEX_SIDE;
+        setHex(ORIENT_FLAT, 20);
+        for (var t = 0; t < tileQuadsRemaining; t++) {
+            var turn = turn % 2;
+            var y = (t * (HAND_TILE_Y + 10)) + HAND_MARGIN_Y + 15;
+            //if (turn != 0) y += 400;
+            
+            //Miniature tile quad            
+            strokeHex(ctx, 0, y, COLOR_HAND_HIGHLIGHT2, 2);	        
+        }
+        setHex(ORIENT_FLAT, savedHexSize);
+        	
     }
 
-    drawPlace = () => {
+    drawPlace = (playerTokens) => {
         var ctx = this.ctx;
         drawBackground(ctx);    
+        
+        for (var turn = 0; turn < playerTokens.length; turn++) {
+            if (!playerTokens[turn].length) {
+                var y = (turn * (HAND_TILE_Y + 10)) + HAND_MARGIN_Y + 15;
+                
+                var tileImages = tileSet.activeImages[turn];
+                var tileImage = tileImages[5];		
+                ctx.drawImage(tileImage, 5, y, HAND_TILE_X - 10, HAND_TILE_Y);	
+            }
+        }
     }
     
     drawMove = (selectedToken) => {   
