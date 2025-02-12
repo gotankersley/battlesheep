@@ -13,11 +13,14 @@ import { Hand, HAND_SIZE_X } from './hand.js';
 //Constants
 const COLOR_GRID = '#e0e0e0';
 const COLOR_BLACK = '#000';
-const COLOR_MOUSE = 'rgba(0, 0, 255, 0.1)';
+const COLOR_MOUSE = 'rgba(0, 0, 255, 0.1)'
+;
 const COLOR_TILE = 'lightgreen';
 const COLOR_TILE_ACTIVE = '#32CD32';
 const COLOR_TILE_BORDER = 'green';
+const COLOR_TILE_PERIMETER = '#32CD32';
 const COLOR_TILE_INTERSECTS = '#8F9779';
+
 const COLOR_TOKEN_SELECTED = 'red';
 const COLOR_TOKEN_SELECTED2 = '#007FFF';
 const COLOR_TOKEN_BY_PLAYER = [COLOR_TOKEN_SELECTED, COLOR_TOKEN_SELECTED2];
@@ -54,6 +57,7 @@ var paused = false;
 var $message;
 var tileQuadRot = 0;
 var tileDest = null;
+var tilePerimeter = null;
 	
 
 export function createStage(containerId) { 
@@ -349,6 +353,9 @@ const onGameOver = (winner, loser) => {
 const onModeChanged = (boardStr) => {    
     resetSelection();
     Url.setHash(boardStr);
+    if (game.board.mode == MODE_PLACE) {        
+        tilePerimeter = game.board.getPerimeter();
+    }
 }
 
 function resetSelection() {
@@ -394,7 +401,7 @@ function draw(time) { //Top-level drawing function
     else if (mode == MODE_PLACE) {
         
         //Tiles
-        drawTiles();
+        drawTilesPlaceMode();
         
         //Tokens
         drawPlaceToken();
@@ -547,6 +554,25 @@ function drawTiles() {
     }
 }
 
+function drawTilesPlaceMode() {
+
+    var posKeys = Object.keys(game.board.tiles);		    
+    for (var t = 0; t < posKeys.length; t++) {
+        var posKey = posKeys[t];
+        var tile = game.board.tiles[posKey];
+        var px = hexToPix(tile.pos);
+                
+        var color = tilePerimeter[posKey]? COLOR_TILE_PERIMETER : COLOR_TILE;
+        fillHex(ctx, px.x, px.y, color);
+        strokeHex(ctx, px.x, px.y, COLOR_TILE_BORDER, 5);	        
+		
+        if (menu.showCoordinates) {
+            ctx.fillStyle = COLOR_BLACK;
+            ctx.fillText(posKey, px.x, px.y); 
+        }
+    }
+}
+
 function drawTileMode() {
     
     var quadSplit = game.board.splitTileQuad(mouse.axial, tileQuadRot);
@@ -624,12 +650,12 @@ function drawPlaceToken() {
 //    //ctx.stroke();
 //}
 
-function triggerClick() {    
-    var evt = new MouseEvent('mousedown', {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-        button : BUTTON_LEFT
-    });
-    canvas.dispatchEvent(evt);
-}
+//function triggerClick() {    
+//    var evt = new MouseEvent('mousedown', {
+//        view: window,
+//        bubbles: true,
+//        cancelable: true,
+//        button : BUTTON_LEFT
+//    });
+//    canvas.dispatchEvent(evt);
+//}

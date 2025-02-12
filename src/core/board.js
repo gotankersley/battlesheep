@@ -324,6 +324,29 @@ export class Board {
         return false;
     }
     
+    getPerimeter() {
+        //Note - This currently includes holes
+        var perimeter = {};
+        
+        var tileKeys = Object.keys(this.tiles);
+        for (var t = 0; t < tileKeys.length; t++) {
+            var tileKey = tileKeys[t];
+            var tile = this.tiles[tileKey];
+            
+            for (var dir = 0; dir < 6; dir++) {
+                var neighQ = tile.pos.q + NEIGHBORS_Q[dir];
+                var neighR = tile.pos.r + NEIGHBORS_R[dir];
+                var neighKey = neighQ + ',' + neighR;
+                
+                if (!this.tiles[neighKey]) perimeter[neighKey] = true;
+            }
+        }
+        
+        return perimeter;
+    }
+    
+
+    
     getMoves() {
         var moves = [];
         

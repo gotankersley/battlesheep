@@ -182,5 +182,11 @@ export class Game {
 		this.gameEvents[EVENT_GAME_OVER](+(!loser), loser);
 			
 	}
+    
+    changeMode = (mode) => {
+        this.board.mode = mode;
+        var boardStr = this.board.toString();         
+        this.gameEvents[EVENT_MODE_CHANGED](boardStr);            
+    }
 }
 //end class Game

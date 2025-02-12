@@ -18,8 +18,8 @@ const TYPES = [
 const METADATA = [
     {name:'white', path: 'img/white', ext: 'png', outline:'#98968d', scale:true},
     {name:'blue', path: 'img/blue', ext: 'png', outline:'#50b8d5', scale:true},
-    {name:'green', path: 'img/green', ext: 'png', outline:'#93cb5a', scale:true},
-    {name:'red', path: 'img/red', ext: 'png', outline:'#c85c59', scale:true},		
+    //{name:'green', path: 'img/green', ext: 'png', outline:'#93cb5a', scale:true},
+    //{name:'red', path: 'img/red', ext: 'png', outline:'#c85c59', scale:true},		
 ];
 
 export function getTileSetNames () { //For menu

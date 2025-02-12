@@ -69,7 +69,7 @@ MenuManager.prototype.onChangePlayer = function(player, val) {
 
 MenuManager.prototype.onChangeMode = function(val) {		
 	if (typeof(val) != 'number') {
-        game.board.mode = Number.parseInt(menu.mode);    
+        game.changeMode(Number.parseInt(menu.mode));
     }
 }
 
