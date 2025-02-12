@@ -3,7 +3,7 @@ import * as Url from '../lib/url-lib.js';
 import { MenuManager } from './menu.js';
 import { TileSet } from './tile-set.js';
 import { Board, PLAYER1, PLAYER2, EMPTY, MODE_TILE, MODE_PLACE, MODE_MOVE, TILE_ROTATIONS } from '../core/board.js';
-import { Game, EVENT_MOVED, EVENT_PLACED, EVENT_TILE, EVENT_GAME_OVER } from '../core/game.js';
+import { Game, EVENT_MOVED, EVENT_PLACED, EVENT_TILED, EVENT_GAME_OVER } from '../core/game.js';
 import { PLAYER_HUMAN } from '../players/players.js';
 import { Mouse, BUTTON_LEFT, BUTTON_RIGHT } from './mouse.js';
 import { Hand, HAND_SIZE_X } from './hand.js';
@@ -119,7 +119,7 @@ export function createStage(containerId) {
         showMessage(err);
         window.game = new Game('');
     }
-    window.game.addEventListener(EVENT_TILE, onTile);
+    window.game.addEventListener(EVENT_TILED, onTiled);
     window.game.addEventListener(EVENT_PLACED, onPlaced);
     window.game.addEventListener(EVENT_MOVED, onMoved);
     window.game.addEventListener(EVENT_GAME_OVER, onGameOver);
@@ -178,16 +178,20 @@ const onMouseDown = (e) => {
     if (game.players[game.board.turn] != PLAYER_HUMAN) {
         showMessage('Waiting for other player to play...');            
     }
-    else if (game.board.mode == MODE_TILE) onTileModeClicked(e);
-    else if (game.board.mode == MODE_PLACE) onPlaceModeClicked(e);
-    else if (game.board.mode == MODE_MOVE) onMoveModeClicked(e);            
+    else if (game.board.mode == MODE_TILE) onClickedTileMode(e);
+    else if (game.board.mode == MODE_PLACE) onClickedPlaceMode(e);
+    else if (game.board.mode == MODE_MOVE) onClickedMoveMode(e);            
 }
 
-function onTileModeClicked(e) {
+function onClickedTileMode(e) {
     if (e.ctrlKey) return;
     
     if (e.button == BUTTON_LEFT) {
-        game.makeTile(mouse.axial, tileQuadRot);
+        var validateTile = game.board.isValidTile(mouse.axial, tileQuadRot);
+        if (validateTile.status) {
+            game.makeTile(mouse.axial, tileQuadRot);
+        }
+        else showMessage(validateTile.msg);
     }
     else if (e.button === BUTTON_RIGHT) {
         if (tileQuadRot < TILE_ROTATIONS-1) tileQuadRot++;
@@ -196,7 +200,7 @@ function onTileModeClicked(e) {
 
 }
 
-function onPlaceModeClicked(e) {
+function onClickedPlaceMode(e) {
     
     if (e.button == BUTTON_LEFT) {	
         var board = game.board;
@@ -216,7 +220,7 @@ function onPlaceModeClicked(e) {
 }
 
 
-function onMoveModeClicked(e) {
+function onClickedMoveMode(e) {
     if (e.button == BUTTON_LEFT) {	
         var board = game.board;
         var player = board.turn;        
@@ -279,13 +283,13 @@ const onKeyDown = (e) => {
             if (tileQuadRot > 0) tileQuadRot--;
             else tileQuadRot = TILE_ROTATIONS-1;            
         }    
-        else if (e.keyCode == KEY_SPACE) triggerClick();          
+        //else if (e.keyCode == KEY_SPACE) triggerClick();          
     }
     
 }
 	
 //Game Events
-const onTile = (pos, tileRot, boardStr) => {        
+const onTiled = (pos, tileRot, boardStr) => {        
     hand.selected = null;
     hand.hover = null;
     Url.setHash(boardStr);    

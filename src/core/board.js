@@ -38,6 +38,8 @@ const TILE_QUADS_BY_ROT = [ //By rotation
     [DIR_NE, DIR_SE, DIR_S],
 ];
 export const TILE_ROTATIONS = 6;
+export const TILE_QUAD = 4;
+export const TILE_COUNT = 32; //(4 hexes in a tile quad * 4 * 2)
 
 export const TURN1 = 0;
 export const TURN2 = 1;
@@ -51,7 +53,6 @@ export const MODE_PLACE = 1;
 export const MODE_MOVE = 2;
 export const MODE_GAME_OVER = 3;
 
-export const TILE_COUNT = 32; //(4 hexes in a tile quad * 4 * 2)
 
 const PROTOCOL_TURN1 = 'h';
 const PROTOCOL_TURN2 = 't';
@@ -266,6 +267,60 @@ export class Board {
 		return {status:true, msg:''};
 	}
     
+    isValidTile(initialPos, tileRot) {
+        var quadSplit = this.splitTileQuad(initialPos, tileRot);
+        if (quadSplit.intersects) return {status:false, msg:'Tiles must not intersect existing tiles'};
+        
+        
+        if (!this.isConnected(quadSplit.hexes)) return {status:false, msg:'Tiles must be connected when placed'};
+            
+    	return {status:true, msg:''};
+	}
+    
+    isConnected(hexes) { //Driver function
+        var breadcrumbs = {};
+        var tiles = {};
+        var tileKeys = Object.keys(this.tiles);
+        var totalTiles = tileKeys.length;
+        if (totalTiles <= 0) return true; //First gets a freebie   
+
+        //Copy existing tiles
+        for (var t = 0; t < totalTiles; t++) {
+            var tileKey = tileKeys[t];
+            tiles[tileKey] = true;
+        }
+            
+        //Copy tile quad
+        for (var h = 0; h < hexes.length; h++) {
+            var pos = hexes[h];
+            var posKey = pos.q + ',' + pos.r;            
+            tiles[posKey] = true;
+        } 
+        totalTiles += TILE_QUAD;
+        
+        var initialPos = hexes[0];
+        var initialPosKey = initialPos.q + ',' + initialPos.r;
+        breadcrumbs[initialPosKey] = true;
+        return this.isConnectedDFS(tiles, breadcrumbs, initialPos, totalTiles, [1]);
+    }
+    
+    isConnectedDFS(tiles, breadcrumbs, pos, total, countRef) { //Recursive Depth-First-Search
+        for (var dir = 0; dir < 6; dir++) {
+            var neighQ = pos.q + NEIGHBORS_Q[dir];
+            var neighR = pos.r + NEIGHBORS_R[dir];
+            var neighKey = neighQ + ',' + neighR;
+            if (tiles[neighKey] && !breadcrumbs[neighKey] ) {                
+                var neighPos = new Pos(neighQ, neighR);
+                breadcrumbs[neighKey] = true;
+                countRef[0]++;
+                if (countRef[0] == total) return true;
+                var connected = this.isConnectedDFS(tiles, breadcrumbs, neighPos, total, countRef); //Recurse
+                if (connected) return true;
+            }
+        }
+        return false;
+    }
+    
     getMoves() {
         var moves = [];
         
@@ -458,8 +513,11 @@ export class Board {
     splitTileQuad(initialPos, tileRot) {
         var hexes = [];
         var tileQuadDirs = TILE_QUADS_BY_ROT[tileRot];
-        hexes.push(new Pos(initialPos.q, initialPos.r));
+        var pos = new Pos(initialPos.q, initialPos.r);
+        var posKey = pos.q + ',' + pos.r;
+        hexes.push(pos);
         var intersects = false;
+        if (this.tiles[posKey]) intersects = true;
         for (var d = 0; d < tileQuadDirs.length; d++) { //Should always only be three
             var dir = tileQuadDirs[d];
             var q = initialPos.q + NEIGHBORS_Q[dir];
@@ -472,28 +530,5 @@ export class Board {
         return {hexes: hexes, intersects: intersects};
     }
     
-    isConnected() { //Driver function
-        var tileKeys = Object.keys(this.tiles);
-        var totalTiles = tileKeys.length;
-        if (totalTiles <= 0) return true;        
-        var initialPos = tileKeys[0].pos; //Pick random to start
-        var breadcrumbs = {};
-        var initialPosKey = initialPos.q + ',' + initialPos.r;
-        breadcrumbs[initialPosKey] = true;
-        return isConnectedDFS(totalTiles, initialPos, breadcrumbs);
-        
-    }
     
-    isConnectedDFS(total, pos, breadcrumbs) { //Recursive Depth-First-Search
-        for (var dir = 0; dir < 6; dir++) {
-            var neighQ = pos.q + NEIGHBORS_Q[dir];
-            var neighR = pos.r + NEIGHBORS_R[dir];
-            var neighKey = neighQ + ',' + neighR;
-            if (this.tiles[neighKey] && !breadcrumbs[neighKey] ) {                
-                var neighPos = new Pos(neighQ, neighR);
-                breadcrumbs[neighKey] = true;
-                isConnectedDFS(total, neighPos, breadcrumbs); //Recurse
-            }
-        }
-    }
 }

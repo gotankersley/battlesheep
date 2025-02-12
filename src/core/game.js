@@ -7,7 +7,7 @@ import * as NetworkPlayer from '../players/network.js';
 export const EVENT_INVALID = 'invalid';
 export const EVENT_MOVED = 'moved';
 export const EVENT_PLACED = 'placed';
-export const EVENT_TILE = 'tile';
+export const EVENT_TILED = 'tile';
 export const EVENT_GAME_OVER = 'gameOver';
 
 
@@ -50,7 +50,7 @@ export class Game {
     
     makeTile = (initialPos, tileRot) => {
         this.board.makeTile(initialPos, tileRot);
-        this.onTile(initialPos, tileRot);
+        this.onTiled(initialPos, tileRot);
     }
 
     play = () => {
@@ -157,14 +157,14 @@ export class Game {
         }
 	}
 
-    onTile = (initialPos, tileRot) => {        
+    onTiled = (initialPos, tileRot) => {        
         var board = this.board;
         
         //History 
         var boardStr = board.toString();        
 		this.history.push(boardStr);
         board.changeTurn(); 
-        this.gameEvents[EVENT_TILE](initialPos, tileRot, boardStr); 
+        this.gameEvents[EVENT_TILED](initialPos, tileRot, boardStr); 
 
     }
     onGameOver = () => {

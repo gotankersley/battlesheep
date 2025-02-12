@@ -55,9 +55,11 @@ export class Mouse {
 		if (e.ctrlKey) this.ctrlOn = true;		
 		this.setCoords(e);		
 		
-        this.clickPos.q = this.axial.q;
-        this.clickPos.r = this.axial.r;
-        this.clickExited = false;
+        if (e.button != BUTTON_RIGHT) {
+            this.clickPos.q = this.axial.q;
+            this.clickPos.r = this.axial.r;
+            this.clickExited = false;
+        }
         
 		if  (e.ctrlKey || e.button == BUTTON_MIDDLE) { //Middle click
 			
