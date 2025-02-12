@@ -6,7 +6,6 @@ Tile:
 
 Place:
 - Show hand
-- Perimeter
 
 
 Random AI:

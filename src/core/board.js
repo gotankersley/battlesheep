@@ -268,6 +268,16 @@ export class Board {
 		return {status:true, msg:''};
 	}
     
+    isValidPlace(pos) {
+        var perimeter = this.getPerimeter();                
+        var posKey = pos.q + ',' + pos.r;
+        if (!this.tiles[posKey]) return {status:false, msg:'Token must be placed on a tile'};
+        
+        if (!perimeter[posKey]) return {status:false, msg:'Token must be placed on the perimeter'};
+        
+    	return {status:true, msg:''};
+	}
+    
     isValidTile(initialPos, tileRot) {
         var quadSplit = this.splitTileQuad(initialPos, tileRot);
         if (quadSplit.intersects) return {status:false, msg:'Tiles must not intersect existing tiles'};
@@ -338,7 +348,7 @@ export class Board {
                 var neighR = tile.pos.r + NEIGHBORS_R[dir];
                 var neighKey = neighQ + ',' + neighR;
                 
-                if (!this.tiles[neighKey]) perimeter[neighKey] = true;
+                if (!this.tiles[neighKey]) perimeter[tileKey] = true;
             }
         }
         

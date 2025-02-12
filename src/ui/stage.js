@@ -18,7 +18,7 @@ const COLOR_MOUSE = 'rgba(0, 0, 255, 0.1)'
 const COLOR_TILE = 'lightgreen';
 const COLOR_TILE_ACTIVE = '#32CD32';
 const COLOR_TILE_BORDER = 'green';
-const COLOR_TILE_PERIMETER = '#32CD32';
+const COLOR_TILE_PERIMETER = 'lightgreen';
 const COLOR_TILE_INTERSECTS = '#8F9779';
 
 const COLOR_TOKEN_SELECTED = 'red';
@@ -218,8 +218,11 @@ function onClickedPlaceMode(e) {
         if (board.tiles[posKey]) { //Valid tile
             var tile = board.tiles[posKey];            
             if (tile.tokenId == EMPTY) { //Is tile occupied?
-                //TODO: Check for perimeter
-                game.makePlace(pos, mouse.ctrlOn);
+                var validatePlace = game.board.isValidPlace(pos);
+                if (validatePlace.status) {
+                    game.makePlace(pos, mouse.ctrlOn);
+                }
+                else showMessage(validatePlace.msg);
             }
             else showMessage('Token may not be placed on same tile as another token');
         }
@@ -355,6 +358,7 @@ const onModeChanged = (boardStr) => {
     Url.setHash(boardStr);
     if (game.board.mode == MODE_PLACE) {        
         tilePerimeter = game.board.getPerimeter();
+        
     }
 }
 
@@ -562,7 +566,7 @@ function drawTilesPlaceMode() {
         var tile = game.board.tiles[posKey];
         var px = hexToPix(tile.pos);
                 
-        var color = tilePerimeter[posKey]? COLOR_TILE_PERIMETER : COLOR_TILE;
+        var color = tilePerimeter[posKey]? COLOR_TILE_PERIMETER : COLOR_TILE_ACTIVE;        
         fillHex(ctx, px.x, px.y, color);
         strokeHex(ctx, px.x, px.y, COLOR_TILE_BORDER, 5);	        
 		
