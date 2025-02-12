@@ -430,6 +430,10 @@ export class Board {
 		var board = new Board();
         boardStr = boardStr.toLowerCase();
         if (!boardStr || boardStr == '') throw('Invalid board str: ' + boardStr);
+        if (boardStr == PROTOCOL_TURN1) {
+            board.mode = MODE_TILE;
+            return board;
+        }
         var pairs = boardStr.split(PROTOCOL_DELIM2);
         
         		
