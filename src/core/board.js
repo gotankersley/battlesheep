@@ -186,7 +186,7 @@ export class Board {
         this.playerTokens[this.turn].push(newToken.id);
         
         tile.tokenId = newToken.id;        
-        
+        if (this.tokens.length == 2) this.mode = MODE_MOVE;
     }
     
     makeTile(initialPos, tileRot) {
@@ -198,7 +198,8 @@ export class Board {
             var tileKey = hex.q + ',' + hex.r;
             this.tiles[tileKey] = new Tile(hex.q, hex.r);
         }
-        
+        var tileKeys = Object.keys(this.tiles);
+        if (tileKeys.length == TILE_COUNT) this.mode = MODE_PLACE;
     }
 		
 	

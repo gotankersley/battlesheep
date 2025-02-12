@@ -3,7 +3,7 @@ import * as Url from '../lib/url-lib.js';
 import { MenuManager } from './menu.js';
 import { TileSet } from './tile-set.js';
 import { Board, PLAYER1, PLAYER2, EMPTY, MODE_TILE, MODE_PLACE, MODE_MOVE, TILE_ROTATIONS } from '../core/board.js';
-import { Game, EVENT_MOVED, EVENT_PLACED, EVENT_TILED, EVENT_GAME_OVER } from '../core/game.js';
+import { Game, EVENT_MOVED, EVENT_PLACED, EVENT_TILED, EVENT_GAME_OVER, EVENT_MODE_CHANGED } from '../core/game.js';
 import { PLAYER_HUMAN } from '../players/players.js';
 import { Mouse, BUTTON_LEFT, BUTTON_RIGHT } from './mouse.js';
 import { Hand, HAND_SIZE_X } from './hand.js';
@@ -92,14 +92,14 @@ export function createStage(containerId) {
     //Url
     Url.init(function(e) {
         var hash = window.location.hash.replace('#', '');
-        //try {
+        try {
             window.game.board = Board.fromString(hash); 
             window.modesController.setValue(game.board.mode);            
-        //}
-        //catch (err) {
-        //    showMessage(err);
-        //    window.game = new Game('');
-        //}
+        }
+        catch (err) {
+            showMessage(err);
+            window.game = new Game('');
+        }
     });
     
     var boardStr = '';
@@ -113,17 +113,18 @@ export function createStage(containerId) {
 			
     
     //Game events	
-    //try {
+    try {
         window.game = new Game(boardStr);
-    //}
-    //catch (err) {
-    //    showMessage(err);
-    //    window.game = new Game('');
-    //}
+    }
+    catch (err) {
+        showMessage(err);
+        window.game = new Game('');
+    }
     window.game.addEventListener(EVENT_TILED, onTiled);
     window.game.addEventListener(EVENT_PLACED, onPlaced);
     window.game.addEventListener(EVENT_MOVED, onMoved);
     window.game.addEventListener(EVENT_GAME_OVER, onGameOver);
+    window.game.addEventListener(EVENT_MODE_CHANGED, onModeChanged);
     window.modesController.setValue(game.board.mode);
     
     //Start rendering
@@ -326,6 +327,13 @@ const onGameOver = (winner, loser) => {
     else alert('Game Over!');
     //else if (winner == WIN_DRAW) showMessage('Tie game');
     //else console.log('Game over?', winner, loser);
+}
+
+const onModeChanged = (boardStr) => {    
+    window.modesController.setValue(game.board.mode);
+    hand.selected = null;
+    hand.hover = null;
+    Url.setHash(boardStr);
 }
 	
 //Drawing	

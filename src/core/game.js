@@ -1,4 +1,4 @@
-import { Board } from '../core/board.js';
+import { Board, MODE_PLACE, MODE_MOVE } from '../core/board.js';
 import { PLAYER_HUMAN, PLAYER_RANDOM, PLAYER_NETWORK } from '../players/players.js';
 import * as RandomPlayer from '../players/random.js';
 import * as NetworkPlayer from '../players/network.js';
@@ -7,8 +7,9 @@ import * as NetworkPlayer from '../players/network.js';
 export const EVENT_INVALID = 'invalid';
 export const EVENT_MOVED = 'moved';
 export const EVENT_PLACED = 'placed';
-export const EVENT_TILED = 'tile';
+export const EVENT_TILED = 'tiled';
 export const EVENT_GAME_OVER = 'gameOver';
+export const EVENT_MODE_CHANGED = 'modeChanged';
 
 
 
@@ -124,7 +125,10 @@ export class Game {
         var boardStr = board.toString();        
 		this.history.push(boardStr);
         board.changeTurn(); 
-        this.gameEvents[EVENT_PLACED](pos, boardStr);            
+        if (board.mode == MODE_MOVE) {
+            this.gameEvents[EVENT_MODE_CHANGED](boardStr);            
+        }
+        else this.gameEvents[EVENT_PLACED](pos, boardStr);            
     }
 
 	onMoved = (src, dst, moveCount) => {        
@@ -164,7 +168,8 @@ export class Game {
         var boardStr = board.toString();        
 		this.history.push(boardStr);
         board.changeTurn(); 
-        this.gameEvents[EVENT_TILED](initialPos, tileRot, boardStr); 
+        if (board.mode == MODE_PLACE) this.gameEvents[EVENT_MODE_CHANGED](boardStr); 
+        else this.gameEvents[EVENT_TILED](initialPos, tileRot, boardStr); 
 
     }
     onGameOver = () => {
