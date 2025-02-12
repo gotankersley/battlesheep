@@ -19,12 +19,12 @@ export const DIR_S = 3;
 export const DIR_SW = 4;
 export const DIR_NW = 5;
 
-export const DIR_FLAG_N = 1;
-export const DIR_FLAG_NE = 2;
-export const DIR_FLAG_SE = 4;
-export const DIR_FLAG_S = 8;
-export const DIR_FLAG_SW = 16;
-export const DIR_FLAG_NW = 32;
+//export const DIR_FLAG_N = 1;
+//export const DIR_FLAG_NE = 2;
+//export const DIR_FLAG_SE = 4;
+//export const DIR_FLAG_S = 8;
+//export const DIR_FLAG_SW = 16;
+//export const DIR_FLAG_NW = 32;
 
 const NEIGHBORS_Q = [0,1,1,0,-1,-1]; //By dir
 const NEIGHBORS_R = [-1,-1,0,1,1,0];  //By dir 

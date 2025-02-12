@@ -19,6 +19,7 @@ const COLOR_TILE_ACTIVE = '#32CD32';
 const COLOR_TILE_BORDER = 'green';
 const COLOR_TILE_INTERSECTS = '#8F9779';
 const COLOR_TOKEN_SELECTED = 'red';
+const COLOR_TOKEN_SELECTED2 = '#007FFF';
 
 const KEY_DELETE = 46;
 const KEY_T = 84;
@@ -47,12 +48,11 @@ window.tileSet;
 //Properties	
 var canvas;
 var ctx;	
-//var tileImages; 
 var hand;
 var paused = false;
 var $message;
 var tileQuadRot = 0;
-
+var tileDest = null;
 	
 
 export function createStage(containerId) { 
@@ -66,7 +66,7 @@ export function createStage(containerId) {
     $message = document.getElementById('message');
     
     //Hand
-    hand = new Hand('hand');
+    hand = new Hand('hand', onHandClicked);
     
     
     canvas = document.getElementById(containerId);	
@@ -253,18 +253,35 @@ function onClickedMoveMode(e) {
                         var dst = pos;
                         var token = board.tokens[mouse.selectedToken];
                         var moveCount = token.count-(hand.selected+1);
-                        var validateMove = board.isValidMove(src, dst, moveCount);
-                        if (validateMove.status) {
-                            game.makeMove(src, dst, moveCount, mouse.ctrlOn);
-                        }
-                        else showMessage(validateMove.msg);
+                                     
+                        //*Whew - now that we have all the input required, actually make the move
+                        makeMove(src, dst, moveCount, mouse.ctrlOn);                        
                     }
+                    else if (tileDest === null) tileDest = pos; //Alternate destination select style
+
                 }
             }
         }
     }
 }
 
+function makeMove(src, dst, moveCount, override) {
+    var validateMove = game.board.isValidMove(src, dst, moveCount);
+    if (validateMove.status) {
+        game.makeMove(src, dst, moveCount, mouse.ctrlOn);
+    }
+    else showMessage(validateMove.msg);
+}
+
+const onHandClicked = () => {
+    if (tileDest !== null) {
+        if (hand.selected !== null) {
+            var token = game.board.tokens[mouse.selectedToken];
+            var moveCount = token.count-(hand.selected+1);
+            makeMove(mouse.selected, tileDest, moveCount, false); 
+        }
+    }
+}
 	
 
 const onKeyDown = (e) => {	
@@ -292,50 +309,49 @@ const onKeyDown = (e) => {
 	
 //Game Events
 const onTiled = (pos, tileRot, boardStr) => {        
-    hand.selected = null;
-    hand.hover = null;
-    Url.setHash(boardStr);    
-    //window.modesController.setValue(MODE_MOVE);
+    resetSelections();
+    Url.setHash(boardStr);        
         
     setTimeout(game.play, DELAY_MOVE);		
 }
 
 const onPlaced = (pos, boardStr) => {        
-    hand.selected = null;
-    hand.hover = null;
-    Url.setHash(boardStr);    
-    //window.modesController.setValue(MODE_MOVE);
+    resetSelections();
+    Url.setHash(boardStr);        
     
     setTimeout(game.play, DELAY_MOVE);		
 }
 
 const onMoved = (src, dst, boardStr) => {         
-    mouse.selected = null;		  
-    mouse.selectedToken = INVALID;
-    hand.selected = null;
-    hand.hover = null;    
+    resetSelections();   
     Url.setHash(boardStr);    
     
     setTimeout(game.play, DELAY_MOVE);		
 }
 
 const onGameOver = (winner, loser) => {
-    mouse.selected = null;	
+    resetSelections();	
     showMessage('Game OVER!');
     if (winner == PLAYER1) alert('Player1 has won');
     else if (winner == PLAYER2) alert('Player2 has won');
     else alert('Game Over!');
-    //else if (winner == WIN_DRAW) showMessage('Tie game');
-    //else console.log('Game over?', winner, loser);
+    
 }
 
 const onModeChanged = (boardStr) => {    
+    resetSelections();
+    Url.setHash(boardStr);
+}
+
+function resetSelections() {
     window.modesController.setValue(game.board.mode);
     hand.selected = null;
     hand.hover = null;
-    Url.setHash(boardStr);
+    tileDest = null;
+    mouse.selected = null;		  
+    mouse.selectedToken = INVALID;    
 }
-	
+
 //Drawing	
 function draw(time) { //Top-level drawing function	
     //Clear the canvas
@@ -381,6 +397,9 @@ function draw(time) { //Top-level drawing function
     else if (mode == MODE_MOVE) {
         //Tiles
         drawTiles();
+        
+        if (tileDest) drawTileDest();
+         
         
         //Tokens
         drawTokens();
@@ -493,6 +512,13 @@ function drawTurn() {
     }
     
 }
+
+function drawTileDest() {
+    var px = hexToPix(tileDest);                       
+           
+    strokeHex(ctx, px.x, px.y, COLOR_TOKEN_SELECTED, 5);            
+}
+    
        
 	
 function drawTiles() {
@@ -558,7 +584,7 @@ function drawTokens() {
         //Highlight Selected
         if (mouse.selectedToken == tokenId) {
             strokeHex(ctx, px.x, px.y, COLOR_TOKEN_SELECTED, 5);    
-        }
+        }        
                     
     }
    

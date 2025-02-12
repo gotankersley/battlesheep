@@ -1,19 +1,26 @@
 TODO:
 
 Tile:
-- Draw visual occlusion
-- Check connected
+x Draw visual occlusion
+x Check connected
 - Show tile quad count in hand
 
-Debug:
-- Normalize
 
 Place:
 - Show hand
 - Perimeter
 
-Move:
-- Alternate split style
 
-General:
-- Board str / mode
+Random AI:
+- Use other modes now
+
+Game Over:
+- tally score
+
+GFX:
+-
+
+Questions:
+- Random of rnd tile->rnd move vs all tiles and rnd
+- Are holes considered perimeter?
+- JSON data vs serialization

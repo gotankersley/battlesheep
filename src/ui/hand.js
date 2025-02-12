@@ -18,7 +18,7 @@ var HAND_HOVER_SIZE = 10;
 //Class Hand
 export class Hand {
     
-    constructor(container) {
+    constructor(container, onClicked) {
         this.canvas = document.getElementById(container);		
         this.ctx = this.canvas.getContext('2d');  					
         
@@ -31,7 +31,8 @@ export class Hand {
             e.preventDefault();
         };
         this.hover = null;
-        this.selected = null;        
+        this.selected = null;  
+        this.onClicked = onClicked;
     }
 
     onMouseMove = (e) => {
@@ -46,7 +47,9 @@ export class Hand {
         if (e.button == BUTTON_LEFT) { 
             var x = e.clientX - window.mouse.canvasBounds.left; 
             var y = e.clientY - window.mouse.canvasBounds.top;
-            this.selected = Math.floor((CANVAS_SIZE_Y-(y))/HAND_TILE_Y);            
+            this.selected = Math.floor((CANVAS_SIZE_Y-(y))/HAND_TILE_Y); 
+
+            this.onClicked();
         }
     }
     
