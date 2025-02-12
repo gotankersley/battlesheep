@@ -295,9 +295,11 @@ export class Board {
         for (var h = 0; h < hexes.length; h++) {
             var pos = hexes[h];
             var posKey = pos.q + ',' + pos.r;            
-            tiles[posKey] = true;
-        } 
-        totalTiles += TILE_QUAD;
+            if (!tiles[posKey]) {
+                tiles[posKey] = true;
+                totalTiles++;
+            }
+        }         
         
         var initialPos = hexes[0];
         var initialPosKey = initialPos.q + ',' + initialPos.r;
@@ -494,9 +496,13 @@ export class Board {
         }
 		
         
-        
-        //TODO: Normalize
-        //TODO: Sanity check all tiles are connected
+        //Sanity check all tiles are connected  
+        var tileKeys = Object.keys(board.tiles);
+        var initialTile = board.tiles[tileKeys[0]];
+        var initialHexes = [initialTile.pos]
+        if (!board.isConnected(initialHexes)) throw ('Tiles must be connected when placed'); 
+
+       //TODO: Normalize?
 		return board;
 	}
     
