@@ -61,18 +61,17 @@ export class Hand {
     drawTile = (tileQuadsRemaining) => {
         var ctx = this.ctx;
         drawBackground(ctx);   
-
-        //ctx.strokeStyle = '#000';       
+        
         for (var t = 0; t < tileQuadsRemaining; t++) {
-            var turn = turn % 2;
+            var turn = t % 2;
             var y = (t * (HAND_TILE_Y + 10)) + HAND_MARGIN_Y + 15;
-            //if (turn != 0) y += 400;
+            
             
             //Miniature tile quad
-            drawMiniHex(ctx, 40, y, COLOR_HAND_HIGHLIGHT2, 2);	        
-            drawMiniHex(ctx, 40, y + 21, COLOR_HAND_HIGHLIGHT2, 2);	        
-            drawMiniHex(ctx, 22, y + 10, COLOR_HAND_HIGHLIGHT2, 2);	        
-            drawMiniHex(ctx, 58, y + 10, COLOR_HAND_HIGHLIGHT2, 2);	        
+            drawMiniHex(ctx, 40, y, COLOR_HAND_HIGHLIGHT, COLOR_HAND_HIGHLIGHT2, 2);	        
+            drawMiniHex(ctx, 40, y + 21, COLOR_HAND_HIGHLIGHT, COLOR_HAND_HIGHLIGHT2, 2);	        
+            drawMiniHex(ctx, 22, y + 10, COLOR_HAND_HIGHLIGHT, COLOR_HAND_HIGHLIGHT2, 2);	        
+            drawMiniHex(ctx, 58, y + 10, COLOR_HAND_HIGHLIGHT, COLOR_HAND_HIGHLIGHT2, 2);	        
         }        
         	
     }
@@ -146,12 +145,24 @@ function drawBackground(ctx) {
 }
 
 
-function drawMiniHex(ctx, x, y, color, width) {
-    let hexVertsX = window.HEX_VERTS_X;
-	let hexVertsY = window.HEX_VERTS_Y;
-	ctx.strokeStyle = color;
+function drawMiniHex(ctx, x, y, colorFill, colorStroke, width) {
+
+    //Fill
+    ctx.fillStyle = colorFill; 	
+    ctx.beginPath();	    
+	drawHex(ctx, x, y);
+    ctx.fill();
+    
+    //Stroke
+	ctx.strokeStyle = colorStroke;
 	ctx.lineWidth = width;
-	ctx.beginPath();	
+	ctx.beginPath();	    
+	drawHex(ctx, x, y);
+	ctx.stroke();
+}
+
+
+function drawHex(ctx, x, y) {
     //Pre-computed using code below
 	ctx.moveTo (x + 12, y + -2.9391523179536475e-15); 
 	ctx.lineTo (x + 6.000000000000002, y + 10.392304845413264);
@@ -160,8 +171,6 @@ function drawMiniHex(ctx, x, y, color, width) {
 	ctx.lineTo (x + -6.000000000000005, y + -10.39230484541326);
 	ctx.lineTo (x + 6.000000000000002, y + -10.392304845413264);
 	ctx.lineTo (x + 12, y + -2.9391523179536475e-15);
-	
-	ctx.stroke();
 }
 
 //var savedHexSize = HEX_SIDE;

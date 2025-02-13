@@ -585,17 +585,21 @@ function drawTileMode() {
     var hexes = quadSplit.hexes;
     var initialColor;
     var otherColor;
+    var borderColor;
     if ( !mouse.clickExited ) {
         initialColor = COLOR_TILE_ACTIVE;
         otherColor = COLOR_TILE;
+        borderColor = COLOR_TILE_BORDER;
     }
     else if ( quadSplit.intersects) {
         initialColor = COLOR_TILE_INTERSECTS;
-        otherColor = COLOR_TILE_INTERSECTS;        
+        otherColor = COLOR_TILE_INTERSECTS;   
+        borderColor = COLOR_TOKEN_BY_PLAYER[game.board.turn];        
     }
     else {
         initialColor = COLOR_TILE_ACTIVE;
         otherColor = COLOR_TILE;
+        borderColor = COLOR_TOKEN_BY_PLAYER[game.board.turn];
     }
     var color = initialColor;
     for (var h = 0; h < hexes.length; h++) {
@@ -603,7 +607,7 @@ function drawTileMode() {
         var px = hexToPix(hex);
         
         fillHex(ctx, px.x, px.y, color); 
-        strokeHex(ctx, px.x, px.y, COLOR_TILE_BORDER, 5); 
+        strokeHex(ctx, px.x, px.y, borderColor, 5); 
         color = otherColor;
     }
 }
