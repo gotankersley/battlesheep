@@ -128,13 +128,7 @@ export class Board {
 
     isGameOver() {
         if (this.mode != MODE_MOVE) return false;
-        var curPlayer = this.turn;
-        var oppPlayer = +(!this.turn);
-        if (this.isGameOverForPlayer(curPlayer)) return true;
-        //    if (this.isGameOverForPlayer(oppPlayer)) return true;
-        //    
-        //}
-        //return false;
+        return this.isGameOverForPlayer(this.turn);       
     }
     
 	isGameOverForPlayer(player) {

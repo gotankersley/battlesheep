@@ -1,14 +1,12 @@
 TODO:
 
-Tile:
-- Show tile quad count in hand
-
-
 
 
 Game Over:
 - Tally score
 
+AI: 
+- Easy
 
 
 

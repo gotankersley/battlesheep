@@ -92,21 +92,6 @@ export class Game {
 		return false;
 	}
 
-    /*
-	redoMove = () => {
-		if (this.undoHistory.length > 0) {	
-			var savedStr = this.undoHistory.pop();
-			this.history.push(savedStr);
-			
-			this.board = new Board(savedStr);					
-			
-			//Check for Game over		
-			if (this.board.isGameOver()) this.onGameOver();				
-			return true;
-		}
-		return false;
-	}
-    */
 
 	//Event methods	
     addEventListener(name, callback) {	
@@ -170,8 +155,17 @@ export class Game {
 
     }
     onGameOver = () => {
-		var loser = this.board.turn; //TODO: draws?
-		
+        var board = this.board;
+        var curPlayer = board.turn;
+        var oppPlayer = +(!curPlayer);
+        
+        var curTileCount = board.playerTokens[curPlayer].length;
+        var oppTileCount = board.playerTokens[oppPlayer].length;
+            
+        var loser;
+        if (curTileCount < oppTileCount) loser = curPlayer;
+        else loser = oppPlayer; //TODO tie and other
+       
         var boardStr = this.board.toString();        
 		this.history.push(boardStr);	
 		
