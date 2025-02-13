@@ -1,8 +1,9 @@
 import { INVALID } from '../lib/hex-lib.js';
 import { Board, MODE_PLACE, MODE_MOVE, MODE_TILE } from '../core/board.js';
-import { PLAYER_HUMAN, PLAYER_RANDOM, PLAYER_NETWORK } from '../players/players.js';
+import { PLAYER_HUMAN, PLAYER_RANDOM, PLAYER_NETWORK, PLAYER_EASY } from '../players/players.js';
 import * as RandomPlayer from '../players/random.js';
 import * as NetworkPlayer from '../players/network.js';
+import * as EasyPlayer from '../players/easy.js';
 
 //Constants
 export const EVENT_INVALID = 'invalid';
@@ -74,8 +75,9 @@ export class Game {
 		
 		//All Async - expect onPlayed callback	
 		switch (player) {
-			case PLAYER_NETWORK: NetworkPlayer.getPlay(board, this.onPlayed); break;	 	//Network
-			case PLAYER_RANDOM: RandomPlayer.getPlay(board, this.onPlayed); break;			//Random			
+			case PLAYER_NETWORK: NetworkPlayer.getPlay(board, this.onPlayed); break; //Network
+			case PLAYER_RANDOM: RandomPlayer.getPlay(board, this.onPlayed); break;	//Random			
+			case PLAYER_EASY: EasyPlayer.getPlay(board, this.onPlayed); break; //Easy
 			default: alert('Invalid player');
 		}		
 	}

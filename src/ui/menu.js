@@ -2,7 +2,7 @@ import { setHex, ORIENT_FLAT, ORIENT_POINTY, INVALID } from '../lib/hex-lib.js';
 import { getTileSetNames } from './tile-set.js';
 import { Board, PLAYER1, PLAYER2, MODE_TILE, MODE_PLACE, MODE_MOVE } from '../core/board.js';
 import { DEFAULT_BOARD_STR } from '../core/game.js';
-import { PLAYER_HUMAN,  PLAYER_RANDOM, PLAYER_NETWORK  } from '../players/players.js';
+import { PLAYER_HUMAN,  PLAYER_RANDOM, PLAYER_NETWORK, PLAYER_EASY  } from '../players/players.js';
 
 //Struct MenuProperties
 function MenuProperties() {
@@ -46,7 +46,7 @@ export function MenuManager() {
     
     //Debug
 	var debugMenu = this.rootMenu.addFolder('Debug');				
-    var testBoards = {Default:0, WinTest:1};
+    var testBoards = {Default:0, WinTest:1, Simple:2};
     debugMenu.add(this.properties, 'testBoards', testBoards).onChange(this.onTestBoard.bind(this));
     debugMenu.add(this.properties, 'normalize');
 
@@ -55,7 +55,7 @@ export function MenuManager() {
     var modes = {Tile:MODE_TILE, Place:MODE_PLACE, Move:MODE_MOVE};
 	window.modesController = this.rootMenu.add(this.properties, 'mode', modes).onChange(this.onChangeMode.bind(this));
 	
-    var playerNames = {Human:PLAYER_HUMAN, Random:PLAYER_RANDOM, Network:PLAYER_NETWORK};
+    var playerNames = {Human:PLAYER_HUMAN, Random:PLAYER_RANDOM, Easy:PLAYER_EASY, Network:PLAYER_NETWORK};
 	this.rootMenu.add(this.properties, 'player1', playerNames).onChange(this.onChangePlayer.bind(this, PLAYER1));
 	this.rootMenu.add(this.properties, 'player2', playerNames).onChange(this.onChangePlayer.bind(this, PLAYER2));
     
@@ -84,5 +84,6 @@ MenuManager.prototype.onChangeOrientation = function(val) {
 MenuManager.prototype.onTestBoard = function(val) {
     if (val == 0) game.board = Board.fromString(DEFAULT_BOARD_STR);  
     else if (val == 1) game.board = Board.fromString('1,2|2,2|1,3|0,3|4,1|5,1|4,2|3,2|7,0|8,0|7,1|6,1|-2,3|-1,3|-2,4|-3,4|7,2|8,2|7,3|6,3|4,4|5,4|4,5|3,5|1,5|2,5|1,6|0,6|-2,6|-1,6|-2,7|-3,7|-3,4h14|-2,4t16|-2,3h2|h');  
+    //else if (val == 2) game.board = Board.fromString('#6,0|7,0|6,1|5,1|3,2|4,2|3,3|2,3|2,3h16|7,0t16|t');  
     window.modesController.setValue(game.board.mode);     
 }

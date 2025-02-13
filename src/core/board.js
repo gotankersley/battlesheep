@@ -112,18 +112,19 @@ export class Board {
         
         //Tokens
         newBoard.tokens = [];
-        newBoard.playerTokens = [];
+        newBoard.playerTokens = [[], []];
         for (var tokenId = 0; tokenId < this.tokens.length; tokenId++) {
             var token = this.tokens[tokenId];
             var newToken = new Token( token.id, token.player, token.count, new Pos(token.pos.q, token.pos.r));
             newBoard.tokens.push(newToken);    
-            newBoard.playerTokens[token.player] = token.id;
+            newBoard.playerTokens[token.player].push(token.id);
             
         }
         
         //Turn				
 		newBoard.turn = this.turn;
         newBoard.mode = this.mode;
+        return newBoard;
 	}
 
     isGameOver() {
