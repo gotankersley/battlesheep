@@ -62,18 +62,18 @@ export class Hand {
         var ctx = this.ctx;
         drawBackground(ctx);   
 
-        ctx.strokeStyle = '#000';
-        var savedHexSize = HEX_SIDE;
-        setHex(ORIENT_FLAT, 20);
+        //ctx.strokeStyle = '#000';       
         for (var t = 0; t < tileQuadsRemaining; t++) {
             var turn = turn % 2;
             var y = (t * (HAND_TILE_Y + 10)) + HAND_MARGIN_Y + 15;
             //if (turn != 0) y += 400;
             
-            //Miniature tile quad            
-            strokeHex(ctx, 0, y, COLOR_HAND_HIGHLIGHT2, 2);	        
-        }
-        setHex(ORIENT_FLAT, savedHexSize);
+            //Miniature tile quad
+            drawMiniHex(ctx, 40, y, COLOR_HAND_HIGHLIGHT2, 2);	        
+            drawMiniHex(ctx, 40, y + 21, COLOR_HAND_HIGHLIGHT2, 2);	        
+            drawMiniHex(ctx, 22, y + 10, COLOR_HAND_HIGHLIGHT2, 2);	        
+            drawMiniHex(ctx, 58, y + 10, COLOR_HAND_HIGHLIGHT2, 2);	        
+        }        
         	
     }
 
@@ -144,3 +144,30 @@ function drawBackground(ctx) {
     ctx.fillStyle = COLOR_HAND_BACKGROUND;
     ctx.fillRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
 }
+
+
+function drawMiniHex(ctx, x, y, color, width) {
+    let hexVertsX = window.HEX_VERTS_X;
+	let hexVertsY = window.HEX_VERTS_Y;
+	ctx.strokeStyle = color;
+	ctx.lineWidth = width;
+	ctx.beginPath();	
+    //Pre-computed using code below
+	ctx.moveTo (x + 12, y + -2.9391523179536475e-15); 
+	ctx.lineTo (x + 6.000000000000002, y + 10.392304845413264);
+	ctx.lineTo (x + -5.999999999999997, y + 10.392304845413264);
+	ctx.lineTo (x + -12, y + 1.4695761589768238e-15);
+	ctx.lineTo (x + -6.000000000000005, y + -10.39230484541326);
+	ctx.lineTo (x + 6.000000000000002, y + -10.392304845413264);
+	ctx.lineTo (x + 12, y + -2.9391523179536475e-15);
+	
+	ctx.stroke();
+}
+
+//var savedHexSize = HEX_SIDE;
+//setHex(ORIENT_FLAT, 12);
+//strokeHex(ctx, 40, y, COLOR_HAND_HIGHLIGHT2, 2);	        
+//strokeHex(ctx, 40, y + 21, COLOR_HAND_HIGHLIGHT2, 2);	        
+//strokeHex(ctx, 22, y + 10, COLOR_HAND_HIGHLIGHT2, 2);	        
+//strokeHex(ctx, 58, y + 10, COLOR_HAND_HIGHLIGHT2, 2);
+//setHex(ORIENT_FLAT, savedHexSize);
