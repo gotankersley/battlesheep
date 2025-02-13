@@ -47,7 +47,7 @@ export function getPlay (board, onPlayed) {
                 
                 var oppMoves = boardCopy.getMoves();
                 var oppMoveCount = oppMoves.length; //Minimize;
-                var score = moves.length/oppMoveCount;
+                var score = oppMoveCount;
                 if (score < bestScore) {
                     bestScore = score;
                     bestMove = {src: move.src, dst: move.dst, count:c};

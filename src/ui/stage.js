@@ -367,6 +367,7 @@ const onModeChanged = (boardStr) => {
     else if (mode == MODE_MOVE) {
         showMessage('Move tokens');
     }
+    setTimeout(game.play, DELAY_MOVE);
 }
 
 function resetSelection() {
