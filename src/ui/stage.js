@@ -356,9 +356,16 @@ const onGameOver = (winner, loser) => {
 const onModeChanged = (boardStr) => {    
     resetSelection();
     Url.setHash(boardStr);
-    if (game.board.mode == MODE_PLACE) {        
-        tilePerimeter = game.board.getPerimeter();
-        
+    var mode = game.board.mode;
+    if (mode == MODE_TILE) {
+        showMessage('Place tile quads');
+    }
+    else if (mode == MODE_PLACE) {        
+        tilePerimeter = game.board.getPerimeter(); //Cache to ease rendering    
+        showMessage('Place tokens');
+    }
+    else if (mode == MODE_MOVE) {
+        showMessage('Move tokens');
     }
 }
 

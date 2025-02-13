@@ -52,9 +52,13 @@ export class Hand {
         if (e.button == BUTTON_LEFT) { 
             var x = e.clientX - window.mouse.canvasBounds.left; 
             var y = e.clientY - window.mouse.canvasBounds.top;
+            var tmpSelected = this.selected;
             this.selected = Math.floor((CANVAS_SIZE_Y-(y))/HAND_TILE_Y); 
-
-            this.onClicked();
+            if (tmpSelected == this.selected) { //De-select
+                this.hover = null;
+                this.selected = null;  
+            }
+            else this.onClicked();
         }
     }
     

@@ -1,6 +1,7 @@
-import { setHex, ORIENT_FLAT, ORIENT_POINTY } from '../lib/hex-lib.js';
+import { setHex, ORIENT_FLAT, ORIENT_POINTY, INVALID } from '../lib/hex-lib.js';
 import { getTileSetNames } from './tile-set.js';
-import { PLAYER1, PLAYER2, MODE_TILE, MODE_PLACE, MODE_MOVE } from '../core/board.js';
+import { Board, PLAYER1, PLAYER2, MODE_TILE, MODE_PLACE, MODE_MOVE } from '../core/board.js';
+import { DEFAULT_BOARD_STR } from '../core/game.js';
 import { PLAYER_HUMAN,  PLAYER_RANDOM, PLAYER_NETWORK  } from '../players/players.js';
 
 //Struct MenuProperties
@@ -18,6 +19,7 @@ function MenuProperties() {
     this.mode = MODE_PLACE;
 
     //Debug
+    this.testBoards = INVALID;
     this.normalize = function() { game.board.normalize(); }; 
     
 }
@@ -44,6 +46,8 @@ export function MenuManager() {
     
     //Debug
 	var debugMenu = this.rootMenu.addFolder('Debug');				
+    var testBoards = {Default:0};
+    debugMenu.add(this.properties, 'testBoards', testBoards).onChange(this.onTestBoard.bind(this));
     debugMenu.add(this.properties, 'normalize');
 
 	
@@ -75,4 +79,9 @@ MenuManager.prototype.onChangeMode = function(val) {
 
 MenuManager.prototype.onChangeOrientation = function(val) {	
 	setHex(menu.orientation, window.HEX_SIDE);
+}
+
+MenuManager.prototype.onTestBoard = function(val) {
+    game.board = Board.fromString(DEFAULT_BOARD_STR);  
+    window.modesController.setValue(game.board.mode);     
 }
