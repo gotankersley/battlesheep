@@ -1,3 +1,4 @@
+import { INVALID } from '../lib/hex-lib.js';
 import { Board, MODE_PLACE, MODE_MOVE, MODE_TILE } from '../core/board.js';
 import { PLAYER_HUMAN, PLAYER_RANDOM, PLAYER_NETWORK } from '../players/players.js';
 import * as RandomPlayer from '../players/random.js';
@@ -156,21 +157,15 @@ export class Game {
     }
     onGameOver = () => {
         var board = this.board;
-        var curPlayer = board.turn;
-        var oppPlayer = +(!curPlayer);
         
-        var curTileCount = board.playerTokens[curPlayer].length;
-        var oppTileCount = board.playerTokens[oppPlayer].length;
-            
-        var loser;
-        if (curTileCount < oppTileCount) loser = curPlayer;
-        else loser = oppPlayer; //TODO tie and other
-       
-        var boardStr = this.board.toString();        
-		this.history.push(boardStr);	
+        var winner = board.getWinner();        
+        var loser = (winner == INVALID)? INVALID : +(!winner);
+        
+        //var boardStr = this.board.toString();        
+		//this.history.push(boardStr);	
 		
 		//Draw the win and other hoopla...
-		this.gameEvents[EVENT_GAME_OVER](+(!loser), loser);
+		this.gameEvents[EVENT_GAME_OVER](winner, loser);
 			
 	}
     

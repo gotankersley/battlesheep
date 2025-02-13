@@ -46,7 +46,7 @@ export function MenuManager() {
     
     //Debug
 	var debugMenu = this.rootMenu.addFolder('Debug');				
-    var testBoards = {Default:0};
+    var testBoards = {Default:0, WinTest:1};
     debugMenu.add(this.properties, 'testBoards', testBoards).onChange(this.onTestBoard.bind(this));
     debugMenu.add(this.properties, 'normalize');
 
@@ -82,6 +82,7 @@ MenuManager.prototype.onChangeOrientation = function(val) {
 }
 
 MenuManager.prototype.onTestBoard = function(val) {
-    game.board = Board.fromString(DEFAULT_BOARD_STR);  
+    if (val == 0) game.board = Board.fromString(DEFAULT_BOARD_STR);  
+    else if (val == 1) game.board = Board.fromString('1,2|2,2|1,3|0,3|4,1|5,1|4,2|3,2|7,0|8,0|7,1|6,1|-2,3|-1,3|-2,4|-3,4|7,2|8,2|7,3|6,3|4,4|5,4|4,5|3,5|1,5|2,5|1,6|0,6|-2,6|-1,6|-2,7|-3,7|-3,4h14|-2,4t16|-2,3h2|h');  
     window.modesController.setValue(game.board.mode);     
 }

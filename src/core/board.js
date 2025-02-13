@@ -128,7 +128,14 @@ export class Board {
 
     isGameOver() {
         if (this.mode != MODE_MOVE) return false;
-        return this.isGameOverForPlayer(this.turn);       
+        if (this.isGameOverForPlayer(this.turn)) {            
+            var oppTurn = +(!this.turn);
+            if (this.isGameOverForPlayer(oppTurn)) return true;
+            
+            //TODO - event?
+            else this.turn = oppTurn;
+        }
+        return false;
     }
     
 	isGameOverForPlayer(player) {
@@ -153,6 +160,70 @@ export class Board {
 		return true; //No moves available
 	}
 	
+    getWinner() {
+        //To be used after the game is over
+        var curPlayer = this.turn;
+        var oppPlayer = +(!curPlayer);
+        
+        var curTileCount = this.playerTokens[curPlayer].length;
+        var oppTileCount = this.playerTokens[oppPlayer].length;
+                    
+        if (curTileCount > oppTileCount) return curPlayer; //Easy victory
+        else if (oppTileCount > curTileCount) return oppPlayer;
+        
+        //Else Tie - Have to see which has longest connected section
+        var playerMaxConnected = [0, 0];
+        var checkedTokens = {};
+        for (var t = 0; t < this.tokens.length; t++) {
+            var token = this.tokens[t];
+            if (checkedTokens[token.id]) continue;
+            else checkedTokens[token.id] = true;
+            
+            var breadcrumbs = {};
+            breadcrumbs[token.id] = true;
+            var countRef = [1]; //Pass-by-reference
+            this.connectedTokenCountBFS(token.pos, token.player, countRef, breadcrumbs); //BFS - Recursive
+            var connectedCount = countRef[0];
+            
+            //Consider all breadcrumbs as having already been checked
+            var breadcrumbKeys = Object.keys(breadcrumbs);
+            for (var b = 0; b < breadcrumbKeys.length; b++) {
+                var breadcrumbKey = breadcrumbKeys[b];
+                checkedTokens[breadcrumbKey] = true;
+            }
+            
+            var currentMax = playerMaxConnected[token.player];
+            playerMaxConnected[token.player] = Math.max(currentMax, connectedCount);
+        }
+        
+        if (playerMaxConnected[curPlayer] > playerMaxConnected[oppPlayer]) return curPlayer;
+        else if (playerMaxConnected[curPlayer] < playerMaxConnected[oppPlayer]) return oppPlayer;
+        else return INVALID; //Is this even possible?
+        
+    }
+    
+    connectedTokenCountBFS(pos, player, countRef, breadcrumbs) { //Recursive Breadth-First-Search
+        //Find the neighboring tokens
+        for (var dir = 0; dir < 6; dir++) {
+            var neighQ = pos.q + NEIGHBORS_Q[dir];
+            var neighR = pos.r + NEIGHBORS_R[dir];            
+            var neighKey = neighQ + ',' + neighR;
+            if (this.tiles[neighKey]) {
+                var tile = this.tiles[neighKey];
+                if (tile.tokenId != EMPTY) {
+                    var token = this.tokens[tile.tokenId];
+                    if (!breadcrumbs[token.id]) {
+                        if (token.player == player) {
+                            breadcrumbs[token.id] = true;
+                            countRef[0]++;
+                            this.connectedTokenCountBFS(token.pos, player, countRef, breadcrumbs); //Recurse
+                        }
+                    }
+                }                                
+            }
+        }        
+    }
+    
     makeMove(srcPos, dstPos, moveCount) { 
         //Higher-level validatation done in isValidMove function
         var srcKey = srcPos.q + ',' + srcPos.r;
