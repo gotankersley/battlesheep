@@ -127,16 +127,15 @@ export class Board {
         return newBoard;
 	}
 
-    isGameOver() {
-        if (this.mode != MODE_MOVE) return false;
-        if (this.isGameOverForPlayer(this.turn)) {            
-            var oppTurn = +(!this.turn);
-            if (this.isGameOverForPlayer(oppTurn)) return true;
-            
-            //TODO - event?
-            else this.turn = oppTurn;
-        }
-        return false;
+    isGameOverForPlayers() {
+        if (this.mode != MODE_MOVE) return [false, false];
+
+        var gameOvers = [false, false];
+        if (this.isGameOverForPlayer(PLAYER1)) gameOvers[PLAYER1] = true;            
+        if (this.isGameOverForPlayer(PLAYER2)) gameOvers[PLAYER2] = true;            
+
+        //Return if game is over for each player respectively
+        return gameOvers;
     }
     
 	isGameOverForPlayer(player) {

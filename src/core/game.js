@@ -1,5 +1,5 @@
 import { INVALID } from '../lib/hex-lib.js';
-import { Board, MODE_PLACE, MODE_MOVE, MODE_TILE } from '../core/board.js';
+import { Board, MODE_PLACE, MODE_MOVE, MODE_TILE, PLAYER1, PLAYER2 } from '../core/board.js';
 import { PLAYER_HUMAN, PLAYER_RANDOM, PLAYER_NETWORK, PLAYER_EASY } from '../players/players.js';
 import * as RandomPlayer from '../players/random.js';
 import * as NetworkPlayer from '../players/network.js';
@@ -59,14 +59,12 @@ export class Game {
     play = () => {
 		
 		var board = this.board;
-		var turn = board.turn;
-		var player = this.players[turn];
-		
-        if (board.isGameOver()){            
-            return this.onGameOver();
-        }
+		if (this.players[board.turn] == PLAYER_HUMAN) return; //Ignore
         
-		if (player == PLAYER_HUMAN) return; //Ignore
+        var gameOvers = board.isGameOverForPlayers();
+        if (gameOvers[PLAYER1] && gameOvers[PLAYER2]) return this.onGameOver();
+        else if (gameOvers[+(!board.turn)]) board.changeTurn();
+        			
 		
 		//Handle no-move, and one move
 		//var moves = board.getMoves();	
@@ -74,7 +72,7 @@ export class Game {
 		
 		
 		//All Async - expect onPlayed callback	
-		switch (player) {
+		switch (this.players[board.turn]) {
 			case PLAYER_NETWORK: NetworkPlayer.getPlay(board, this.onPlayed); break; //Network
 			case PLAYER_RANDOM: RandomPlayer.getPlay(board, this.onPlayed); break;	//Random			
 			case PLAYER_EASY: EasyPlayer.getPlay(board, this.onPlayed); break; //Easy
@@ -139,11 +137,14 @@ export class Game {
 		
         
 		//Check for game over
-		if (board.isGameOver()) this.onGameOver();
-		else {
-            board.changeTurn(); 
-            this.gameEvents[EVENT_MOVED](src, dst, boardStr);            
+        var gameOvers = board.isGameOverForPlayers();
+        if (gameOvers[PLAYER1] && gameOvers[PLAYER2]) this.onGameOver(); //Both
+        else {
+            if (!gameOvers[+(!board.turn)]) board.changeTurn();
+            this.gameEvents[EVENT_MOVED](src, dst, boardStr);  
         }
+        
+
 	}
 
     onTiled = (initialPos, tileRot) => {        

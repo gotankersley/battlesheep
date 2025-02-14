@@ -43,11 +43,18 @@ export function getPlay (board, onPlayed) {
             for (var c = 1; c <= move.count; c++){
                 var boardCopy = board.clone();
                 boardCopy.makeMove(move.src, move.dst, c);
-                boardCopy.changeTurn();
+                var playerMoves = boardCopy.getMoves();
+                var playerMoveCount = playerMoves.length;
+                var playerTokenCount = boardCopy.playerTokens[boardCopy.turn].length;
                 
+                boardCopy.changeTurn();                
                 var oppMoves = boardCopy.getMoves();
-                var oppMoveCount = oppMoves.length; //Minimize;
-                var score = oppMoveCount;
+                var oppMoveCount = oppMoves.length; 
+                var oppTokenCount = boardCopy.playerTokens[boardCopy.turn].length;
+                
+                var score = playerMoveCount == 0? 100 : oppMoveCount/playerMoveCount;
+                score += playerTokenCount-oppTokenCount;
+                
                 if (score < bestScore) {
                     bestScore = score;
                     bestMove = {src: move.src, dst: move.dst, count:c};

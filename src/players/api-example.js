@@ -4,7 +4,7 @@ import { Board } from '../core/board.js';
 
 const BASE_URL = 'https://softserve.harding.edu/aivai/';
 
-const MAX_ITERATIONS = 2;
+const MAX_ITERATIONS = 100;
 
 
 const stateUrl = BASE_URL + 'play-state';
