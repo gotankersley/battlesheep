@@ -3,7 +3,7 @@ import * as Url from '../lib/url-lib.js';
 import { MenuManager } from './menu.js';
 import { TileSet } from './tile-set.js';
 import { Board, PLAYER1, PLAYER2, EMPTY, MODE_TILE, MODE_PLACE, MODE_MOVE, TILE_ROTATIONS, TILE_QUAD } from '../core/board.js';
-import { Game, EVENT_MOVED, EVENT_PLACED, EVENT_TILED, EVENT_GAME_OVER, EVENT_MODE_CHANGED } from '../core/game.js';
+import { Game, EVENT_MOVED, EVENT_PLACED, EVENT_TILED, EVENT_GAME_OVER, EVENT_NO_MOVES, EVENT_MODE_CHANGED } from '../core/game.js';
 import { PLAYER_HUMAN } from '../players/players.js';
 import { Mouse, BUTTON_LEFT, BUTTON_RIGHT } from './mouse.js';
 import { Hand, HAND_SIZE_X } from './hand.js';
@@ -34,7 +34,6 @@ const KEY_SPACE = 32;
 const MESSAGE_DURATION = 3000; //MS
 const DELAY_MOVE = 200;
 
-//const TAU = 2*Math.PI;
 
 //Globals
 window.CANVAS_SIZE_X;
@@ -58,6 +57,7 @@ var $message;
 var tileQuadRot = 0;
 var tileDest = null;
 var tilePerimeter = null;
+var noMovesWarned = false;
 	
 
 export function createStage(containerId) { 
@@ -130,6 +130,7 @@ export function createStage(containerId) {
     window.game.addEventListener(EVENT_MOVED, onMoved);
     window.game.addEventListener(EVENT_GAME_OVER, onGameOver);
     window.game.addEventListener(EVENT_MODE_CHANGED, onModeChanged);
+    window.game.addEventListener(EVENT_NO_MOVES, onNoMovesForPlayer);
     window.modesController.setValue(game.board.mode);
     
     //Start rendering
@@ -368,6 +369,14 @@ const onModeChanged = (boardStr) => {
         showMessage('Move tokens');
     }
     setTimeout(game.play, DELAY_MOVE);
+}
+
+const onNoMovesForPlayer = (player) => {
+    if (!noMovesWarned) {
+        var playerName = player == PLAYER1? 'Player 1' : 'Player 2';
+        showMessage(playerName + ' has no moves, turn not changed');
+        noMovesWarned = true;
+    }
 }
 
 function resetSelection() {
@@ -660,13 +669,6 @@ function drawPlaceToken() {
     }
 }
 	
-
-//function drawCircle(x, y, r) {
-//    ctx.beginPath();
-//    ctx.arc(x, y, r, 0, TAU, false);
-//    ctx.fill();
-//    //ctx.stroke();
-//}
 
 //function triggerClick() {    
 //    var evt = new MouseEvent('mousedown', {

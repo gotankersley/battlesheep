@@ -12,6 +12,7 @@ export const EVENT_PLACED = 'placed';
 export const EVENT_TILED = 'tiled';
 export const EVENT_GAME_OVER = 'gameOver';
 export const EVENT_MODE_CHANGED = 'modeChanged';
+export const EVENT_NO_MOVES = 'noMoves';
 
 
 
@@ -63,7 +64,11 @@ export class Game {
         
         var gameOvers = board.isGameOverForPlayers();
         if (gameOvers[PLAYER1] && gameOvers[PLAYER2]) return this.onGameOver();
-        else if (gameOvers[+(!board.turn)]) board.changeTurn();
+        else if (gameOvers[board.turn]) {
+            this.gameEvents[EVENT_NO_MOVES](board.turn);   
+            board.changeTurn();
+            return;
+        }         
         			
 		
 		//Handle no-move, and one move
@@ -140,7 +145,11 @@ export class Game {
         var gameOvers = board.isGameOverForPlayers();
         if (gameOvers[PLAYER1] && gameOvers[PLAYER2]) this.onGameOver(); //Both
         else {
-            if (!gameOvers[+(!board.turn)]) board.changeTurn();
+            if (!gameOvers[+(!board.turn)]) {
+                board.changeTurn();
+            }
+            else this.gameEvents[EVENT_NO_MOVES](+(!board.turn));   
+            
             this.gameEvents[EVENT_MOVED](src, dst, boardStr);  
         }
         

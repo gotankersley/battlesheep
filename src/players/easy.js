@@ -29,12 +29,12 @@ export function getPlay (board, onPlayed) {
         onPlayed(randPlay);
     }
     
-    //1 Ply brute-force lookahead
+    //1 Ply heuristic
     else if (board.mode == MODE_MOVE) {
             
         var moves = board.getMoves();    
         if (!moves.length) throw ('No moves available');    
-        var bestScore = INFINITY;
+        var bestScore = -INFINITY;
         var bestMove = null;
         
         for (var m = 0; m < moves.length; m++) {
@@ -42,20 +42,10 @@ export function getPlay (board, onPlayed) {
             //Check combinations
             for (var c = 1; c <= move.count; c++){
                 var boardCopy = board.clone();
-                boardCopy.makeMove(move.src, move.dst, c);
-                var playerMoves = boardCopy.getMoves();
-                var playerMoveCount = playerMoves.length;
-                var playerTokenCount = boardCopy.playerTokens[boardCopy.turn].length;
+                boardCopy.makeMove(move.src, move.dst, c);                               
+                var score = boardCopy.score();
                 
-                boardCopy.changeTurn();                
-                var oppMoves = boardCopy.getMoves();
-                var oppMoveCount = oppMoves.length; 
-                var oppTokenCount = boardCopy.playerTokens[boardCopy.turn].length;
-                
-                var score = playerMoveCount == 0? 100 : oppMoveCount/playerMoveCount;
-                score += playerTokenCount-oppTokenCount;
-                
-                if (score < bestScore) {
+                if (score > bestScore) {
                     bestScore = score;
                     bestMove = {src: move.src, dst: move.dst, count:c};
                 }

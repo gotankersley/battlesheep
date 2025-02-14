@@ -688,5 +688,31 @@ export class Board {
         return {hexes: hexes, intersects: intersects};
     }
     
-    
+    score() {
+        
+        var p1Score = 0;
+        var p2Score = 0;
+        
+         //Tokens
+        for (var tokenId = 0; tokenId < this.tokens.length; tokenId++) {
+            var token = this.tokens[tokenId];
+            
+            //Get empty neighbors 
+            var emptyCount = 0;
+            for (var dir = 0; dir < 6; dir++) {
+                var neighQ = token.pos.q + NEIGHBORS_Q[dir];
+                var neighR = token.pos.r + NEIGHBORS_R[dir];
+                var neighKey = neighQ + ',' + neighR;
+                if (this.tiles[neighKey] && this.tiles[neighKey].tokenId == EMPTY) {
+                    emptyCount++;
+                }                
+            }
+            
+            if (token.player == PLAYER1) p1Score += (token.count*emptyCount);
+            else p2Score += (token.count*emptyCount);
+        }
+        
+        if (this.turn == PLAYER1) return p1Score - p2Score;
+        else return p2Score - p1Score;        
+    }
 }
