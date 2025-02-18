@@ -48,14 +48,16 @@ export function getPlay (board, onPlayed) {
     
     //Flat Monte-Carlo simulation
     else if (board.mode == MODE_MOVE) {
-        var tidToPos = Object.keys(board.tiles); //Store here to convert TIDs back to posKeys
-        var posToTid = {};
-        var bitboard = Bitboard.fromBoard(board, tidToPos, posToTid);
+
+        var posToTid = {}; //Create here to convert posKeys back to TIDs 
+        var bbRoot = Bitboard.fromBoard(board, posToTid);
         
         var moves = board.getMoves();    
         if (!moves.length) throw ('No moves available');    
         var bestScore = -INFINITY;
         var bestMove = null;
+        var curPlayer = board.turn;
+        var oppPlayer = +(!curPlayer);
         
         //Loop through all moves
         for (var m = 0; m < moves.length; m++) {
@@ -64,14 +66,14 @@ export function getPlay (board, onPlayed) {
             //Check combinations
             for (var c = 1; c <= move.count; c++){
                 var score = 0;
-                var bbChild = bitboard.clone();
+                var bbChild = bbRoot.clone();
                 var srcTid = posToTid[move.src.q + ',' + move.src.r];
                 var dstTid = posToTid[move.dst.q + ',' + move.dst.r];
-                bbChild.makeMove(srcTid, dstTid, c);
+                bbChild.makeMove(srcTid, dstTid, c, curPlayer);                
                 
                 for (var s = 0; s < SIMS_PER_MOVE; s++) {
                     var bb = bbChild.clone(); //Copy to mutate
-                    score += bb.simulate();
+                    score += bb.simulate(oppPlayer, curPlayer);
                 }
                 
                 if (score > bestScore) {

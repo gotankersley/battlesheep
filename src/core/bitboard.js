@@ -1,6 +1,11 @@
 import { INVALID, Hex } from '../lib/hex-lib.js';
 import { PLAYER1, PLAYER2, TILE_COUNT, NEIGHBORS_Q, NEIGHBORS_R, EMPTY, DIRECTIONS } from './board.js';
 
+//ABOUT: This is an optimized version of the board used by the AI to ease the computational burden
+//in exploring various move posibilities. 
+//NOTE: This is intended to specifically be used for the "MOVE" mode,
+//and not for the "TILE" and "PLACE" modes.
+
 const LOOP1 = 0;
 const LOOP2 = 1;
 const IDX1 = 2;
@@ -15,11 +20,8 @@ const OPP_DIRECTIONS = [3,4,5,0,1,2];
 
 const SIM_WIN = 1;
 const SIM_LOSE = -1;
+const SIM_TIE = 0; //IDK if this is possible...
 
-//ABOUT: This is an optimized version of the board used by the AI to ease the computational burden
-//in exploring various move posibilities. 
-//NOTE: This is intended to specifically be used for the "MOVE" mode,
-//and not for the "TILE" and "PLACE" modes.
 export class Bitboard {
     constructor() {
         //Data structures optimized to use bitwise operations
@@ -27,9 +29,8 @@ export class Bitboard {
         this.playerTokens = new Uint32Array(2); //[PLAYER1, PLAYER2]
         this.counts = new Array(TILE_COUNT); //Not unsigned, because we want to store INVALID counts
         this.lines = new Array(TILE_COUNT); //Partitioned by TID index, this is the line of TIDs going in each hex cardinal direction
-        
-        this.turn = PLAYER1;
-        //Note: No mode (See above)
+                
+        //Note: No mode, or turn (See above)
     }
     
     clone() {
@@ -46,18 +47,18 @@ export class Bitboard {
         
         bitboard.playerTokens[PLAYER1] = this.playerTokens[PLAYER1];
         bitboard.playerTokens[PLAYER2] = this.playerTokens[PLAYER2];
-        
-        bitboard.turn = this.turn;        
+                
         return bitboard;
         
     }
     
     //Precalculate connections and dependencies
-    static fromBoard(board, tileKeys, posToTid) {
+    static fromBoard(board, posToTid) {
         var bitboard = new Bitboard();
         
         //NOTE: In lieu of coordinates, we will assign each tile an arbitrary tile id (TID),
         //which corresponds to the indices the data structure arrays, and the bits in the unsigned int-32 bitflags        
+        var tileKeys = Object.keys(board.tiles);
         if (tileKeys.length != TILE_COUNT) throw('Expected ' + TILE_COUNT + ' tiles, instead received ' + tileKeys.length);
         
         for (var tid = 0; tid < TILE_COUNT; tid++) {
@@ -107,25 +108,26 @@ export class Bitboard {
             
             
         }
-        
-        bitboard.turn = board.turn;        
+                    
         return bitboard;
     }
     
-    simulate() {    
-        var curPlayer = this.turn;
+    
+    simulate(turn, curPlayer) {                    
+        
         for (var i = 0; i < TILE_COUNT; i++) {
-            var hasMoves = this.randMove();
+            var hasMoves = this.randMove(turn);
             if (!hasMoves) {
-                if (this.turn == curPlayer) return SIM_WIN;
-                else return SIM_LOSE;
+                if (turn == curPlayer) return SIM_LOSE;
+                else return SIM_WIN;
             }
+            else turn = +(!turn); //Change turn
         }
-        return SIM_LOSE;
+        return SIM_TIE;
     }
     
-    randMove() {
-        var turn = this.turn;
+    
+    randMove(turn) {        
         if (!this.playerTokens[turn]) return false;
         var bits = new Uint32Array(RAND_DEST+1);
         
@@ -134,27 +136,22 @@ export class Bitboard {
         var srcTid = getRandBit(bits, RAND_TOKEN);        
         
         //Get a random destination
+        if (!this.connections[srcTid]) return false;
         bits[RAND_DEST] = this.connections[srcTid];        
         var dstTid = getRandBit(bits, RAND_DEST);
                 
         //Get a random count
         var count = Math.floor(Math.random() * this.counts[dstTid]);
         
-        this.makeMove(srcTid, dstTid, count);
-        this.turn = +(!turn); //Change turn
+        this.makeMove(srcTid, dstTid, count, turn);        
+        
         return true;
     }
     
-    makeMove(srcTid, dstTid, count) {
-        //Oh, what a tangled web we weave, when at first we seek to optimize...
-        var turn = this.turn;
-        this.playerTokens[turn] |= (1 << dstTid); //Create new token at dest
-        this.counts[srcTid] -= count; //Remove from source
-        if (this.counts[srcTid] <= 1) { //Remove from player tokens
-            this.playerTokens[turn] ^= (1 << srcTid);
-        } 
-        this.counts[dstTid] = count; //Create new stack at dest
-
+    
+    makeMove(srcTid, dstTid, count, turn) {
+        //Oh, what a tangled web we weave, when at first we seek to optimize...        
+      
         //Update connections - New token partitions existing connection lines        
         var bits = new Uint32Array(TO_REMOVE+1);
         //Loop through all connections for dest
@@ -184,14 +181,19 @@ export class Bitboard {
 			bits[LOOP1] &= bits[LOOP1]-1; //Required to avoid infinite looping...
 		}
         
-        this.connections[dstTid] = 0; //Remove all connections       
+        this.counts[dstTid] = count; //Create new stack at dest
+        this.counts[srcTid] -= count; //Remove count from source
+        if (this.counts[srcTid] <= 1) { //Remove from player tokens
+            this.playerTokens[turn] ^= (1 << srcTid);
+        } 
+        if (this.counts[dstTid] > 1 && this.connections[dstTid]) { //See if has potential to be source before including
+            this.playerTokens[turn] |= (1 << dstTid); //Create new token at dest
+        }
     }
+
 }
 
-//function bitRot(bits, idx, dir) {
-//    bits[idx] = bits[idx] << dir | bits[idx] >> 32-dir);
-//}
-
+//Bitwise function select a random '1' from a bitstring
 function getRandBit(bits, idx) {
     //Get a random source token    
     var randIdx = Math.floor(Math.random() * TILE_COUNT);
