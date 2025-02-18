@@ -88,6 +88,7 @@ export class Game {
 			var boardStr = this.history[this.history.length-1];
 			
 			this.board = Board.fromString(boardStr);
+            this.board.changeTurn();
 			return true;		
 		}
 		return false;

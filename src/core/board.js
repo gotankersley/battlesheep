@@ -663,6 +663,32 @@ export class Board {
         return {src:src, dst:dst, count:count};
     }
     
+    playToString = (play) => {
+        var playStr = '';
+        if (this.mode = MODE_TILE) {
+            //Split tile quad into 4 individual hexes
+            var quadSplit = game.board.splitTileQuad(play.pos, play.rot);
+            var hexes = quadSplit.hexes;
+            for (var h = 0; h < TILE_QUAD; h++) {
+                var hex = hexes[h];
+                playStr += hex.q + PROTOCOL_DELIM1 + hex.r;
+                if (h+1 != TILE_QUAD) playStr += PROTOCOL_DELIM2;
+            }
+        }
+        else if (this.mode = MODE_PLACE) {
+            var pos = play.pos;
+            playStr = pos.q + PROTOCOL_DELIM1 + pos.r;                
+        }
+        else if (this.mode == MODE_MOVE) {
+            playStr = play.src.q + PROTOCOL_DELIM1 + play.src.q + PROTOCOL_DELIM2;
+            playStr += play.count + PROTOCOL_DELIM2;
+            playStr += play.dst.q + ',' + randMove.dst.r;    
+        }
+        else throw('Invalid mode: ' + this.mode);
+        
+        return playStr;        
+    }
+    
     splitTileQuad(initialPos, tileRot) {
         var hexes = [];
         var tileQuadDirs = TILE_QUADS_BY_ROT[tileRot];
@@ -682,7 +708,7 @@ export class Board {
         }
         return {hexes: hexes, intersects: intersects};
     }
-    
+    /*
     score() {
         
         var p1Score = 0;
@@ -709,5 +735,67 @@ export class Board {
         
         if (this.turn == PLAYER1) return p1Score - p2Score;
         else return p2Score - p1Score;        
+    }
+    */
+    
+    getConnectedCount(pos) {
+        var count = 0;
+        //Get the lines in all six directions
+        for (var dir = 0; dir < DIRECTIONS; dir++) {
+            var stepQ = pos.q;
+            var stepR = pos.r;
+                                                            
+            for (var steps = 0; steps < TILE_COUNT; steps++ ){ //Should never really by this many steps
+                stepQ += NEIGHBORS_Q[dir];
+                stepR += NEIGHBORS_R[dir];
+                var stepKey = stepQ + ',' + stepR;
+                //Make sure spot is a valid un-occupied tile
+                if (this.tiles[stepKey] && this.tiles[stepKey].tokenId == EMPTY) {                                            
+                    count++;                    
+                }
+                else break;
+            }
+        }     
+        return count;
+    }
+    
+    getRandPlay() {
+        //Tile
+        if (this.mode == MODE_TILE) {
+            var tileMoves = this.getTileMoves();
+            if (tileMoves.length <= 0) throw ('No tile moves available');
+            
+            var randPlay = tileMoves[Math.floor(Math.random() * tileMoves.length)];	
+            
+            return randPlay;
+            
+        }
+        
+        //Place
+        else if (this.mode == MODE_PLACE) {
+            var perimeter = this.getPerimeter();                
+            var perimeterKeys = Object.keys(perimeter);        
+            if (!perimeterKeys.length) throw('No place moves available');
+            
+            var randKey = perimeterKeys[Math.floor(Math.random() * perimeterKeys.length)];
+            var tile = this.tiles[randKey];
+            var pos = new Pos(tile.pos.q, tile.pos.r);
+            var randPlay = {pos: pos};
+            
+            return randPlay;
+        }
+        
+        //Move
+        else if (this.mode == MODE_MOVE) {
+                
+            var moves = this.getMoves();    
+            if (!moves.length) throw ('No moves available');    
+            
+            var randPlay = moves[Math.floor(Math.random() * moves.length)];	//Random spot	
+            randPlay.count = Math.floor(Math.random() * randPlay.count)+1 //Random split
+            
+            return randPlay;
+            
+        }
     }
 }

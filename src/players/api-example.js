@@ -19,22 +19,18 @@ for (var i = 0; i < MAX_ITERATIONS; i++) {
     var board = Board.fromString(boardStr);
     
     //Choose a move    
-    var moves = board.getMoves();
-    if (!moves.length) throw ('No moves available');    
+    try {
+        var randPlay = board.getRandPlay();
+    }
+    catch (err) {
+        console.log('No plays available: ', board.toString());
+        break;
+    }
     
-    var randMove = moves[Math.floor(Math.random() * moves.length)];	//Random spot	
-    randMove.count = Math.floor(Math.random() * randMove.count)+1 //Random split
-    
-    //Serialize move
-    var moveStr = (
-        randMove.src.q + ',' + randMove.src.q + '|' +
-        randMove.count + '|' +
-        randMove.dst.q + ',' + randMove.dst.r
-    );
-    var moveStr = '1,0|2|0,1';
-    
+        
     //Submit the move action
-    var actionArgs = {uuid: uuid, action: moveStr};
+    var playStr = board.playToString(randPlay);
+    var actionArgs = {uuid: uuid, action: playStr};
     var actionUrl = BASE_URL + 'submit-action';
     var result = apiPost(actionUrl, actionArgs); //Synchronous API Call    
             

@@ -3,7 +3,7 @@ import { PLAYER1, PLAYER2, TILE_COUNT, NEIGHBORS_Q, NEIGHBORS_R, EMPTY, DIRECTIO
 
 //ABOUT: This is an optimized version of the board used by the AI to ease the computational burden
 //in exploring various move posibilities. 
-//NOTE: This is intended to specifically be used for the "MOVE" mode,
+//NOTE: This is intended only for the "MOVE" mode,
 //and not for the "TILE" and "PLACE" modes.
 
 const LOOP1 = 0;

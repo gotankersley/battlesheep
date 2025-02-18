@@ -31,10 +31,8 @@ export function getPlay (board, onPlayed) {
         for (var p = 0; p < perimeterKeys.length; p++){
             var posKey = perimeterKeys[p];
             var pos = board.tiles[posKey].pos;
-            var boardCopy = board.clone();
-            boardCopy.makePlace(pos);
             
-            var score = boardCopy.score();
+            var score = board.getConnectedCount(pos);
                 
             if (score > bestScore) {
                 bestScore = score;
@@ -76,6 +74,7 @@ export function getPlay (board, onPlayed) {
                     score += bb.simulate(oppPlayer, curPlayer);
                 }
                 
+                console.log(move, c, srcTid, dstTid, score);
                 if (score > bestScore) {
                     bestScore = score;
                     bestMove = {src: move.src, dst: move.dst, count:c};
@@ -83,7 +82,7 @@ export function getPlay (board, onPlayed) {
             }
         }
                       
-        
+        console.log('Best: ', bestScore, bestMove);
         if (bestMove) onPlayed(bestMove);        
         else throw('No moves available');         
 	}
