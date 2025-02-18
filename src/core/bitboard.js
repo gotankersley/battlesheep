@@ -103,9 +103,7 @@ export class Bitboard {
                     }
                     else break;
                 }
-            }
-            
-            
+            }                        
             
         }
                     
