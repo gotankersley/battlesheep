@@ -1,7 +1,7 @@
 import { Pos, MODE_PLACE, MODE_MOVE, MODE_TILE } from '../core/board.js';
 import { Bitboard } from '../core/bitboard.js';
 
-const SIMS_PER_MOVE = 1;
+const SIMS_PER_MOVE = 1000;
 const INFINITY = 1000000;
 
 //Rambo Player
@@ -40,7 +40,7 @@ export function getPlay (board, onPlayed) {
             }
         }
                         
-        if (bestPlay) onPlayed(bestPlay);
+        if (bestPlay) onPlayed({pos: bestPlay});
         else throw('No plays available');         
     }
     
@@ -74,7 +74,7 @@ export function getPlay (board, onPlayed) {
                     score += bb.simulate(oppPlayer, curPlayer);
                 }
                 
-                console.log(move, c, srcTid, dstTid, score);
+                //console.log(move, c, srcTid, dstTid, score);
                 if (score > bestScore) {
                     bestScore = score;
                     bestMove = {src: move.src, dst: move.dst, count:c};

@@ -350,7 +350,7 @@ const onGameOver = (winner, loser) => {
     showMessage('Game OVER!');
     if (winner == PLAYER1) alert('Player1 has won');
     else if (winner == PLAYER2) alert('Player2 has won');
-    else alert('Game Over!');
+    else alert('Tie Game!');
     
 }
 

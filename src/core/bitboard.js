@@ -35,13 +35,13 @@ export class Bitboard {
     
     clone() {
         var bitboard = new Bitboard();
-        for (var tid = 0; t < TILE_COUNT; t++) {
+        for (var tid = 0; tid < TILE_COUNT; tid++) {
             bitboard.connections[tid] = this.connections[tid];
             bitboard.counts[tid] = this.counts[tid];  
             bitboard.lines[tid] = new Uint32Array(DIRECTIONS);
                         
-            for (var dir = 0; dir < DIRECTIONS; d++) {
-                bitboard.lines[tid][dir] = board.lines[tid][dir];
+            for (var dir = 0; dir < DIRECTIONS; dir++) {
+                bitboard.lines[tid][dir] = this.lines[tid][dir];
             }
         }
         
@@ -156,7 +156,7 @@ export class Bitboard {
         bits[LOOP1] = this.connections[dstTid]; //Keep as unsigned-int to avoid problems with 2^31
         while (bits[LOOP1]) {
 			bits[IDX1] = bits[LOOP1] & -bits[LOOP1]; // isolate least significant bit
-			var tid = Math.log2(minBit[IDX1]); 
+			var tid = Math.log2(bits[IDX1]); 
             
             //Directions
             for (var dir = 0; dir < DIRECTIONS; dir++) { 
@@ -195,7 +195,7 @@ export class Bitboard {
 function getRandBit(bits, idx) {
     //Get a random source token    
     var randIdx = Math.floor(Math.random() * TILE_COUNT);
-    var revRandIdx = TILE_COUNT-dir;
+    var revRandIdx = TILE_COUNT-randIdx;
     
     bits[idx] = (bits[idx] << randIdx) | (bits[idx] >> revRandIdx); //Circular rotate random amount
     bits[idx] = bits[idx] & -bits[idx]; // isolate least significant bit

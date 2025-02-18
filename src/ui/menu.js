@@ -46,7 +46,7 @@ export function MenuManager() {
     
     //Debug
 	var debugMenu = this.rootMenu.addFolder('Debug');				
-    var testBoards = {Default:0, WinTest:1, Simple:2};
+    var testBoards = {Default:0, WinTest:1, Line:2};
     debugMenu.add(this.properties, 'testBoards', testBoards).onChange(this.onTestBoard.bind(this));
     debugMenu.add(this.properties, 'normalize');
 
@@ -55,8 +55,7 @@ export function MenuManager() {
     var modes = {Tile:MODE_TILE, Place:MODE_PLACE, Move:MODE_MOVE};
 	window.modesController = this.rootMenu.add(this.properties, 'mode', modes).onChange(this.onChangeMode.bind(this));
 	
-    //var playerNames = {Human:PLAYER_HUMAN, Random:PLAYER_RANDOM, Network:PLAYER_NETWORK, Rambo:PLAYER_RAMBO};
-    var playerNames = {Human:PLAYER_HUMAN, Random:PLAYER_RANDOM, Network:PLAYER_NETWORK};
+    var playerNames = {Human:PLAYER_HUMAN, Random:PLAYER_RANDOM, Network:PLAYER_NETWORK, Rambo:PLAYER_RAMBO};    
 	this.rootMenu.add(this.properties, 'player1', playerNames).onChange(this.onChangePlayer.bind(this, PLAYER1));
 	this.rootMenu.add(this.properties, 'player2', playerNames).onChange(this.onChangePlayer.bind(this, PLAYER2));
     
@@ -85,6 +84,9 @@ MenuManager.prototype.onChangeOrientation = function(val) {
 MenuManager.prototype.onTestBoard = function(val) {
     if (val == 0) game.board = Board.fromString(DEFAULT_BOARD_STR);  
     else if (val == 1) game.board = Board.fromString('1,2|2,2|1,3|0,3|4,1|5,1|4,2|3,2|7,0|8,0|7,1|6,1|-2,3|-1,3|-2,4|-3,4|7,2|8,2|7,3|6,3|4,4|5,4|4,5|3,5|1,5|2,5|1,6|0,6|-2,6|-1,6|-2,7|-3,7|-3,4h14|-2,4t16|-2,3h2|h');  
-    else if (val == 2) game.board = Board.fromString('2,1|3,1|2,2|1,2|2,3|3,3|2,4|1,4|2,5|3,5|2,6|1,6|2,7|3,7|2,8|1,8|2,9|3,9|2,10|1,10|2,11|3,11|2,12|1,12|2,13|3,13|2,14|1,14|2,15|3,15|2,16|1,16|t');  
+    else if (val == 2) {
+        game.board = Board.fromString('0,0|1,0|0,1|-1,1|0,2|1,2|0,3|-1,3|0,4|1,4|0,5|-1,5|0,6|1,6|0,7|-1,7|0,8|1,8|0,9|-1,9|0,10|1,10|0,11|-1,11|0,12|1,12|0,13|-1,13|0,14|1,14|0,15|-1,15|t');  
+        game.changeMode(MODE_PLACE);
+    }
     window.modesController.setValue(game.board.mode);     
 }
