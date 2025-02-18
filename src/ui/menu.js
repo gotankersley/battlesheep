@@ -55,7 +55,7 @@ export function MenuManager() {
     var modes = {Tile:MODE_TILE, Place:MODE_PLACE, Move:MODE_MOVE};
 	window.modesController = this.rootMenu.add(this.properties, 'mode', modes).onChange(this.onChangeMode.bind(this));
 	
-    var playerNames = {Human:PLAYER_HUMAN, Random:PLAYER_RANDOM, Network:PLAYER_NETWORK, Rambo:PLAYER_RAMBO};    
+    var playerNames = {Human:PLAYER_HUMAN, Random:PLAYER_RANDOM, Network:PLAYER_NETWORK, RAMBO:PLAYER_RAMBO};    
 	this.rootMenu.add(this.properties, 'player1', playerNames).onChange(this.onChangePlayer.bind(this, PLAYER1));
 	this.rootMenu.add(this.properties, 'player2', playerNames).onChange(this.onChangePlayer.bind(this, PLAYER2));
     

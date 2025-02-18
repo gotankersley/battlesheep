@@ -1,7 +1,7 @@
 import { Pos, MODE_PLACE, MODE_MOVE, MODE_TILE } from '../core/board.js';
 import { Bitboard } from '../core/bitboard.js';
 
-const SIMS_PER_MOVE = 1000;
+const SIMS_PER_MOVE = 2000;
 const INFINITY = 1000000;
 
 //Rambo Player
