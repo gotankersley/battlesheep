@@ -72,16 +72,11 @@ export class TileSet {
         var tileType = 5; //TODO - use or lose        
 		var set = this.cur[player];
 		var meta = METADATA[set];
-		
+		//var textOffset = (HEX_TILE_CENTER_Y/2);
+        
 		//Bounding box
 		if (DRAW_BOUNDING_BOX) ctx.strokeRect(x, y, HEX_TILE, HEX_TILE); 
 		
-		//Outline
-		//if (meta.outline) {			
-		//	//fillHex(ctx, x, y, 'rgba(255, 255, 255, 0.5');
-		//	fillHex(ctx, x, y, 'lightgreen');
-		//	strokeHex(ctx, x, y, meta.outline, 3);	
-		//}
 						
 		//Rotate tile
 		ctx.save();
@@ -100,7 +95,8 @@ export class TileSet {
 		ctx.restore();
         if (count != INVALID) {
             ctx.fillStyle = COLOR_COUNT;
-            ctx.fillText('' + count, x-scale+10, y-scale);		
+            //ctx.fillText('' + count, x-scale+10, y-scale);		
+            ctx.fillText('' + count, x, y);		
         }
 			
 	}

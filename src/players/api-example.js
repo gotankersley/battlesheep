@@ -23,7 +23,7 @@ for (var i = 0; i < MAX_ITERATIONS; i++) {
     if (!moves.length) throw ('No moves available');    
     
     var randMove = moves[Math.floor(Math.random() * moves.length)];	//Random spot	
-    randMove.count = Math.floor(Math.random() * randPlay.count)+1 //Random split
+    randMove.count = Math.floor(Math.random() * randMove.count)+1 //Random split
     
     //Serialize move
     var moveStr = (

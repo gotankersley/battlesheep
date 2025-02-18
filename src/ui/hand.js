@@ -64,6 +64,7 @@ export class Hand {
     
     drawTile = (tileQuadsRemaining) => {
         var ctx = this.ctx;
+        ctx.clearRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
         drawBackground(ctx);   
         
         for (var t = 0; t < tileQuadsRemaining; t++) {
@@ -82,6 +83,7 @@ export class Hand {
 
     drawPlace = (playerTokens) => {
         var ctx = this.ctx;
+        ctx.clearRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
         drawBackground(ctx);    
         
         for (var turn = 0; turn < playerTokens.length; turn++) {
@@ -98,13 +100,26 @@ export class Hand {
     drawMove = (selectedToken) => {   
          
         var ctx = this.ctx;
-        drawBackground(ctx);
-        ctx.font = 'bold 18px arial'; 
-        
-        if (selectedToken >= 0) { 
+        ctx.clearRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
+      
+        if (selectedToken < 0) drawBackground(ctx);
+        else {
             var token = game.board.tokens[selectedToken];
             var count = token.count-1; //Have to leave at least one
             
+            ctx.font = 'bold 18px arial'; 
+            var tileImages = tileSet.activeImages[token.player];          
+            var tileImage = tileImages[5];        
+            
+            for (var h = 0; h < count; h++) {
+                var y = CANVAS_SIZE_Y-((h+1) * HAND_TILE_Y);  
+                ctx.drawImage(tileImage, 0, y, HAND_TILE_X, HAND_TILE_Y);	
+                ctx.fillStyle = 'rgba(200, 200, 200, 0.6)';
+                ctx.fillRect(0, y, HAND_TILE_X, HAND_TILE_Y);
+            }
+            
+            drawBackground(ctx);
+                        
                         
             for (var h = 0; h < count; h++) {
                 var y = CANVAS_SIZE_Y-(((h+1) * HAND_TILE_Y) + HAND_MARGIN_Y);  
@@ -143,7 +158,7 @@ export class Hand {
 
     
 function drawBackground(ctx) {
-    ctx.clearRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
+    
     ctx.fillStyle = COLOR_HAND_BACKGROUND;
     ctx.fillRect(0, 0, HAND_SIZE_X, CANVAS_SIZE_Y);
 }

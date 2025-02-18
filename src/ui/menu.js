@@ -2,7 +2,7 @@ import { setHex, ORIENT_FLAT, ORIENT_POINTY, INVALID } from '../lib/hex-lib.js';
 import { getTileSetNames } from './tile-set.js';
 import { Board, PLAYER1, PLAYER2, MODE_TILE, MODE_PLACE, MODE_MOVE } from '../core/board.js';
 import { DEFAULT_BOARD_STR } from '../core/game.js';
-import { PLAYER_HUMAN,  PLAYER_RANDOM, PLAYER_NETWORK, PLAYER_EASY  } from '../players/players.js';
+import { PLAYER_HUMAN,  PLAYER_RANDOM, PLAYER_NETWORK, PLAYER_RAMBO  } from '../players/players.js';
 
 //Struct MenuProperties
 function MenuProperties() {
@@ -55,7 +55,7 @@ export function MenuManager() {
     var modes = {Tile:MODE_TILE, Place:MODE_PLACE, Move:MODE_MOVE};
 	window.modesController = this.rootMenu.add(this.properties, 'mode', modes).onChange(this.onChangeMode.bind(this));
 	
-    var playerNames = {Human:PLAYER_HUMAN, Random:PLAYER_RANDOM, Easy:PLAYER_EASY, Network:PLAYER_NETWORK};
+    var playerNames = {Human:PLAYER_HUMAN, Random:PLAYER_RANDOM, Network:PLAYER_NETWORK, Rambo:PLAYER_RAMBO};
 	this.rootMenu.add(this.properties, 'player1', playerNames).onChange(this.onChangePlayer.bind(this, PLAYER1));
 	this.rootMenu.add(this.properties, 'player2', playerNames).onChange(this.onChangePlayer.bind(this, PLAYER2));
     

@@ -1,9 +1,9 @@
 import { INVALID } from '../lib/hex-lib.js';
 import { Board, MODE_PLACE, MODE_MOVE, MODE_TILE, PLAYER1, PLAYER2 } from '../core/board.js';
-import { PLAYER_HUMAN, PLAYER_RANDOM, PLAYER_NETWORK, PLAYER_EASY } from '../players/players.js';
+import { PLAYER_HUMAN, PLAYER_RANDOM, PLAYER_NETWORK, PLAYER_RAMBO } from '../players/players.js';
 import * as RandomPlayer from '../players/random.js';
 import * as NetworkPlayer from '../players/network.js';
-import * as EasyPlayer from '../players/easy.js';
+import * as RamboPlayer from '../players/rambo.js';
 
 //Constants
 export const EVENT_INVALID = 'invalid';
@@ -68,19 +68,14 @@ export class Game {
             this.gameEvents[EVENT_NO_MOVES](board.turn);   
             board.changeTurn();
             return;
-        }         
-        			
-		
-		//Handle no-move, and one move
-		//var moves = board.getMoves();	
-		//if (moves.length == 0) return this.onPlayed();		
+        }                 				
 		
 		
 		//All Async - expect onPlayed callback	
 		switch (this.players[board.turn]) {
 			case PLAYER_NETWORK: NetworkPlayer.getPlay(board, this.onPlayed); break; //Network
 			case PLAYER_RANDOM: RandomPlayer.getPlay(board, this.onPlayed); break;	//Random			
-			case PLAYER_EASY: EasyPlayer.getPlay(board, this.onPlayed); break; //Easy
+			case PLAYER_RAMBO: RamboPlayer.getPlay(board, this.onPlayed); break; //Rambo
 			default: alert('Invalid player');
 		}		
 	}

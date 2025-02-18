@@ -1,16 +1,23 @@
 TODO:
 
+UI Tweaks:
+- Remove extra images?
+- Red/Green tiles?
+- Midnight font color
 
+API Example:
+- PlayString
+- CORS?
 
 Game Over:
-- Tally score
+- Show score on tie
 
 AI: 
-- Easy
+- Rambo
 
 
 
 Questions:
 - Random of rnd tile->rnd move vs all tiles and rnd
 - Are holes considered perimeter?
-- JSON data vs serialization
+- JSON data vs serialization?

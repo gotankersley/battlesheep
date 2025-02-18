@@ -18,16 +18,11 @@ export const DIR_SE = 2;
 export const DIR_S = 3;
 export const DIR_SW = 4;
 export const DIR_NW = 5;
+export const DIRECTIONS = 6;
 
-//export const DIR_FLAG_N = 1;
-//export const DIR_FLAG_NE = 2;
-//export const DIR_FLAG_SE = 4;
-//export const DIR_FLAG_S = 8;
-//export const DIR_FLAG_SW = 16;
-//export const DIR_FLAG_NW = 32;
-
-const NEIGHBORS_Q = [0,1,1,0,-1,-1]; //By dir
-const NEIGHBORS_R = [-1,-1,0,1,1,0];  //By dir 
+export const NEIGHBORS_Q = [0,1,1,0,-1,-1]; //By dir
+export const NEIGHBORS_R = [-1,-1,0,1,1,0];  //By dir 
+//export const NEIGHBORS_S = [1,0,-1,-1,0,1];  //By dir 
 
 const TILE_QUADS_BY_ROT = [ //By rotation
     [DIR_SE, DIR_S, DIR_SW],
@@ -147,7 +142,7 @@ export class Board {
             if (token.count <= 1) continue; //Token can't be split further
             
             //Check neighbors to verify that at least one move is available            
-            for (var dir = 0; dir < 6; dir++) {
+            for (var dir = 0; dir < DIRECTIONS; dir++) {
                 var neighQ = token.pos.q + NEIGHBORS_Q[dir];
                 var neighR = token.pos.r + NEIGHBORS_R[dir];
                 var neighKey = neighQ + ',' + neighR;
@@ -204,7 +199,7 @@ export class Board {
     
     connectedTokenCountBFS(pos, player, countRef, breadcrumbs) { //Recursive Breadth-First-Search
         //Find the neighboring tokens
-        for (var dir = 0; dir < 6; dir++) {
+        for (var dir = 0; dir < DIRECTIONS; dir++) {
             var neighQ = pos.q + NEIGHBORS_Q[dir];
             var neighR = pos.r + NEIGHBORS_R[dir];            
             var neighKey = neighQ + ',' + neighR;
@@ -387,7 +382,7 @@ export class Board {
     }
     
     isConnectedDFS(tiles, breadcrumbs, pos, total, countRef) { //Recursive Depth-First-Search
-        for (var dir = 0; dir < 6; dir++) {
+        for (var dir = 0; dir < DIRECTIONS; dir++) {
             var neighQ = pos.q + NEIGHBORS_Q[dir];
             var neighR = pos.r + NEIGHBORS_R[dir];
             var neighKey = neighQ + ',' + neighR;
@@ -412,7 +407,7 @@ export class Board {
             var tileKey = tileKeys[t];
             var tile = this.tiles[tileKey];
             
-            for (var dir = 0; dir < 6; dir++) {
+            for (var dir = 0; dir < DIRECTIONS; dir++) {
                 var neighQ = tile.pos.q + NEIGHBORS_Q[dir];
                 var neighR = tile.pos.r + NEIGHBORS_R[dir];
                 var neighKey = neighQ + ',' + neighR;
@@ -440,7 +435,7 @@ export class Board {
             var tile = this.tiles[perimeterKey]; 
             
             //Find the neighboring edge from the perimeter            
-            for (var dir = 0; dir < 6; dir++) {
+            for (var dir = 0; dir < DIRECTIONS; dir++) {
                 var neighQ = tile.pos.q + NEIGHBORS_Q[dir];
                 var neighR = tile.pos.r + NEIGHBORS_R[dir];
                 var neighKey = neighQ + ',' + neighR;
@@ -473,7 +468,7 @@ export class Board {
             if (token.count <= 1) continue; //Token can't be split further
             
             //Check neighbors to verify that at least one move is available            
-            for (var dir = 0; dir < 6; dir++) {
+            for (var dir = 0; dir < DIRECTIONS; dir++) {
                 var neighQ = token.pos.q + NEIGHBORS_Q[dir];
                 var neighR = token.pos.r + NEIGHBORS_R[dir];
                 var neighKey = neighQ + ',' + neighR;
@@ -699,7 +694,7 @@ export class Board {
             
             //Get empty neighbors 
             var emptyCount = 0;
-            for (var dir = 0; dir < 6; dir++) {
+            for (var dir = 0; dir < DIRECTIONS; dir++) {
                 var neighQ = token.pos.q + NEIGHBORS_Q[dir];
                 var neighR = token.pos.r + NEIGHBORS_R[dir];
                 var neighKey = neighQ + ',' + neighR;
