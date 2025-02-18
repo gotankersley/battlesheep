@@ -1,9 +1,6 @@
 TODO:
 
-UI Tweaks:
-- Remove extra images?
-- Red/Green tiles?
-- Midnight font color
+
 
 API Example:
 - PlayString

@@ -6,20 +6,20 @@ const DRAW_BOUNDING_BOX = false;
 const COLOR_COUNT = '#000';
     
 const TYPES = [
-    {name:'sheep1', scale: 30}, 
-    {name:'sheep2', scale: 40}, 
-    {name:'sheep3', scale: 40}, 
-    {name:'sheep4', scale: 30}, 
-    {name:'sheep5', scale: 40}, 
-    {name:'sheep6', scale: 40}, 
+    {name:'sheep1', scale: 40}, 
+    //{name:'sheep2', scale: 40}, 
+    //{name:'sheep3', scale: 40}, 
+    //{name:'sheep4', scale: 30}, 
+    //{name:'sheep5', scale: 40}, 
+    //{name:'sheep6', scale: 30}, 
 ];
 
 //Scoped variables		
 const METADATA = [
     {name:'white', path: 'img/white', ext: 'png', outline:'#98968d', scale:true},
     {name:'blue', path: 'img/blue', ext: 'png', outline:'#50b8d5', scale:true},
-    //{name:'green', path: 'img/green', ext: 'png', outline:'#93cb5a', scale:true},
-    //{name:'red', path: 'img/red', ext: 'png', outline:'#c85c59', scale:true},		
+    {name:'green', path: 'img/green', ext: 'png', outline:'#93cb5a', scale:true},
+    {name:'red', path: 'img/red', ext: 'png', outline:'#c85c59', scale:true},		
 ];
 
 export function getTileSetNames () { //For menu
@@ -69,10 +69,10 @@ export class TileSet {
 	}
 	
 	draw = (ctx, x, y, player, count) => {
-        var tileType = 5; //TODO - use or lose        
+        var tileType = 0; 
 		var set = this.cur[player];
 		var meta = METADATA[set];
-		//var textOffset = (HEX_TILE_CENTER_Y/2);
+		
         
 		//Bounding box
 		if (DRAW_BOUNDING_BOX) ctx.strokeRect(x, y, HEX_TILE, HEX_TILE); 

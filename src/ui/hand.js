@@ -91,7 +91,7 @@ export class Hand {
                 var y = (turn * (HAND_TILE_Y + 10)) + HAND_MARGIN_Y + 15;
                 
                 var tileImages = tileSet.activeImages[turn];
-                var tileImage = tileImages[5];		
+                var tileImage = tileImages[0];		
                 ctx.drawImage(tileImage, 5, y, HAND_TILE_X - 10, HAND_TILE_Y);	
             }
         }
@@ -109,7 +109,7 @@ export class Hand {
             
             ctx.font = 'bold 18px arial'; 
             var tileImages = tileSet.activeImages[token.player];          
-            var tileImage = tileImages[5];        
+            var tileImage = tileImages[0];        
             
             for (var h = 0; h < count; h++) {
                 var y = CANVAS_SIZE_Y-((h+1) * HAND_TILE_Y);  
