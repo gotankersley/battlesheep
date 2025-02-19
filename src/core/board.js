@@ -325,7 +325,16 @@ export class Board {
             var tile = this.tiles[posKey];
             if (tile.tokenId != EMPTY) return {status: false, msg:'Can not jump over other tokens'};
         }
-        var moves = this.getMoves();
+        
+        //Must be at end-of-line
+        pos.q += dirQ;
+        pos.r += dirR;
+        var posKey = pos.q + ',' + pos.r;
+        if (this.tiles[posKey]) {
+            if (this.tiles[posKey].tokenId == EMPTY) {
+                return {status: false, msg:'Must travel as far as possible on move line until reaching another token or edge'};
+            }
+        }
         
 		return {status:true, msg:''};
 	}
@@ -473,23 +482,31 @@ export class Board {
                 var neighR = token.pos.r + NEIGHBORS_R[dir];
                 var neighKey = neighQ + ',' + neighR;
                 
+                //Traverse to the end of the line
                 var stepCount = 1;
                 while (stepCount < MAX_TRAVERSAL && this.tiles[neighKey] && this.tiles[neighKey].tokenId == EMPTY){
+                    neighQ += NEIGHBORS_Q[dir];
+                    neighR += NEIGHBORS_R[dir];
+                    neighKey = neighQ + ',' + neighR;
+                    stepCount++;
+                }
+                
+                //Back-up one, and make sure end position is valid
+                neighQ -= NEIGHBORS_Q[dir];
+                neighR -= NEIGHBORS_R[dir];
+                neighKey = neighQ + ',' + neighR;
+                if (this.tiles[neighKey] && this.tiles[neighKey].tokenId == EMPTY) {
                     var move = {
                         src:new Pos(token.pos.q, token.pos.r),
                         dst:new Pos(neighQ, neighR),
                         count:token.count-1, //The represents the max available
                     };
                     moves.push(move);
-                    
-                    neighQ += NEIGHBORS_Q[dir];
-                    neighR += NEIGHBORS_R[dir];
-                    neighKey = neighQ + ',' + neighR;
-                    stepCount++;
                 }
             }
             
         }        
+        
         return moves;
     }
 	

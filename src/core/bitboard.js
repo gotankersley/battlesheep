@@ -199,7 +199,7 @@ function getRandBit(bits, idx) {
     
     bits[idx] = (bits[idx] << randIdx) | (bits[idx] >> revRandIdx); //Circular rotate random amount
     bits[idx] = bits[idx] & -bits[idx]; // isolate least significant bit
-    var tid = Math.log2(bits[idx]);
     bits[idx] = (bits[idx] << revRandIdx) | (bits[idx] >> randIdx); //Circular rotate back
+    var tid = Math.log2(bits[idx]);
     return tid;
 }
