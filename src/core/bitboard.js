@@ -90,7 +90,7 @@ export class Bitboard {
                 var stepQ = tile.pos.q;
                 var stepR = tile.pos.r;
                                                                 
-                for (var steps = 0; steps < TILE_COUNT; steps++ ){ //Should never really by this many steps
+                for (var steps = 0; steps < TILE_COUNT; steps++ ){ //Should never really be this many steps
                     stepQ += NEIGHBORS_Q[dir];
                     stepR += NEIGHBORS_R[dir];
                     var stepKey = stepQ + ',' + stepR;
@@ -98,10 +98,18 @@ export class Bitboard {
                     if (board.tiles[stepKey] && board.tiles[stepKey].tokenId == EMPTY) {                                            
                         var otherTid = posToTid[stepKey]; 
                         bitboard.lines[tid][dir] |= (1 << otherTid);
-                        bitboard.connections[tid] |= (1 << otherTid);
                         //Note - The active partition tile TID is not included in any of the lines
                     }
-                    else break;
+                    else { 
+                        stepQ += NEIGHBORS_Q[dir];
+                        stepR += NEIGHBORS_R[dir];
+                        var stepKey = stepQ + ',' + stepR;
+                        var otherTid = posToTid[stepKey]; 
+                        if (otherTid != tid) { //Only include EOL positions
+                            bitboard.connections[tid] |= (1 << otherTid);                        
+                        }
+                        break;
+                    }
                 }
             }                        
             

@@ -491,7 +491,7 @@ export class Board {
                     stepCount++;
                 }
                 
-                //Back-up one, and make sure end position is valid
+                //Back-up one, and make sure EOL position is valid
                 neighQ -= NEIGHBORS_Q[dir];
                 neighR -= NEIGHBORS_R[dir];
                 neighKey = neighQ + ',' + neighR;
