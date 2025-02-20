@@ -99,7 +99,8 @@ export function createStage(containerId) {
         var hash = window.location.hash.replace('#', '');
         try {
             window.game.board = Board.fromString(hash); 
-            window.modesController.setValue(game.board.mode);            
+            window.modesController.setValue(game.board.mode);  
+            if (window.game.board.mode == MODE_PLACE) game.changeMode(MODE_PLACE);
         }
         catch (err) {
             showMessage(err);
@@ -119,7 +120,7 @@ export function createStage(containerId) {
     
     //Game events	
     try {
-        window.game = new Game(boardStr);
+        window.game = new Game(boardStr);       
     }
     catch (err) {
         showMessage(err);
@@ -132,6 +133,7 @@ export function createStage(containerId) {
     window.game.addEventListener(EVENT_MODE_CHANGED, onModeChanged);
     window.game.addEventListener(EVENT_NO_MOVES, onNoMovesForPlayer);
     window.modesController.setValue(game.board.mode);
+    if (window.game.board.mode == MODE_PLACE) game.changeMode(MODE_PLACE);
     
     //Start rendering
     window.tileSet = new TileSet(function() {    
