@@ -219,6 +219,7 @@ export class Board {
         }        
     }
     
+    
     makeMove(srcPos, dstPos, moveCount) { 
         //Higher-level validatation done in isValidMove function
         var srcKey = srcPos.q + ',' + srcPos.r;
@@ -408,9 +409,9 @@ export class Board {
     }
     
     getPerimeter() { //Essentially equivalent to getPlaceMoves, but useful whenever the perimeter is needed
-        //Note - This currently includes holes
-        var perimeter = {};
         
+            
+        var adjacentEdges = {};
         var tileKeys = Object.keys(this.tiles);
         for (var t = 0; t < tileKeys.length; t++) {
             var tileKey = tileKeys[t];
@@ -421,11 +422,58 @@ export class Board {
                 var neighR = tile.pos.r + NEIGHBORS_R[dir];
                 var neighKey = neighQ + ',' + neighR;
                 
-                if (!this.tiles[neighKey]) perimeter[tileKey] = true;
+                if (!this.tiles[neighKey]) adjacentEdges[neighKey] = new Pos(neighQ, neighR);
+                    
             }
         }
         
-        return perimeter;
+        //Perimeter (may) contain holes, so check adjacent edges to determine topography
+        var perimeters = [];
+        var longestPerimeterLength = INVALID;
+        var longestPerimeterIndex = INVALID;
+        var allBreadcrumbs = {};
+        
+        var adjacentEdgeKeys = Object.keys(adjacentEdges);
+        for (var k = 0; k < adjacentEdgeKeys.length; k++) {
+            var adjacentEdgeKey = adjacentEdgeKeys[k];
+            if (allBreadcrumbs[adjacentEdgeKey]) continue;
+            else allBreadcrumbs[adjacentEdgeKey] = true;
+            
+            var adjacentEdgePos = adjacentEdges[adjacentEdgeKey];
+            var breadcrumbs = {};
+            breadcrumbs[adjacentEdgeKey] = true;
+            var perimeter = {};
+            this.connectedEdgesBFS(adjacentEdgePos, adjacentEdges, perimeter, breadcrumbs, allBreadcrumbs);
+            var perimeterKeys = Object.keys(perimeter);
+            if (longestPerimeterLength < perimeterKeys.length) {
+                longestPerimeterLength = perimeterKeys.length;
+                longestPerimeterIndex = perimeters.length;
+                perimeters.push(perimeter);
+            }
+        }
+        
+        if (longestPerimeterIndex == INVALID) throw ('Unable to get parameter');
+        return perimeters[longestPerimeterIndex];   
+    }
+    
+    connectedEdgesBFS(pos, edges, perimeterRef, breadcrumbsRef, allBreadcrumbsRef) { //Recursive Breadth-First-Search
+        //Recursively find connected from pos
+        for (var dir = 0; dir < DIRECTIONS; dir++) {
+            var neighQ = pos.q + NEIGHBORS_Q[dir];
+            var neighR = pos.r + NEIGHBORS_R[dir];            
+            var neighKey = neighQ + ',' + neighR;
+            if (edges[neighKey]) { //See if this is an edge              
+                if (!breadcrumbsRef[neighKey]) {                      
+                    breadcrumbsRef[neighKey] = true;
+                    allBreadcrumbsRef[neighKey] = true;                    
+                    var neighPos = edges[neighKey];
+                    this.connectedEdgesBFS(neighPos, edges, perimeterRef, breadcrumbsRef, allBreadcrumbsRef); //Recurse                    
+                }                
+            }
+            else if (this.tiles[neighKey]) {
+                perimeterRef[neighKey] = true;
+            }
+        }        
     }
 
     getTileMoves() {
