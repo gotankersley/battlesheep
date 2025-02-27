@@ -1,13 +1,13 @@
-import { Pos, MODE_PLACE, MODE_MOVE, MODE_TILE, DIRECTIONS } from '../core/board.js';
-import { GraphBoard, BB_SIZE, cloneBitboard } from '../core/graph-board.js';
+import { INVALID } from '../lib/hex-lib.js';
+import { Pos, MODE_PLACE, MODE_MOVE, MODE_TILE, DIRECTIONS, TILE_COUNT } from '../core/board.js';
+import { GraphBoard, BB_SIZE, cloneBitboard, LOOP, IDX } from '../core/graph-board.js';
 
 
-const MAX_DEPTH = 6;
+const MAX_DEPTH = 2;
 const INFINITY = 1000000;
 const DEBUG = true;
 
-const LOOP = 0;
-const IDX = 1;
+
 
 //Working variables - since the main negamax fn is recursive, it's convenient for them to be global
 var bestRootState = null;
@@ -68,9 +68,14 @@ export function getPlay (board, onPlayed) {
                              
         if (bestRootState) {
             //Convert TID's back Axial coordinates
+            var srcKey = graphBoard.tidToPos[bestRootState.src];
+            var dstKey = graphBoard.tidToPos[bestRootState.dst];
+            var src = board.tiles[srcKey].pos;
+            var dst = board.tiles[dstKey].pos;
+            
             var bestMove = {
-                src: graphBoard.tidToPos[bestRootState.src],
-                dst: graphBoard.tidToPos[bestRootState.dst],
+                src: new Pos(src.q, src.r),
+                dst: new Pos(dst.q, dst.r),
                 count: bestRootState.c,
             };
             console.log('Best: ', bestScore, bestRootState, bestMove);
@@ -88,11 +93,13 @@ function negamax (bb, alpha, beta, depth, turn) {
         
     //Anchor
     if (depth >= MAX_DEPTH) { //Max depth - Score	
-        return graphBoard.scoreBitboard(bb, turn); //TODO - score
+        var curScore = graphBoard.scoreBitboard(bb, turn); 
+        var oppScore = graphBoard.scoreBitboard(bb, +(!turn)); 
+        return curScore - oppScore;
     }
     
     
-    var bestScore = -INFINITY- depth;        
+    var bestScore = -5500;//-INFINITY- depth;        
     var hasMoveAvail = false;
     //Loop through all tokens
     var bits = new Uint32Array(BB_SIZE);    

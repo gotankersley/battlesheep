@@ -8,9 +8,9 @@ import { PLAYER1, PLAYER2, TILE_COUNT, NEIGHBORS_Q, NEIGHBORS_R, EMPTY, DIRECTIO
 
 export const BB_SIZE = 2;
 
-const P1 = 0;
-const P2 = 1;
 
+export const LOOP = 0;
+export const IDX = 1;
 
 export class GraphBoard {
     constructor(board, bb) {
@@ -59,6 +59,7 @@ export class GraphBoard {
                         var otherTid = posToTid[stepKey];
                         this.graph[tid][dir] = otherTid;
                     }
+                    else break;
                 } //End step loop
             } //End directions loop
         } //End TID loop   
