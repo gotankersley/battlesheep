@@ -88,19 +88,22 @@ function negamax (bb, alpha, beta, depth, turn) {
         
     //Anchor
     if (depth >= MAX_DEPTH) { //Max depth - Score	
-        return 0; //TODO - score
+        return graphBoard.scoreBitboard(bb, turn); //TODO - score
     }
     
-    //Loop through child states
+    
     var bestScore = -INFINITY- depth;        
-        
+    var hasMoveAvail = false;
     //Loop through all tokens
     var bits = new Uint32Array(BB_SIZE);    
     bits[LOOP] = bb[turn];        
     while (bits[LOOP]) {
-        bits[IDX] = bits[LOOP] & -bits[LOOP]; // isolate least significant bit
+        bits[IDX] = bits[LOOP] & -bits[LOOP]; //Isolate least significant bit
         var tokenTid = Math.log2(bits[IDX]); 
+        bits[LOOP] &= bits[LOOP]-1; //Required to avoid infinite looping...
         
+        if (graphBoard.counts[tokenTid] <= 1) continue; //If token can't be split            
+            
         //Loop all directions
         for (var dir = 0; dir < DIRECTIONS; dir++) {
             
@@ -119,17 +122,21 @@ function negamax (bb, alpha, beta, depth, turn) {
                     var count = graphBoard.counts[srcTid];
                     for (var c = 1; c <= count; c++){
                         totalNodes++;
-                        
+                        hasMoveAvail = true;
                         //Copy board
                         var bbCopy = cloneBitboard(bb);
                         graphBoard.makeMove(bb, turn, srcTid, dstTid, c);
-                        
-                        //TODO - win check and turn change
-                        var recursedScore = negamax(bbCopy, -beta, -Math.max(alpha, bestScore), depth+1, turn); //Swap cur player as we descend
+                                                                        
+                        var oppTurn = +(!turn);
+                        var recursedScore = negamax(bbCopy, -beta, -Math.max(alpha, bestScore), depth+1, oppTurn); //Swap cur player as we descend
                         var currentScore = -recursedScore;
                         
-                        graphBoard.unMakeMove(srcTid, dstTid, c);
-                            
+                        graphBoard.undoCount(srcTid, dstTid, c);
+                        
+                        //Terminal condition
+                        if (recursedScore == -INFINITY) return INFINITY;
+                        
+                                                 
                         if (currentScore > bestScore) { 
                             bestScore = currentScore;			
                             if (depth == 0) {                                
@@ -140,14 +147,14 @@ function negamax (bb, alpha, beta, depth, turn) {
                     }
                     
                     break; //Exit step loop
-                }
-            }
+                } //End EOL position found
+            } //End step loop
             
         }//End directions loop
-        
-        bits[LOOP] &= bits[LOOP]-1; //Required to avoid infinite looping...
+                
     } //End tokens loop
            
+    if (!hasMoveAvail) return -INFINITY; //Loss
     
     return bestScore;
 }

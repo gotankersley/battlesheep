@@ -77,7 +77,7 @@ export class GraphBoard {
         this.counts[srcTid] -= count; //Remove count from source
     }
 
-    unMakeMove(srcTid, dstTid, count) {
+    undoCount(srcTid, dstTid, count) {
         //Note: this is necessary because we are making the (questionable) choice
         //to be chintzy with memory WRT the counts, and un-setting it after use.
         //Yes, live by the sword, die by the sword...
@@ -85,7 +85,47 @@ export class GraphBoard {
         this.counts[srcTid] += count; //Add count back
     }
 
-
+    scoreBitboard(bb, turn) {
+        var score = 0;
+        
+        //Loop through all tokens
+        var hasMoveAvail = false;
+        var bits = new Uint32Array(BB_SIZE);    
+        bits[LOOP] = bb[turn];        
+        while (bits[LOOP]) {
+            bits[IDX] = bits[LOOP] & -bits[LOOP]; //Isolate least significant bit
+            var tokenTid = Math.log2(bits[IDX]); 
+            bits[LOOP] &= bits[LOOP]-1; //Required to avoid infinite looping...
+            
+            if (this.counts[tokenTid] <= 1) {
+                score -= 5;
+                continue; //If token can't be split    
+            }
+            
+            //Loop all directions
+            for (var dir = 0; dir < DIRECTIONS; dir++) {
+                
+                var stepTid = tokenTid;
+                //Step in line as far as possible to find moves
+                for (var steps = 0; steps < TILE_COUNT; steps++ ){ //Should never really be this many steps
+                    var connectedTid = this.graph[stepTid][dir];
+                    if (connectedTid != INVALID) stepTid = connectedTid; //Traverse
+                    else {
+                        //EOL Move position found
+                        if (stepTid == tokenTid) break; //Haven't actually gone anywhere
+                        
+                        //Loop through possible counts
+                        var srcTid = tokenTid;
+                        var dstTid = stepTid;
+                        score += this.counts[srcTid];
+                        
+                        break; //Exit step loop
+                    } //End EOL position found
+                } //End step loop
+            }//End directions loop
+        } //End tokens loop  
+        return score;
+    }        
 }
     
     
@@ -95,6 +135,4 @@ export function cloneBitboard(bb) {
     newBitboard[PLAYER2] = bb[PLAYER2];
     return newBitboard;
 }
-
-
 
