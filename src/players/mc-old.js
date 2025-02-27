@@ -1,11 +1,10 @@
 import { Pos, MODE_PLACE, MODE_MOVE, MODE_TILE } from '../core/board.js';
-import { GraphBoard } from '../core/graph-board.js';
+import { Bitboard } from '../core/bitboard.js';
 
-
+const SIMS_PER_MOVE = 2000;
 const INFINITY = 1000000;
-var DEBUG = true;
 
-//Alpha Beta Player
+//Rambo Player
 export function getPlay (board, onPlayed) {
 
     //Tile - Random
@@ -45,7 +44,7 @@ export function getPlay (board, onPlayed) {
         else throw('No plays available');         
     }
     
-    //Alpha Beta search
+    //Flat Monte-Carlo simulation
     else if (board.mode == MODE_MOVE) {
 
         var posToTid = {}; //Create here to convert posKeys back to TIDs 
@@ -89,101 +88,7 @@ export function getPlay (board, onPlayed) {
 	}
 	else throw('Invalid Board Mode: ' + board.mode);
     	
-}
 
-
-//Recursive Alpha-Beta tree search	
-function negamax (gryph, alpha, beta, depth) { 						
-        
-    //Anchor
-    if (depth >= MAX_DEPTH) { //Max depth - Score	
-        return gryph.score2();
-    }
-    
-    //Loop through child states
-    var bestScore = -INFINITY- depth;
-    var moves = gryph.getMoves();
-    totalNodes += moves.length;
-    
-    
-    for (var m = 0; m < moves.length; m++) {
-   
-        var move = moves[m];
-        var srcTid = move[MOVE_SRC_TID];
-        var tile = gryph.tiles[srcTid];
-                        
-        var dstQ = move[MOVE_DST_Q];
-        var dstR = move[MOVE_DST_R];
-        
-        //Evaluate Child move
-        var isPlace = true;
-        if (tile[COL_IN_HAND] == IN_HAND) { //Place
-            gryph.makePlace(srcTid, dstQ, dstR);
-        }
-        else { //Move                
-            isPlace = false;
-            var srcQ = tile[COL_Q];        
-            var srcR = tile[COL_R];
-            gryph.makeMove(srcTid, dstQ, dstR);
-        }
-        
-        if (transpositions[gryph.zobrist]) {
-            //We've already evaluated this position - undo move and continue
-            if (isPlace) {
-                gryph.makeUnPlace(srcTid, dstQ, dstR);
-            }
-            else {
-                gryph.makeMove(srcTid, srcQ, srcR); //Undo move
-            }                
-            continue; 
-        }			
-        else transpositions[gryph.zobrist] = true; 
-        
-        //Win
-        if (gryph.countQueenSurrounded(gryph.oppTurn) == DIRECTIONS) {
-            if (isPlace) {
-                gryph.makeUnPlace(srcTid, dstQ, dstR);
-            }
-            else {
-                gryph.makeMove(srcTid, srcQ, srcR); //Undo move
-            }  
-            return INFINITY+depth;
-        }
-
-        //Loss						
-        else if (gryph.countQueenSurrounded(gryph.turn) == DIRECTIONS) {
-            //Obviously, the player won't do this unless it's their only option
-            if (isPlace) {
-                gryph.makeUnPlace(srcTid, dstQ, dstR);
-            }
-            else {
-                gryph.makeMove(srcTid, srcQ, srcR); //Undo move
-            }                
-            continue; 
-        }
-        
-        
-        gryph.changeTurn();    
-        var recursedScore = negamax(gryph, -beta, -Math.max(alpha, bestScore), depth+1); //Swap cur player as we descend
-        var currentScore = -recursedScore;
-        
-        gryph.changeTurn();  //Un-change move after popping the stack            
-        if (isPlace) {
-            gryph.makeUnPlace(srcTid, dstQ, dstR);
-        }
-        else {
-            gryph.makeMove(srcTid, srcQ, srcR); //Undo move
-        }
-        
-        
-        if (currentScore > bestScore) { 
-            bestScore = currentScore;			
-            if (bestScore >= beta) return bestScore;//AB cut-off
-        }	
-
-    }
-    
-    return bestScore;
 }
 
 

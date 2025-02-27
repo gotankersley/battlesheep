@@ -2,7 +2,7 @@ import { setHex, ORIENT_FLAT, ORIENT_POINTY, INVALID } from '../lib/hex-lib.js';
 import { getTileSetNames } from './tile-set.js';
 import { Board, PLAYER1, PLAYER2, MODE_TILE, MODE_PLACE, MODE_MOVE } from '../core/board.js';
 import { DEFAULT_BOARD_STR } from '../core/game.js';
-import { PLAYER_HUMAN,  PLAYER_RANDOM, PLAYER_NETWORK, PLAYER_RAMBO  } from '../players/players.js';
+import { PLAYER_HUMAN,  PLAYER_RANDOM, PLAYER_NETWORK, PLAYER_RAMBO } from '../players/players.js';
 
 //Struct MenuProperties
 function MenuProperties() {
