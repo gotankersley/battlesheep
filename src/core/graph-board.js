@@ -6,7 +6,7 @@ import { PLAYER1, PLAYER2, TILE_COUNT, NEIGHBORS_Q, NEIGHBORS_R, EMPTY, DIRECTIO
 //NOTE: This is not intended to be used for the "TILE" mode
 
 
-const BB_SIZE = 2;
+export const BB_SIZE = 2;
 
 const P1 = 0;
 const P2 = 1;
@@ -15,7 +15,7 @@ const P2 = 1;
 export class GraphBoard {
     constructor(board, bb) {
 
-        bb = new Uint32Array(BB_SIZE); //Ref
+        //bb = new Uint32Array(BB_SIZE); //Ref
         this.counts = new Uint32Array(TILE_COUNT); 
         
         //Adjacency Matrix - [TID| DIR N, DIR NE, ... , DIR NW]
@@ -77,6 +77,13 @@ export class GraphBoard {
         this.counts[srcTid] -= count; //Remove count from source
     }
 
+    unMakeMove(srcTid, dstTid, count) {
+        //Note: this is necessary because we are making the (questionable) choice
+        //to be chintzy with memory WRT the counts, and un-setting it after use.
+        //Yes, live by the sword, die by the sword...
+        this.counts[dstTid] = 0; //
+        this.counts[srcTid] += count; //Add count back
+    }
 
 
 }

@@ -1,11 +1,21 @@
-import { Pos, MODE_PLACE, MODE_MOVE, MODE_TILE } from '../core/board.js';
-import { GraphBoard } from '../core/graph-board.js';
+import { Pos, MODE_PLACE, MODE_MOVE, MODE_TILE, DIRECTIONS } from '../core/board.js';
+import { GraphBoard, BB_SIZE, cloneBitboard } from '../core/graph-board.js';
 
 
+const MAX_DEPTH = 6;
 const INFINITY = 1000000;
-var DEBUG = true;
+const DEBUG = true;
 
-//Alpha Beta Player
+const LOOP = 0;
+const IDX = 1;
+
+//Working variables - since the main negamax fn is recursive, it's convenient for them to be global
+var bestRootState = null;
+
+var graphBoard;
+var totalNodes = 0;
+
+//Rambo Player
 export function getPlay (board, onPlayed) {
 
     //Tile - Random
@@ -47,44 +57,25 @@ export function getPlay (board, onPlayed) {
     
     //Alpha Beta search
     else if (board.mode == MODE_MOVE) {
+        bestRootState = null;        
+        totalNodes = 0;
 
-        var posToTid = {}; //Create here to convert posKeys back to TIDs 
-        var bbRoot = Bitboard.fromBoard(board, posToTid);
+        var bb = new Uint32Array(BB_SIZE);
+        graphBoard = new GraphBoard(board, bb);
+        var turn = board.turn;
         
-        var moves = board.getMoves();    
-        if (!moves.length) throw ('No moves available');    
-        var bestScore = -INFINITY;
-        var bestMove = null;
-        var curPlayer = board.turn;
-        var oppPlayer = +(!curPlayer);
-        
-        //Loop through all moves
-        for (var m = 0; m < moves.length; m++) {
-            var move = moves[m];
-            
-            //Check combinations
-            for (var c = 1; c <= move.count; c++){
-                var score = 0;
-                var bbChild = bbRoot.clone();
-                var srcTid = posToTid[move.src.q + ',' + move.src.r];
-                var dstTid = posToTid[move.dst.q + ',' + move.dst.r];
-                bbChild.makeMove(srcTid, dstTid, c, curPlayer);                
-                
-                for (var s = 0; s < SIMS_PER_MOVE; s++) {
-                    var bb = bbChild.clone(); //Copy to mutate
-                    score += bb.simulate(oppPlayer, curPlayer);
-                }
-                
-                //console.log(move, c, srcTid, dstTid, score);
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestMove = {src: move.src, dst: move.dst, count:c};
-                }
-            }
+        var bestScore = negamax(bb, -INFINITY, INFINITY, 0, turn);
+                             
+        if (bestRootState) {
+            //Convert TID's back Axial coordinates
+            var bestMove = {
+                src: graphBoard.tidToPos[bestRootState.src],
+                dst: graphBoard.tidToPos[bestRootState.dst],
+                count: bestRootState.c,
+            };
+            console.log('Best: ', bestScore, bestRootState, bestMove);
+            onPlayed(bestMove);        
         }
-                      
-        console.log('Best: ', bestScore, bestMove);
-        if (bestMove) onPlayed(bestMove);        
         else throw('No moves available');         
 	}
 	else throw('Invalid Board Mode: ' + board.mode);
@@ -93,95 +84,70 @@ export function getPlay (board, onPlayed) {
 
 
 //Recursive Alpha-Beta tree search	
-function negamax (gryph, alpha, beta, depth) { 						
+function negamax (bb, alpha, beta, depth, turn) { 						
         
     //Anchor
     if (depth >= MAX_DEPTH) { //Max depth - Score	
-        return gryph.score2();
+        return 0; //TODO - score
     }
     
     //Loop through child states
-    var bestScore = -INFINITY- depth;
-    var moves = gryph.getMoves();
-    totalNodes += moves.length;
-    
-    
-    for (var m = 0; m < moves.length; m++) {
-   
-        var move = moves[m];
-        var srcTid = move[MOVE_SRC_TID];
-        var tile = gryph.tiles[srcTid];
+    var bestScore = -INFINITY- depth;        
+        
+    //Loop through all tokens
+    var bits = new Uint32Array(BB_SIZE);    
+    bits[LOOP] = bb[turn];        
+    while (bits[LOOP]) {
+        bits[IDX] = bits[LOOP] & -bits[LOOP]; // isolate least significant bit
+        var tokenTid = Math.log2(bits[IDX]); 
+        
+        //Loop all directions
+        for (var dir = 0; dir < DIRECTIONS; dir++) {
+            
+            var stepTid = tokenTid;
+            //Step in line as far as possible to find moves
+            for (var steps = 0; steps < TILE_COUNT; steps++ ){ //Should never really be this many steps
+                var connectedTid = graphBoard.graph[stepTid][dir];
+                if (connectedTid != INVALID) stepTid = connectedTid; //Traverse
+                else {
+                    //EOL Move position found
+                    if (stepTid == tokenTid) break; //Haven't actually gone anywhere
+                    
+                    //Loop through possible counts
+                    var srcTid = tokenTid;
+                    var dstTid = stepTid;
+                    var count = graphBoard.counts[srcTid];
+                    for (var c = 1; c <= count; c++){
+                        totalNodes++;
                         
-        var dstQ = move[MOVE_DST_Q];
-        var dstR = move[MOVE_DST_R];
-        
-        //Evaluate Child move
-        var isPlace = true;
-        if (tile[COL_IN_HAND] == IN_HAND) { //Place
-            gryph.makePlace(srcTid, dstQ, dstR);
-        }
-        else { //Move                
-            isPlace = false;
-            var srcQ = tile[COL_Q];        
-            var srcR = tile[COL_R];
-            gryph.makeMove(srcTid, dstQ, dstR);
-        }
-        
-        if (transpositions[gryph.zobrist]) {
-            //We've already evaluated this position - undo move and continue
-            if (isPlace) {
-                gryph.makeUnPlace(srcTid, dstQ, dstR);
+                        //Copy board
+                        var bbCopy = cloneBitboard(bb);
+                        graphBoard.makeMove(bb, turn, srcTid, dstTid, c);
+                        
+                        //TODO - win check and turn change
+                        var recursedScore = negamax(bbCopy, -beta, -Math.max(alpha, bestScore), depth+1, turn); //Swap cur player as we descend
+                        var currentScore = -recursedScore;
+                        
+                        graphBoard.unMakeMove(srcTid, dstTid, c);
+                            
+                        if (currentScore > bestScore) { 
+                            bestScore = currentScore;			
+                            if (depth == 0) {                                
+                                bestRootState = {src:srcTid, dst:dstTid, c:c};
+                            }   
+                            if (bestScore >= beta) return bestScore;//AB cut-off
+                        }	
+                    }
+                    
+                    break; //Exit step loop
+                }
             }
-            else {
-                gryph.makeMove(srcTid, srcQ, srcR); //Undo move
-            }                
-            continue; 
-        }			
-        else transpositions[gryph.zobrist] = true; 
+            
+        }//End directions loop
         
-        //Win
-        if (gryph.countQueenSurrounded(gryph.oppTurn) == DIRECTIONS) {
-            if (isPlace) {
-                gryph.makeUnPlace(srcTid, dstQ, dstR);
-            }
-            else {
-                gryph.makeMove(srcTid, srcQ, srcR); //Undo move
-            }  
-            return INFINITY+depth;
-        }
-
-        //Loss						
-        else if (gryph.countQueenSurrounded(gryph.turn) == DIRECTIONS) {
-            //Obviously, the player won't do this unless it's their only option
-            if (isPlace) {
-                gryph.makeUnPlace(srcTid, dstQ, dstR);
-            }
-            else {
-                gryph.makeMove(srcTid, srcQ, srcR); //Undo move
-            }                
-            continue; 
-        }
-        
-        
-        gryph.changeTurn();    
-        var recursedScore = negamax(gryph, -beta, -Math.max(alpha, bestScore), depth+1); //Swap cur player as we descend
-        var currentScore = -recursedScore;
-        
-        gryph.changeTurn();  //Un-change move after popping the stack            
-        if (isPlace) {
-            gryph.makeUnPlace(srcTid, dstQ, dstR);
-        }
-        else {
-            gryph.makeMove(srcTid, srcQ, srcR); //Undo move
-        }
-        
-        
-        if (currentScore > bestScore) { 
-            bestScore = currentScore;			
-            if (bestScore >= beta) return bestScore;//AB cut-off
-        }	
-
-    }
+        bits[LOOP] &= bits[LOOP]-1; //Required to avoid infinite looping...
+    } //End tokens loop
+           
     
     return bestScore;
 }
