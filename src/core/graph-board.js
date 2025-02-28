@@ -26,10 +26,10 @@ export class GraphBoard {
         this.tidToPos = tileKeys; //This is the map from TID's back to position keys - Store to be paranoid that TID order doesn't change   
         if (tileKeys.length != TILE_COUNT) throw('Expected ' + TILE_COUNT + ' tiles, instead received ' + tileKeys.length);
             
-        var posToTid = {}; 
+        this.posToTid = {}; 
         for (var tid = 0; tid < TILE_COUNT; tid++) {
             var tileKey = tileKeys[tid];
-            posToTid[tileKey] = tid;
+            this.posToTid[tileKey] = tid;
             this.graph[tid] = new Array(DIRECTIONS).fill(INVALID);
         }
         
@@ -50,14 +50,14 @@ export class GraphBoard {
                 var stepQ = tile.pos.q;
                 var stepR = tile.pos.r;
                 var stepKey = stepQ + ',' + stepR;                
-                var prevTid = posToTid[stepKey];
+                var prevTid = this.posToTid[stepKey];
                 for (var steps = 0; steps < TILE_COUNT; steps++ ){ //Should never really be this many steps
                     stepQ += NEIGHBORS_Q[dir];
                     stepR += NEIGHBORS_R[dir];
                     stepKey = stepQ + ',' + stepR;
                     
                     if (board.tiles[stepKey]) {
-                        var stepTid = posToTid[stepKey];
+                        var stepTid = this.posToTid[stepKey];
                         this.graph[prevTid][dir] = stepTid;
                         prevTid = stepTid;
                     }

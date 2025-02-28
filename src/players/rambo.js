@@ -136,15 +136,15 @@ function negamax (bb, alpha, beta, depth, turn) {
                         hasMoveAvail = true;
                         //Copy board
                         var bbCopy = cloneBitboard(bb);
-                        graphBoard.makeMove(bb, turn, srcTid, dstTid, c);
+                        graphBoard.makeMove(bbCopy, turn, srcTid, dstTid, c);
                       
                         //Anchor
                         var oppTurn = +(!turn);
                         var currentScore;
                         if (depth+1 >= MAX_DEPTH) { //Max depth - Score	
                             
-                            var curScore = graphBoard.scoreBitboard(bb, turn); 
-                            var oppScore = graphBoard.scoreBitboard(bb, oppTurn); 
+                            var curScore = graphBoard.scoreBitboard(bbCopy, turn); 
+                            var oppScore = graphBoard.scoreBitboard(bbCopy, oppTurn); 
                             currentScore = curScore - oppScore;
 
                             //console.log('Depth', depth, 'src', srcTid, 'dst', dstTid, 'count', c, 'score', currentScore);                           
