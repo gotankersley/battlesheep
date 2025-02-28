@@ -11,11 +11,11 @@ export const BB_SIZE = 2;
 
 export const LOOP = 0;
 export const IDX = 1;
+export const ALL_TOKENS = 2;
 
 export class GraphBoard {
     constructor(board, bb) {
-
-        //bb = new Uint32Array(BB_SIZE); //Ref
+        
         this.counts = new Uint32Array(TILE_COUNT); 
         
         //Adjacency Matrix - [TID| DIR N, DIR NE, ... , DIR NW]
@@ -49,15 +49,17 @@ export class GraphBoard {
             for (var dir = 0; dir < DIRECTIONS; dir++) {
                 var stepQ = tile.pos.q;
                 var stepR = tile.pos.r;
-                                                                
+                var stepKey = stepQ + ',' + stepR;                
+                var prevTid = posToTid[stepKey];
                 for (var steps = 0; steps < TILE_COUNT; steps++ ){ //Should never really be this many steps
                     stepQ += NEIGHBORS_Q[dir];
                     stepR += NEIGHBORS_R[dir];
-                    var stepKey = stepQ + ',' + stepR;
+                    stepKey = stepQ + ',' + stepR;
                     
                     if (board.tiles[stepKey]) {
-                        var otherTid = posToTid[stepKey];
-                        this.graph[tid][dir] = otherTid;
+                        var stepTid = posToTid[stepKey];
+                        this.graph[prevTid][dir] = stepTid;
+                        prevTid = stepTid;
                     }
                     else break;
                 } //End step loop
@@ -90,18 +92,18 @@ export class GraphBoard {
         var score = 0;
         
         //Loop through all tokens
-        var hasMoveAvail = false;
-        var bits = new Uint32Array(BB_SIZE);    
+        
+        var bits = new Uint32Array(BB_SIZE+1);    
         bits[LOOP] = bb[turn];        
+        bits[ALL_TOKENS] = bb[PLAYER1] | bb[PLAYER2];
         while (bits[LOOP]) {
             bits[IDX] = bits[LOOP] & -bits[LOOP]; //Isolate least significant bit
             var tokenTid = Math.log2(bits[IDX]); 
             bits[LOOP] &= bits[LOOP]-1; //Required to avoid infinite looping...
             
-            if (this.counts[tokenTid] <= 1) {
-                score -= 5;
-                continue; //If token can't be split    
-            }
+            var tokenHasMoveAvail = false;
+            if (this.counts[tokenTid] <= 1) continue; //If token can't be split    
+            
             
             //Loop all directions
             for (var dir = 0; dir < DIRECTIONS; dir++) {
@@ -110,7 +112,7 @@ export class GraphBoard {
                 //Step in line as far as possible to find moves
                 for (var steps = 0; steps < TILE_COUNT; steps++ ){ //Should never really be this many steps
                     var connectedTid = this.graph[stepTid][dir];
-                    if (connectedTid != INVALID) stepTid = connectedTid; //Traverse
+                    if (connectedTid != INVALID && !(bits[ALL_TOKENS] & (1 << connectedTid))) stepTid = connectedTid; //Traverse
                     else {
                         //EOL Move position found
                         if (stepTid == tokenTid) break; //Haven't actually gone anywhere
@@ -120,11 +122,16 @@ export class GraphBoard {
                         var dstTid = stepTid;
                         score += this.counts[srcTid];
                         
+                        tokenHasMoveAvail = true;
                         break; //Exit step loop
                     } //End EOL position found
                 } //End step loop
             }//End directions loop
+            
+            if (!tokenHasMoveAvail) score -= this.counts[tokenTid]; //Penalize trapped
         } //End tokens loop  
+        
+        
         return score;
     }        
 }
