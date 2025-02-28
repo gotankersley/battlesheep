@@ -128,7 +128,7 @@ export class GraphBoard {
                 } //End step loop
             }//End directions loop
             
-            if (!tokenHasMoveAvail) score -= this.counts[tokenTid]; //Penalize trapped
+            if (!tokenHasMoveAvail) score -= Math.pow(this.counts[tokenTid], 2); //Penalize trapped
         } //End tokens loop  
         
         

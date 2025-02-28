@@ -3,7 +3,7 @@ import { Pos, MODE_PLACE, MODE_MOVE, MODE_TILE, DIRECTIONS, TILE_COUNT, PLAYER1,
 import { GraphBoard, BB_SIZE, cloneBitboard, LOOP, IDX, ALL_TOKENS } from '../core/graph-board.js';
 
 
-const MAX_DEPTH = 2;
+const MAX_DEPTH = 5;
 const INFINITY = 1000000;
 const DEBUG = true;
 
@@ -130,8 +130,8 @@ function negamax (bb, alpha, beta, depth, turn) {
                     var srcTid = tokenTid;
                     var dstTid = stepTid;
                     var count = graphBoard.counts[srcTid];
-                    //for (var c = 1; c < count; c++){
-                    for (var c = count-1; c < count; c++){ //Max
+                    for (var c = 1; c < count; c++){
+                    //for (var c = count-1; c < count; c++){ //Max
                         totalNodes++;
                         hasMoveAvail = true;
                         //Copy board
