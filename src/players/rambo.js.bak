@@ -1,13 +1,14 @@
 import { INVALID } from '../lib/hex-lib.js';
-import { Pos, MODE_PLACE, MODE_MOVE, MODE_TILE, DIRECTIONS, TILE_COUNT, PLAYER1, PLAYER2, EMPTY } from '../core/board.js';
+import { Pos, MODE_PLACE, MODE_MOVE, MODE_TILE, DIRECTIONS, TILE_COUNT, PLAYER1, PLAYER2 } from '../core/board.js';
 import { GraphBoard, BB_SIZE, cloneBitboard, LOOP, IDX, ALL_TOKENS } from '../core/graph-board.js';
 
 
-const MAX_DEPTH = 5;
 const INFINITY = 1000000;
 const DEBUG = true;
 
+const COUNT_RANGE = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
 
+var MAX_DEPTH = 5;
 
 
 //Working variables - since the main negamax fn is recursive, it's convenient for them to be global
@@ -42,7 +43,6 @@ export function getPlay (board, onPlayed) {
         
         for (var p = 0; p < perimeterKeys.length; p++){
             var posKey = perimeterKeys[p];
-            if (board.tiles[posKey].tokenId != EMPTY) continue;
             var pos = board.tiles[posKey].pos;
             
             var score = board.getConnectedCount(pos);
@@ -65,6 +65,8 @@ export function getPlay (board, onPlayed) {
         var bb = new Uint32Array(BB_SIZE);
         graphBoard = new GraphBoard(board, bb);
         var turn = board.turn;
+        MAX_DEPTH = (graphBoard.tokenCount < 10)?  8 : 5; //Variable depth based on chunking
+        
         
         var bestScore = negamax(bb, -INFINITY, INFINITY, 0, turn);
                              
@@ -131,8 +133,21 @@ function negamax (bb, alpha, beta, depth, turn) {
                     var srcTid = tokenTid;
                     var dstTid = stepTid;
                     var count = graphBoard.counts[srcTid];
-                    for (var c = 1; c < count; c++){
-                    //for (var c = count-1; c < count; c++){ //Max
+                    var countLength;
+                    var countValues;
+                    //Chunking - For the first half of moving, don't both with exact counts
+                    if (graphBoard.tokenCount >= 10) {
+                        countLength = count-1;
+                        countValues = COUNT_RANGE;
+                    }
+                    else {
+                        countLength = 3;
+                        countValues = [1, Math.floor(count/2), count-1];
+                    }
+                    
+                    for (var ci = 0; ci < countLength; ci++){
+                        var c = countValues[ci];
+                        
                         totalNodes++;
                         hasMoveAvail = true;
                         //Copy board
