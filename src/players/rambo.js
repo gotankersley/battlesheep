@@ -19,15 +19,31 @@ var totalNodes = 0;
 //Rambo Player
 export function getPlay (board, onPlayed) {
 
-    //Tile - Random
+    //Tile - Minimize perimeter
     if (board.mode == MODE_TILE) {
         var tileMoves = board.getTileMoves();
         if (tileMoves.length <= 0) throw ('No tile moves available');
         
-        //Just pick a random tiling - who even knows?!?!
-        var randPlay = tileMoves[Math.floor(Math.random() * tileMoves.length)];	
+        //Try to keep the perimeter as clustered / square as possible to increase moving strength.  
+        //Note: This is because linear boards usually have very well defined choke-points that are obvious to humans,
+        //But often are too deep in the move tree for the AI to see
+        var bestPerimeter = TILE_COUNT;
+        var bestMove = null;
+        for (var m = 0; m < tileMoves.length; m++) {
+            var move = tileMoves[m];
+            var boardCopy = board.clone();
+            boardCopy.makeTile(move.pos, move.rot);
+            var perimeter = boardCopy.getPerimeter();                
+            var perimeterKeys = Object.keys(perimeter); 
+            var perimeterLength = perimeterKeys.length;
+            if (perimeterLength < bestPerimeter) {
+                bestPerimeter = perimeterLength;
+                bestMove = move;
+            }
+        }
         
-        onPlayed(randPlay);
+        if (bestMove == null) throw('No tile moves available');               
+        onPlayed(bestMove);
         
     }
     
