@@ -3,18 +3,17 @@ import { Board } from '../core/board.js';
 //Network player
 var networkUrl = null;
 
-const URL = 'https://softserve.harding.edu/aivai/play-state'; //For other domains add "Access-Control-Allow-Origin: *" to the header
+const URL = 'https://softserve.harding.edu/state/'; //For other domains add "Access-Control-Allow-Origin: *" to the header
 export function getPlay (board, onPlayed) { 
 	
 	//var playerId = +(new Date()); //Timestamp
 		
-    if (!networkUrl) networkUrl = prompt('Enter a service URL', URL);    
+    //if (!networkUrl) networkUrl = prompt('Enter a service URL', URL);    
     
     var boardStr = board.toString();
             
-    //var url = networkUrl + boardStr + '/act/' +;
-    //TODO - id's
-    var url = networkUrl;
+    var url = URL + boardStr + '/think';
+       
     
     ajax(url, (data, status) => {
         //Optional argument to log info 
