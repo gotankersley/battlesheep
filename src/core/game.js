@@ -60,7 +60,7 @@ export class Game {
     
     makeTileSeparate = (tileHexes) => {
         this.board.makeTileSeparate(tileHexes);
-        this.onTiled(null, null);
+        this.onTiled(INVALID, INVALID);
     }
 
     play = () => {

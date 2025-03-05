@@ -731,7 +731,7 @@ export class Board {
         else if (this.mode == MODE_PLACE) { //Example: 
             if (pairs.length != 1) throw('Invalid place action: ' + actionStr);
             var pos = parseCoord(pairs[0]);                        
-            return pos;
+            return {pos:pos};
         }
         else if (this.mode == MODE_MOVE) { //Example: 2,1|6|4,-1           
             if (pairs.length != 3) throw('Invalid move action: ' + actionStr);
