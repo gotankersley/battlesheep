@@ -264,6 +264,17 @@ export class Board {
         var tileKeys = Object.keys(this.tiles);
         if (tileKeys.length == TILE_COUNT) this.mode = MODE_PLACE;
     }
+    
+    makeTileSeparate(tileHexes) {        
+        for (var h = 0; h < tileHexes.length; h++) {
+            var hex = tileHexes[h];
+            var tileKey = hex.q + ',' + hex.r;
+            if (this.tiles[tileKey]) throw('Tiles must not intersect existing tiles');
+            this.tiles[tileKey] = new Tile(hex.q, hex.r);
+        }
+        var tileKeys = Object.keys(this.tiles);
+        if (tileKeys.length == TILE_COUNT) this.mode = MODE_PLACE;
+    }
 		
 	
 	changeTurn() {
@@ -705,27 +716,38 @@ export class Board {
 		return board;
 	}
     
-    static parseMove = (moveStr) => { //Example: 2,1|6|4,-1
-        var pairs = moveStr.split(PROTOCOL_DELIM2);
-        if (pairs.length != 3) throw('Invalid move str: ' + moveStr);
+    
+    parseAction = (actionStr) => { 
+        var pairs = actionStr.split(PROTOCOL_DELIM2);
+        if (this.mode == MODE_TILE) { //Example: 0,0|0,1|1,0|1,1
+            if (pairs.length != 4) throw('Invalid tile action: ' + actionStr);
+            var tileHexes = [];
+            tileHexes.push(parseCoord(pairs[0]));
+            tileHexes.push(parseCoord(pairs[1]));
+            tileHexes.push(parseCoord(pairs[2]));
+            tileHexes.push(parseCoord(pairs[3]));                        
+            return {tileHexes:tileHexes};           
+        }
+        else if (this.mode == MODE_PLACE) { //Example: 
+            if (pairs.length != 1) throw('Invalid place action: ' + actionStr);
+            var pos = parseCoord(pairs[0]);                        
+            return pos;
+        }
+        else if (this.mode == MODE_MOVE) { //Example: 2,1|6|4,-1           
+            if (pairs.length != 3) throw('Invalid move action: ' + actionStr);
         
-        //Source
-        var srcStr = pairs[0];
-        var srcArr = srcStr.split(PROTOCOL_DELIM1);
-        if (srcArr.length != 2) throw('Invalid move source coordinates: ' + moveStr);
-        var src = new Pos(Number.parseInt(srcArr[0]), Number.parseInt(srcArr[1]));
-        
-        //Count
-        var count = Number.parseInt(pairs[1]);
-        
-        
-        //Dest
-        var dstStr = pairs[0];
-        var dstArr = dstStr.split(PROTOCOL_DELIM1);
-        if (dstArr.length != 2) throw('Invalid move dest coordinates: ' + moveStr);
-        var dst = new Pos(Number.parseInt(dstArr[0]), Number.parseInt(dstArr[1])); 
+            //Source
+            var src = parseCoord(pairs[0]);            
             
-        return {src:src, dst:dst, count:count};
+            //Count
+            var count = Number.parseInt(pairs[1]);
+            
+            
+            //Dest
+            var dst = parseCoord(pairs[2]);          
+            return {src:src, dst:dst, count:count};
+        }
+        else throw('Unable to parse action: ' + actionStr);
     }
     
     playToString = (play) => {
@@ -754,7 +776,7 @@ export class Board {
         return playStr;        
     }
     
-    splitTileQuad(initialPos, tileRot) {
+    splitTileQuad(initialPos, tileRot) { //Split into 4 individual hexes
         var hexes = [];
         var tileQuadDirs = TILE_QUADS_BY_ROT[tileRot];
         var pos = new Pos(initialPos.q, initialPos.r);
@@ -773,6 +795,38 @@ export class Board {
         }
         return {hexes: hexes, intersects: intersects};
     }
+    
+    joinTileQuad(hexes) { //Combine 4 individual hexes into 1 tile quad, with an initial position and rotation
+        var hexGrid = {};
+        var hexKeys = [];
+        for (var h = 0; h < TILE_QUAD; h++) {
+            var hex = hexes[h];
+            var hexKey = hex.q + ',' + hex.r;
+            hexKeys.push(hexKey);
+            hexGrid[hexKey] = true;
+        }
+        
+        for (var h = 0; h < TILE_QUAD; h++) {
+            var pos = hexes[h];
+            
+            //Loop through neighbors
+            var neighborDirs = [];
+            for (var dir = 0; dir < DIRECTIONS; dir++) {
+                var neighQ = pos.q + NEIGHBORS_Q[dir];
+                var neighR = pos.r + NEIGHBORS_R[dir];
+                var neighKey = neighQ + ',' + neighR;
+                if (hexGrid[neighKey]) neighborDirs.push(dir);                    
+            }
+            if (neighborDirs.length == 3) {
+                var initialPos = pos;
+                var rot = neighborDirs[1];
+                return {pos:initialPos, rot:rot};
+            }
+        }
+        
+        throw('Unable to join individual hexes into single tile quad');
+    }
+        
     /*
     score() {
         
@@ -863,4 +917,10 @@ export class Board {
             
         }
     }
+}
+
+function parseCoord(coordStr) {    
+    var coordArr = coordStr.split(PROTOCOL_DELIM1);
+    if (coordArr.length != 2) throw('Error parsing coordinate: ' + coordStr);
+    return new Pos(Number.parseInt(coordArr[0]), Number.parseInt(coordArr[1]));
 }

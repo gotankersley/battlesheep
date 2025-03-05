@@ -57,6 +57,11 @@ export class Game {
         this.board.makeTile(initialPos, tileRot);
         this.onTiled(initialPos, tileRot);
     }
+    
+    makeTileSeparate = (tileHexes) => {
+        this.board.makeTileSeparate(tileHexes);
+        this.onTiled(null, null);
+    }
 
     play = () => {
 		
@@ -104,7 +109,8 @@ export class Game {
     onPlayed = (play) => {
         var mode = this.board.mode;
         if (mode == MODE_TILE) {
-            this.makeTile(play.pos, play.rot);
+            if (play.tileHexes) this.makeTileSeparate(play.tileHexes); 
+            else this.makeTile(play.pos, play.rot);
         }
         else if (mode == MODE_PLACE) {
             this.makePlace(play.pos);

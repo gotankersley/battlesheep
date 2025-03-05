@@ -19,11 +19,11 @@ export function getPlay (board, onPlayed) {
         //Optional argument to log info 
         if (data.hasOwnProperty('log')) console.log(data.log); 
         
-        //Expect a Move String - Example: 2,1|6|4,-1
-        var moveStr = data.move;
-        var move = Board.parseMove(moveStr);
+        //Expect an Action String - Example: 2,1|6|4,-1
+        var actionStr = data.action;
+        var play = board.parseAction(actionStr);
                 
-        onPlayed(move);			
+        onPlayed(play);			
     });
     
 
