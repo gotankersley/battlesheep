@@ -1,8 +1,9 @@
 import { INVALID } from '../lib/hex-lib.js';
 import { Board, MODE_PLACE, MODE_MOVE, MODE_TILE, PLAYER1, PLAYER2 } from '../core/board.js';
-import { PLAYER_HUMAN, PLAYER_RANDOM, PLAYER_NETWORK, PLAYER_RAMBO, PLAYER_RAMSES } from '../players/players.js';
+import { PLAYER_HUMAN, PLAYER_RANDOM, PLAYER_NETWORK, PLAYER_RAMBO, PLAYER_RAMSES, PLAYER_NICO } from '../players/players.js';
 import * as RandomPlayer from '../players/random.js';
 import * as NetworkPlayer from '../players/network.js';
+import * as NicoPlayer from '../players/nico.js';
 import * as RamboPlayer from '../players/rambo.js';
 import * as RamsesPlayer from '../players/ramses.js';
 
@@ -80,10 +81,11 @@ export class Game {
 		
 		//All Async - expect onPlayed callback	
 		switch (this.players[board.turn]) {
-			case PLAYER_NETWORK: NetworkPlayer.getPlay(board, this.onPlayed); break; //Network
 			case PLAYER_RANDOM: RandomPlayer.getPlay(board, this.onPlayed); break;	//Random			
 			case PLAYER_RAMBO: RamboPlayer.getPlay(board, this.onPlayed); break; //Rambo
 			case PLAYER_RAMSES: RamsesPlayer.getPlay(board, this.onPlayed); break; //Ramses
+			case PLAYER_NETWORK: NetworkPlayer.getPlay(board, this.onPlayed); break; //Network
+			case PLAYER_NICO: NicoPlayer.getPlay(board, this.onPlayed); break; //Nico
 			default: alert('Invalid player');
 		}		
 	}

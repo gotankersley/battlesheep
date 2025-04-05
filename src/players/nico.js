@@ -1,14 +1,14 @@
 import { Board } from '../core/board.js';
 
-//Network player
+//Nico player
 var networkUrl = null;
 
-const URL = 'http://localhost:8000'; //For other domains add "Access-Control-Allow-Origin: *" to the header
+const URL = 'https://softserve.emperor-discus.ts.net/state/'; //For other domains add "Access-Control-Allow-Origin: *" to the header
 export function getPlay (board, onPlayed) { 
 	
 	//var playerId = +(new Date()); //Timestamp
 		
-    if (!networkUrl) networkUrl = prompt('Enter a service URL', URL);    
+    //if (!networkUrl) networkUrl = prompt('Enter a service URL', URL);    
     
     var boardStr = board.toString();
             

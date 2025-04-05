@@ -13,7 +13,7 @@ export const HEX_SIZE_LARGEST = 100;
 //INIT 
 window.WORLD_X = 0;
 window.WORLD_Y = 0;
-setHex(ORIENT_FLAT, 60); //Initialize constants
+setHex(ORIENT_FLAT, 50); //Initialize constants
 //
 
 export function setHex(orient, newSize) {
