@@ -1,6 +1,7 @@
 //https://softserve.harding.edu/docs#/
 import { apiPost } from '../lib/network-lib.js';
 import { Board } from '../core/board.js';
+import * as RamboPlayer from './rambo.js';
 
 const BASE_URL = '/battlesheep/api-proxy/';
 
@@ -26,26 +27,28 @@ for (var i = 0; i < MAX_ITERATIONS; i++) {
     //Parse the state
     var board = Board.fromString(boardStr);
     
-    //Choose a move    
-    try {        
-        var randPlay = board.getRandPlay();
+    //Choose a move               
+    //var randPlay = board.getRandPlay();
+    var actionStr;
+    if (boardStr == 'h') { 
+        //Hard-code initial, because it has to be one of the ones the API allows
+        actionStr = '0,0|0,1|1,0|1,1';
     }
-    catch (err) {
-        console.log('No plays available: ', board.toString());
-        break;
+    else {
+        var play = RamboPlayer.getPlay(board, null); 
+        actionStr = board.playToString(play);
     }
-    
         
-    //Submit the move action
-    var playStr = board.playToString(randPlay);
+    //Submit the move action    
     var actionArgs = {
         player:PLAYER_NAME,
+        token:PLAYER_TOKEN,
         action_id:actionId,
-        action: playStr
+        action: actionStr
     };
     var actionUrl = BASE_URL + 'submit-action';
     var result = apiPost(actionUrl, actionArgs); //Synchronous API Call    
-    console.log(playStr, result);
+    console.log(actionStr, result);
     
     //Exit loop when a win is found
     if (result.winner != 'none') break;

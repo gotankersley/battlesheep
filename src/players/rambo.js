@@ -42,8 +42,9 @@ export function getPlay (board, onPlayed) {
             }
         }
         
-        if (bestMove == null) throw('No tile moves available');               
-        onPlayed(bestMove);
+        if (bestMove == null) throw('No tile moves available');  
+        if (onPlayed === null) return bestMove; //sync
+        else onPlayed(bestMove); //async
         
     }
     
@@ -69,8 +70,10 @@ export function getPlay (board, onPlayed) {
             }
         }
                         
-        if (bestPlay) onPlayed({pos: bestPlay});
-        else throw('No plays available');         
+        if (bestPlay == null) throw('No plays available');         
+        
+        if (onPlayed === null) return {pos: bestPlay}; //sync
+        else onPlayed({pos: bestPlay}); //async        
     }
     
     //Alpha Beta search
@@ -101,11 +104,14 @@ export function getPlay (board, onPlayed) {
                 console.log('Total Nodes: ', totalNodes);
             }
             
-            onPlayed(bestMove);        
+            if (onPlayed === null) return bestMove; //sync
+            else onPlayed(bestMove); //async
         }
         else if (bestScore == -INFINITY) {
             console.log('All moves lead to loss - chosing random');
-            onPlayed(board.getRandPlay());
+            var randPlay = board.getRandPlay();
+            if (onPlayed === null) return randPlay; //sync
+            else onPlayed(randPlay); //sync
         }
         else throw('No moves available');         
 	}
