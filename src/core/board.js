@@ -752,9 +752,9 @@ export class Board {
     
     playToString = (play) => {
         var playStr = '';
-        if (this.mode = MODE_TILE) {
+        if (this.mode == MODE_TILE) {
             //Split tile quad into 4 individual hexes
-            var quadSplit = game.board.splitTileQuad(play.pos, play.rot);
+            var quadSplit = this.splitTileQuad(play.pos, play.rot);
             var hexes = quadSplit.hexes;
             for (var h = 0; h < TILE_QUAD; h++) {
                 var hex = hexes[h];
@@ -762,14 +762,14 @@ export class Board {
                 if (h+1 != TILE_QUAD) playStr += PROTOCOL_DELIM2;
             }
         }
-        else if (this.mode = MODE_PLACE) {
+        else if (this.mode == MODE_PLACE) {
             var pos = play.pos;
             playStr = pos.q + PROTOCOL_DELIM1 + pos.r;                
         }
         else if (this.mode == MODE_MOVE) {
-            playStr = play.src.q + PROTOCOL_DELIM1 + play.src.q + PROTOCOL_DELIM2;
+            playStr = play.src.q + PROTOCOL_DELIM1 + play.src.r + PROTOCOL_DELIM2;
             playStr += play.count + PROTOCOL_DELIM2;
-            playStr += play.dst.q + ',' + randMove.dst.r;    
+            playStr += play.dst.q + ',' + play.dst.r;    
         }
         else throw('Invalid mode: ' + this.mode);
         
@@ -881,6 +881,9 @@ export class Board {
     getRandPlay() {
         //Tile
         if (this.mode == MODE_TILE) {
+            if (Object.keys(this.tiles).length <= 0) {
+                return {pos:{q:0, r:1}, rot:4};
+            }
             var tileMoves = this.getTileMoves();
             if (tileMoves.length <= 0) throw ('No tile moves available');
             
