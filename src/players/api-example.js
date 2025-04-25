@@ -7,12 +7,16 @@ const BASE_URL = '/battlesheep/api-proxy/';
 
 const MAX_ITERATIONS = 50;
 const PLAYER_NAME = 'rambo';
-const PLAYER_TOKEN = 'CecowZQiItDgrzsXI5tGkvTCk_zoQMPZRX3apbRj2pk';
-const EVENT = 'mirror';
+const PLAYER_TOKEN = '';
+//const EVENT = 'mirror';
+const EVENT = 'mock-2';
+const HTTP_WAIT = 204;
+const SLEEP_TIME = 5000; //Time in Milliseconds
 
 
 const stateUrl = BASE_URL + 'play-state';
-for (var i = 0; i < MAX_ITERATIONS; i++) {
+//for (var i = 0; i < MAX_ITERATIONS; i++) {
+while (true) {
     
     //Get the state    
     var args = {
@@ -20,7 +24,11 @@ for (var i = 0; i < MAX_ITERATIONS; i++) {
         player:PLAYER_NAME,
         token:PLAYER_TOKEN,
     };
-    var data = apiPost(stateUrl, args); //Synchronous API Call            
+    var data = apiPost(stateUrl, args); //Synchronous API Call      
+    if (data.statusCode == HTTP_WAIT) {
+        synchronousSleep(SLEEP_TIME);
+        continue;
+    }
     var boardStr = data.state;    
     var actionId = data.action_id;
     
@@ -51,6 +59,14 @@ for (var i = 0; i < MAX_ITERATIONS; i++) {
     console.log(actionStr, result);
     
     //Exit loop when a win is found
-    if (result.winner != 'none') break;
-    
+    //if (result.winner != 'none') break;
+    synchronousSleep(3000);
+}
+
+
+// Calling the function will block all code in your script until the specified ms have passed
+// It will also cause your CPU fans to run at full speed!
+function synchronousSleep(ms) {
+	var start = performance.now();
+	while (performance.now() - start < ms);
 }

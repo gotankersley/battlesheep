@@ -3,7 +3,7 @@ import { Board } from '../core/board.js';
 //Nico player
 var networkUrl = null;
 
-const URL = 'https://softserve.emperor-discus.ts.net/state/'; //For other domains add "Access-Control-Allow-Origin: *" to the header
+const URL = ''; //For other domains add "Access-Control-Allow-Origin: *" to the header
 export function getPlay (board, onPlayed) { 
 	
 	//var playerId = +(new Date()); //Timestamp
